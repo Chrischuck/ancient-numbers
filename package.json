@@ -1,0 +1,33 @@
+{
+  "name": "numbers",
+  "version": "1.0.0",
+  "description": "cool numbers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --hot --inline --watch",
+    "staging": "NODE_ENV=production webpack -p --config ./webpack.dev.config.js",
+    "build": "NODE_ENV=production webpack -p --config ./webpack.production.config.js",
+    "start": "node server.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.39",
+    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.39",
+    "@babel/plugin-transform-runtime": "^7.0.0-beta.39",
+    "@babel/preset-env": "^7.0.0-beta.39",
+    "@babel/runtime": "^7.0.0-beta.39",
+    "babel-loader": "^8.0.0-beta.0",
+    "css-loader": "^0.28.9",
+    "file-loader": "^1.1.6",
+    "node-sass": "^4.7.2",
+    "sass-loader": "^6.0.6",
+    "vue-loader": "^14.0.3",
+    "vue-style-loader": "^3.1.2",
+    "vue-template-compiler": "^2.5.13",
+    "webpack": "^3.10.0",
+    "webpack-dev-server": "^2.11.1"
+  },
+  "dependencies": {
+    "vue": "^2.5.13"
+  }
+}
