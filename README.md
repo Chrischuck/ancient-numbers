@@ -1,10 +1,10 @@
 # Ancient Number Systems 🗿
 
-A number converter(Hindu-Arabic to an ancient system) built with Vue and love. 
+A number converter(Hindu-Arabic to an ancient system). Built with Vue and love. 
 
 ## Goals of this repo
-- [] Learn Vue
-- [] Learn about ancient math/numbers
+- [ ] Learn Vue
+- [ ] Learn about ancient math/numbers
 
 ## Installation/Running
 Clone the repo:  
