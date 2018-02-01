@@ -1,32 +1,17 @@
 <template>
-  <div id="app" />
-</template> 
+  <div id="content">
+    <router-view></router-view>
+  </div>
+</template>
 
 <script>
-  import Vue from 'vue'
-  import NotFound from './routes/notFound/index.vue'
-  const Home = { template: '<p>home page</p>' }
-
-  const routes = {
-    '/': Home
+  export default {
+    name: 'ancient-numbers'
   }
-
-  export default new Vue({
-  el: '#app',
-  data: {
-    currentRoute: window.location.pathname
-  },
-  computed: {
-    ViewComponent () {
-      return routes[this.currentRoute] || NotFound
-    }
-  },
-  render (h) { return h(this.ViewComponent) }
-  })
 </script>
 
 <style>
-#app {
+#content {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
