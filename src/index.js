@@ -1,7 +1,7 @@
 import Vue from 'vue'
 
-import App from './src/App.vue'
-import router from './src/router.js'
+import App from './App.vue'
+import router from './router.js'
 
 export default new Vue({
   el: '#app',
