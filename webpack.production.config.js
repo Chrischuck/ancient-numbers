@@ -1,4 +1,5 @@
 const webpack = require('webpack')
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -108,6 +109,9 @@ module.exports = {
       'NODE_ENV': JSON.stringify('production')
       }
     }),
+    new CopyWebpackPlugin([
+      { from: '../_redirects' },
+    ]),
     /*
     new FaviconsWebpackPlugin({
       logo: './assets/logo.png',
@@ -124,10 +128,6 @@ module.exports = {
        windows: false
      }
    }),
-    new CopyWebpackPlugin([
-      { from: '../_redirects' },
-      { from: '../manifest.json' }
-    ]),
     new OfflinePlugin({
       caches: {
         main: ['*.bundle.js', 'index.html', 'styles.css', '*.png', '*.ico', 'manifest.json'],
