@@ -1,12 +1,12 @@
 <template>
-  <div id='content'>
+  <div id='not-found-content'>
     <h1 id='header'>404 Not Found</h1>
     <router-link id='button' :to="'/'">Home</router-link>
   </div>
 </template>
 
 <style>
-  #content {
+  #not-found-content {
     display: flex;
     flex-direction: column;
     justify-content: center;
