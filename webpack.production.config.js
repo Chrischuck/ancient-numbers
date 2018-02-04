@@ -1,6 +1,7 @@
 const webpack = require('webpack')
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const OfflinePlugin = require('offline-plugin');
 
 module.exports = {
   context: __dirname + '/src',
@@ -128,9 +129,10 @@ module.exports = {
        windows: false
      }
    }),
+   */
     new OfflinePlugin({
       caches: {
-        main: ['*.bundle.js', 'index.html', 'styles.css', '*.png', '*.ico', 'manifest.json'],
+        main: ['*.bundle.js', 'index.html', '*.js'],
         additional: [],
         optional: []
       },
@@ -143,12 +145,12 @@ module.exports = {
         }
       ],
       AppCache: false,
-      externals: ['/', '/grade-calculator'],
+      externals: ['/'],
       ServiceWorker: {
-        output: 'baremin-sw.js',
+        output: 'ancient-sw.js',
         minify: true
       }
     })
-    */
+  
   ]
 }
