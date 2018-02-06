@@ -1,12 +1,11 @@
 <template>
-  <div class="hello">
-    <div class="wrapper" v-bind:style="bgc">
+  <div class="wrapper" v-bind:style="bgc">
     <div class="logo">
       <p id="anc">ANCIENT <span id="norm">NUMBER</span></p>
       <p id="norm2">CONVERTER</p>
     </div>  
     <h3>(for millenials)</h3>
-    <h2>{{ msg }}</h2>
+    <h2>A simple and graceful ancient number converter made with love.</h2>
     
     <div id="app">
        <!-- the router outlet, where all matched components would ber viewed -->
@@ -14,17 +13,10 @@
       <router-view></router-view>
     </div>
   </div>
-  </div>
 </template>
 
 <script>
   export default {
-    name: 'hello',
-    data () {
-      return {
-        msg: 'A simple and graceful ancient number converter made with love.'
-      }
-    }
   }
 </script>
 
