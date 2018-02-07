@@ -1,6 +1,6 @@
 # Ancient Number Systems 🗿
 
-A number converter(Hindu-Arabic to an ancient system). Built with Vue and love. 
+A number converter(Hindu-Arabic to an ancient system). Built with Vue and love.
 
 ## Goals of this repo
 - [ ] Learn Vue
