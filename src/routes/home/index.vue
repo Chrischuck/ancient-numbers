@@ -8,7 +8,7 @@
     <h2>A simple and graceful ancient number converter made with love.</h2>
     
     <div id="button-wrapper">
-      <router-link id='cbutton' v-bind:to="'/converter'">Converter</router-link>
+      <router-link id='cbutton' v-bind:to="'/convert'">Converter</router-link>
     </div>
     
   </div>
