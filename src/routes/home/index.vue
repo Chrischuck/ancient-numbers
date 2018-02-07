@@ -7,11 +7,10 @@
     <h3>(for millenials)</h3>
     <h2>A simple and graceful ancient number converter made with love.</h2>
     
-    <div id="app">
-       <!-- the router outlet, where all matched components would ber viewed -->
+    <div id="button-wrapper">
       <router-link id='cbutton' v-bind:to="'/converter'">Converter</router-link>
-      <router-view></router-view>
     </div>
+    
   </div>
 </template>
 
@@ -31,7 +30,7 @@ hello {
   color: #000;
 }
 
-#app {
+#button-wrapper {
   text-align: center;
 }
 
@@ -119,4 +118,5 @@ a {
     transition: .5s;
     background-color: #4d403a;
     }
+ 
 </style>
