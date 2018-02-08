@@ -4,7 +4,6 @@ import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import App from './App.vue'
 import router from './router.js'
 
-console.log('asdfasd')
 OfflinePluginRuntime.install();
 
 export default new Vue({
