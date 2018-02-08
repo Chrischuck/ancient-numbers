@@ -2,7 +2,7 @@ import Vue from 'vue'
 import NotFound from '../index.vue'
 
 describe('index.vue', () => {
-  it('displays default message', () => {
+  it('displays not found message', () => {
     const Ctor = Vue.extend(NotFound)
     const vm = new Ctor().$mount()
 
