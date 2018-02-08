@@ -10,6 +10,7 @@ A number converter(Hindu-Arabic to an ancient system). Built with Vue and love.
 ## Installation/Running
 
 ### Initial Setup
+======
 Clone the repo:  
 ```bash
 git clone https://github.com/Chrischuck/ancient-numbers.git
@@ -25,7 +26,8 @@ npm install
 ```
 
 ### Run Development
-Run development:  
+======
+Run dev server:  
 ```bash
 npm run dev
 ```
@@ -37,6 +39,7 @@ npm run test
 ```
 
 ### Production
+======
 Build for production:  
 ```bash
 npm run build
