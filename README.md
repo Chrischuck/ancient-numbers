@@ -10,7 +10,7 @@ A number converter(Hindu-Arabic to an ancient system). Built with Vue and love.
 ## Installation/Running
 
 ### Initial Setup
---- 
+ 
 
 Clone the repo:  
 ```bash
@@ -27,7 +27,7 @@ npm install
 ```
 
 ### Run Development
----
+
 
 Run dev server:  
 ```bash
@@ -41,7 +41,7 @@ npm run test
 ```
 
 ### Production
----
+
 
 Build for production:  
 ```bash
