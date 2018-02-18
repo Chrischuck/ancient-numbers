@@ -37,7 +37,7 @@
   flex-direction: column;
 }
 .img {
-  width: 100%;
+  width: 86%;
 }
 .word-wrapper {
   padding-left: 5%;
