@@ -22,7 +22,7 @@
 <style scoped>
 
 .wrapper {
-  height: 500px;
+  height: 550px;
   display: flex;
   flex-direction: row;
 }

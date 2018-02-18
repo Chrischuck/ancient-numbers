@@ -22,16 +22,21 @@
 <style scoped>
 
 .wrapper {
-  height: 750px;
+  height: 800px;
   background-color: #FAEBD7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
 }
 #button-wrapper {
   text-align: center;
 }
 
 .logo {
-  margin-top: 6%;
   word-spacing: -10px;
+  margin-top: -8%;
 }
 
 #anc {
@@ -40,6 +45,7 @@
   font-family: MarketDeco;
   margin-bottom: 0px;
   text-align: center;
+  margin-top: 0px;
 }
 
 #norm {
