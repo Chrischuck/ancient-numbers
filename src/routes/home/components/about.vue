@@ -1,12 +1,18 @@
 <template>
   <div class="wrapper">
-    <div class='half'>
+    <div class='section'>
       <div class='word-wrapper'>
-        <h2>Some other cool fact.</h2>
+        <p>pic</p>
+        <h2>Name one</h2>
+        <p>words about</p>
       </div>
     </div>
-    <div class='half'>
-      <img class='img' src='http://originalpeople.org/wp-content/uploads/2013/08/ishango_bone.jpg' />
+    <div class='section'>
+      <div class='word-wrapper'>
+        <p>pic</p>
+        <h2>Name one</h2>
+        <p>words about</p>
+      </div>
     </div>
   </div>
 </template>
@@ -19,13 +25,12 @@
 <style scoped>
 
 .wrapper {
-  background-color: #f9f9f9;
   height: 550px;
   display: flex;
   flex-direction: row;
 }
 
-.half {
+.section {
   padding: 10px;
   flex: 1;
   height: 100%;
