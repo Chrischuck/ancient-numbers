@@ -1,6 +1,6 @@
 const mutations = {
   increment(state) {
-    state.counter ++
+    state.counter *= .999999
   }
 }
 
