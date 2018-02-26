@@ -1,8 +1,22 @@
 <template>
   <div id='not-found-content'>
-    <h1 id='header'>CONVERTER</h1>
+    <h1 id='header'>CONVERTER {{this.$store.state.counter}}</h1>
+    <button v-on:click='this.increment'>click</button>
   </div>
 </template>
+
+<script>
+  import { mapState } from 'vuex'
+
+  export default {
+    methods: {
+      increment() {
+        this.$store.commit('increment')
+        console.log(this.$store.state.counter)
+      }
+    }
+  }
+</script>
 
 <style>
   #not-found-content {
