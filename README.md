@@ -33,7 +33,7 @@ Run dev server:
 ```bash
 npm run dev
 ```
-Now open up your favorite web browser and navigate to `localhost:8080'.
+Now open up your favorite web browser and navigate to `localhost:8080`.
 
 Run tests:  
 ```bash
