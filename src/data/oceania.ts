@@ -11,7 +11,7 @@ export const oceaniaSystems: SystemDefinition[] = [
     structure: 'Mixed',
     baseLabel: 'Decimal with binary steps',
     summary:
-      'An oral counting tradition that combines ordinary units with a remarkable doubling sequence: ten, twenty, forty, eighty. Its elegance comes from regrouping quantities rather than writing a string of binary digits.',
+      'Spoken counting with groups of 10, 20, 40, and 80. The counting unit depends on the object.',
     history:
       'Bender and Beller’s 2013 analysis draws especially on Te Rangi Hiroa’s ethnography. The specialized system counted valued goods alongside an ordinary decimal system; it was not a universal replacement for decimal counting.',
     howItWorks:
@@ -70,13 +70,13 @@ export const oceaniaSystems: SystemDefinition[] = [
     structure: 'Spoken',
     baseLabel: 'Decimal number words',
     summary:
-      'Te reo Māori expresses numbers through words and composition. Contemporary tens are especially transparent: rua tekau is two tens, while mā joins an additional unit after a ten.',
+      'Contemporary Māori number words: rua tekau means two tens; mā joins additional units.',
     history:
       'Modern counting belongs to a living language. Earlier practices cannot simply be read back from today’s terminology: Te Aka records that tekau, now ten, originally denoted twenty, as related forms still do in other eastern Polynesian languages.',
     howItWorks:
       'The examples use contemporary cardinal forms. Tekau mā rua combines ten and two; rua tekau combines two and ten. Context can add particles or change how a number is used in a sentence, so isolated counting words are shown here.',
     caveat:
-      'This exhibit does not claim a separate ancient Māori numeral alphabet. Historical pair counting and contemporary decimal counting should be distinguished. Macron placement is part of accurate spelling, not ornamental typography.',
+      'This exhibit does not claim a separate ancient Māori numeral alphabet. Historical pair counting and contemporary decimal counting should be distinguished. Macrons are part of the spelling.',
     engine: 'explainer',
     min: '1',
     max: '99',
@@ -129,14 +129,13 @@ export const oceaniaSystems: SystemDefinition[] = [
     era: 'Living',
     structure: 'Spoken',
     baseLabel: 'Contextual grouping terms',
-    summary:
-      'Hawaiian grouping terms turn collections into memorable units: kāuna groups four, kaʻau forty, and lau four hundred. They sit alongside ordinary counting words, rather than forming a simple positional “base forty” script.',
+    summary: 'Grouping terms include kāuna (4), kaʻau (40), and lau (400).',
     history:
-      'Hawaiian language teaching preserves this vocabulary as a way of discussing quantities and a Hawaiian view of the world. ʻŌlelo Online explicitly distinguishes grouping objects from simply naming numbers, much as English distinguishes a dozen from twelve.',
+      'ʻŌlelo Online teaches these terms for grouping objects, distinguishing a group name from a number, much as English distinguishes a dozen from twelve.',
     howItWorks:
       'The exhibit presents the documented grouping values 4, 40, 400 and 4,000. A group label describes the collection being counted. Larger traditional expressions can also carry a sense of abundance rather than a strictly numerical value in every context.',
     caveat:
-      'These are selected grouping terms, not general number translations or written numeral glyphs. The ʻokina and kahakō are meaningful parts of Hawaiian spelling. No modern geometric symbols are substituted for the authentic words.',
+      'These are selected grouping terms, not general number translations or written numeral glyphs. The ʻokina and kahakō are meaningful parts of Hawaiian spelling.',
     engine: 'explainer',
     min: '4',
     max: '4000',
@@ -181,8 +180,7 @@ export const oceaniaSystems: SystemDefinition[] = [
     era: 'Living',
     structure: 'Physical',
     baseLabel: '27 body positions',
-    summary:
-      'Counting travels across the body: from a thumb, up the arm and around the head, then down the other arm to the opposite little finger. A named position identifies the quantity reached.',
+    summary: 'A 27-position body count, from one thumb to the opposite little finger.',
     history:
       'Geoffrey Saxe’s field research documents both the counting practice and its changes through trade, currency and schooling. Traditional enumeration and later arithmetic strategies are related but historically distinct uses of the same body sequence.',
     howItWorks:

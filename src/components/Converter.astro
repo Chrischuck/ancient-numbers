@@ -28,13 +28,12 @@ const base = import.meta.env.BASE_URL;
         Calculate
       </button>
     </div>
-    <span class="section-index">01 / THE CONVERTER</span>
   </div>
   <div class="converter-grid">
     <div id="input-panel" class="input-panel" role="tabpanel" aria-labelledby="translate-tab">
       <div class="input-heading">
         <label class="eyebrow" for="number-input">
-          YOUR NUMBER
+          NUMBER
         </label>
         <span class="input-kind">Hindu-Arabic · base 10</span>
       </div>
@@ -73,12 +72,12 @@ const base = import.meta.env.BASE_URL;
         />
       </div>
       <p id="input-help" class="input-help">
-        A whole number, decimal, or fraction. Try 42 or 3/2.
+        Whole numbers, decimals, or fractions (e.g. 3/2).
       </p>
       <p id="input-error" class="input-error" role="alert" hidden></p>
       <div class="system-field">
         <label class="eyebrow" for="system-select">
-          EXPLORE A DIFFERENT SYSTEM
+          NUMERAL SYSTEM
         </label>
         <div class="select-wrap">
           <select id="system-select">
@@ -90,7 +89,7 @@ const base = import.meta.env.BASE_URL;
                   .map((s) => (
                     <option value={s.id} selected={s.id === 'kaktovik'}>
                       {s.name}
-                      {s.engine === 'explainer' ? ' · specimen explorer' : ''}
+                      {s.engine === 'explainer' ? ' · examples only' : ''}
                     </option>
                   ))}
               </optgroup>
@@ -108,7 +107,7 @@ const base = import.meta.env.BASE_URL;
       </div>
       <div class="input-note">
         <span class="live-dot" aria-hidden="true"></span>
-        <span id="availability">Verified whole-number conversion</span>
+        <span id="availability">Whole numbers</span>
       </div>
     </div>
     <div class="output-panel" aria-busy="false">
@@ -159,7 +158,7 @@ const base = import.meta.env.BASE_URL;
   </div>
   <div class="converter-context">
     <div>
-      <span class="eyebrow">THE IDEA BEHIND THE SYMBOLS</span>
+      <span class="eyebrow">NOTATION</span>
       <p id="system-summary">{initial.summary}</p>
     </div>
     <div class="context-location">
@@ -171,28 +170,24 @@ const base = import.meta.env.BASE_URL;
       </p>
     </div>
     <a id="learn-link" href={`${base}systems/kaktovik/`}>
-      Meet the system <span aria-hidden="true">↗</span>
+      Details <span aria-hidden="true">↗</span>
     </a>
   </div>
   <details class="notation-details">
     <summary>
-      How to read this representation <span aria-hidden="true">+</span>
+      How to read it <span aria-hidden="true">+</span>
     </summary>
     <div>
       <p id="reading-explanation">{initial.howItWorks}</p>
       <p id="system-caveat">{initial.caveat}</p>
       <a id="system-source" href={initial.sources[0].url} target="_blank" rel="noopener noreferrer">
-        Read the primary reference ↗
+        Source ↗
       </a>
     </div>
   </details>
   <div class="compare-bar">
-    <div>
-      <span class="eyebrow">SAME NUMBER, ANOTHER PERSPECTIVE</span>
-      <p>See how other traditions express it.</p>
-    </div>
     <button id="add-comparison" class="text-button" type="button">
-      Compare a system <span aria-hidden="true">+</span>
+      Add comparison <span aria-hidden="true">+</span>
     </button>
   </div>
   <div id="comparisons" class="comparisons"></div>

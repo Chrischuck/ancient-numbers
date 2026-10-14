@@ -18,7 +18,7 @@ export const asiaSystems: SystemDefinition[] = [
     era: 'Ancient',
     structure: 'Positional',
     baseLabel: 'Base 60',
-    summary: 'Sixty ways to fill a place, made from just two wedge shapes.',
+    summary: 'Base-60 place values, with wedge signs for units and tens.',
     history:
       'Old Babylonian scribes pressed reed styluses into clay. Their mathematical tablets combine a base-sixty place system with additive groups of tens and ones. The square-root tablet YBC 7289 is an extraordinary surviving example.',
     howItWorks:
@@ -73,7 +73,7 @@ export const asiaSystems: SystemDefinition[] = [
     era: 'Ancient',
     structure: 'Additive',
     baseLabel: 'Decimal sign values',
-    summary: 'Distinct signs for each ten, long before decimal digits took over.',
+    summary: 'Additive signs for units and multiples of ten.',
     history:
       'Brahmi was used across the Indian subcontinent and developed many regional forms. Its earlier numeral repertoire uses separate signs for ones and tens; a later positional digit set belongs to a different stage of the tradition.',
     howItWorks:
@@ -125,7 +125,8 @@ export const asiaSystems: SystemDefinition[] = [
     era: 'Ancient',
     structure: 'Mixed',
     baseLabel: 'Decimal, with groups of 20',
-    summary: 'A right-to-left number tradition built around fours, tens, and twenties.',
+    summary:
+      'Right-to-left notation with signs for one, two, three, four, ten, twenty, and one hundred.',
     history:
       'Kharoshthi accompanied Gāndhārī manuscripts and inscriptions in the northwest of the Indian subcontinent. The numeral shapes here follow the first-century manuscript tradition documented by Unicode.',
     howItWorks:
@@ -190,7 +191,7 @@ export const asiaSystems: SystemDefinition[] = [
     era: 'Historical',
     structure: 'Additive',
     baseLabel: 'Decimal sign values',
-    summary: 'An older Sri Lankan notation with separate signs for every ten.',
+    summary: 'Historical Sri Lankan signs for units and multiples of ten.',
     history:
       'Sinhala Illakkam survives in royal documents and artifacts, including material from the Kandyan period. Sri Lankan research distinguished this non-positional set from the zero-bearing astrological numerals called Lith Illakkam.',
     howItWorks:
@@ -235,7 +236,7 @@ export const asiaSystems: SystemDefinition[] = [
     era: 'Historical',
     structure: 'Multiplicative',
     baseLabel: 'Decimal, named powers',
-    summary: 'Read a number as thousands, hundreds, tens, and ones.',
+    summary: 'Digits combine with signs for ten, one hundred, and one thousand.',
     history:
       'Traditional Tamil numerals retain distinct signs for ten, hundred, and thousand. This additive-multiplicative notation differs from modern positional writing with Tamil digits and a zero.',
     howItWorks:
@@ -288,7 +289,8 @@ export const asiaSystems: SystemDefinition[] = [
     era: 'Historical',
     structure: 'Physical',
     baseLabel: 'Base 10',
-    summary: 'A place-value calculator made of small sticks and empty spaces.',
+    summary:
+      'Decimal place values represented by counting rods. Rod orientation alternates between adjacent positions.',
     history:
       'Counting rods were arranged on a board to perform mathematics. The app adopts the Song-period forms used in Unicode’s chart; earlier Han texts can exchange the orientations.',
     howItWorks:
@@ -341,7 +343,8 @@ export const asiaSystems: SystemDefinition[] = [
     era: 'Historical',
     structure: 'Positional',
     baseLabel: 'Base 10',
-    summary: 'A merchant’s shorthand with alternating strokes to keep digits clear.',
+    summary:
+      'Decimal merchant numerals with alternating stroke orientations for one, two, and three.',
     history:
       'Suzhou numerals appear extensively in surviving Chinese merchant account books. Related to counting-rod notation, they became a compact companion to abacus bookkeeping and persisted in some later commercial settings.',
     howItWorks:
@@ -400,7 +403,7 @@ export const asiaSystems: SystemDefinition[] = [
     era: 'Ancient',
     structure: 'Additive',
     baseLabel: 'Decimal sign values',
-    summary: 'Monumental cuneiform with a small, distinctive numeral repertoire.',
+    summary: 'Additive cuneiform signs for units, ten, twenty, and one hundred.',
     history:
       'Old Persian script was developed for royal monumental inscriptions associated with Darius I. Its wedge-shaped signs are a distinct writing system, not simply Babylonian cuneiform with the same mathematical rules.',
     howItWorks:
@@ -447,7 +450,7 @@ export const asiaSystems: SystemDefinition[] = [
     era: 'Ancient',
     structure: 'Additive',
     baseLabel: 'Decimal tallies',
-    summary: 'Right-to-left tallies from the Mediterranean’s trading world.',
+    summary: 'Right-to-left additive notation with signs for units, ten, twenty, and one hundred.',
     history:
       'Phoenician writing spread across Mediterranean networks and continued in Punic forms. Its numerical notation uses repeated signs, with dedicated marks for ten, twenty, and hundred alongside small tally groups.',
     howItWorks:
@@ -495,7 +498,7 @@ export const asiaSystems: SystemDefinition[] = [
     era: 'Historical',
     structure: 'Mixed',
     baseLabel: 'Decimal orders',
-    summary: 'A specialist accountant’s script with an intricate life of its own.',
+    summary: 'Specialized number signs used in Ottoman accounting records.',
     history:
       'Ottoman Siyaq belonged to specialized accounting and administrative practice. Its numeral repertoire has primary units, tens, hundreds, larger orders, alternate historical forms, and selected fractions.',
     howItWorks:

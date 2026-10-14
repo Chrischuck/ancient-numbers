@@ -16,7 +16,7 @@ const first =
 <Layout title={`${system.name} — Ancient Numbers`} description={system.summary} active="collection">
   <div class="container">
     <div class="breadcrumb">
-      <a href={`${base}collection/`}>The collection</a>
+      <a href={`${base}collection/`}>Collection</a>
       <span aria-hidden="true">/</span>
       <span>{system.region}</span>
       <span aria-hidden="true">/</span>
@@ -34,7 +34,7 @@ const first =
           class="dark-button"
           href={`${base}?system=${system.id}&number=${system.specimen}#converter`}
         >
-          {system.engine === 'explainer' ? 'Explore the specimens' : 'Try the converter'}{' '}
+          {system.engine === 'explainer' ? 'View examples' : 'Convert numbers'}{' '}
           <span aria-hidden="true">↗</span>
         </a>
         <dl class="system-facts">
@@ -49,9 +49,7 @@ const first =
         </dl>
       </div>
       <div class="system-showcase" data-system={system.id}>
-        <span class="eyebrow">
-          {system.engine === 'explainer' ? 'VERIFIED SPECIMEN' : 'A NUMBER, ANOTHER PERSPECTIVE'}
-        </span>
+        <span class="eyebrow">EXAMPLES</span>
         <div id="detail-specimen">
           <Specimen system={system} />
         </div>
@@ -76,30 +74,30 @@ const first =
     </section>
     <div class="system-article">
       <article>
-        <h2>Where it comes from.</h2>
+        <h2>History</h2>
         <p>{system.history}</p>
-        <h2>How to read it.</h2>
+        <h2>Notation</h2>
         <p>{system.howItWorks}</p>
-        <h2>What makes it different.</h2>
+        <h2>Limits</h2>
         <p>{system.caveat}</p>
         <a
           class="inline-link"
           href={`${base}?system=${system.id}&number=${system.specimen}#converter`}
         >
-          See it alongside another tradition <span aria-hidden="true">↗</span>
+          Compare systems <span aria-hidden="true">↗</span>
         </a>
       </article>
       <aside class="system-aside">
         <div class="note-box">
-          <h3>{system.engine === 'explainer' ? 'A specimen explorer' : 'About this converter'}</h3>
+          <h3>{system.engine === 'explainer' ? 'Examples only' : 'Conversion'}</h3>
           <p>
             {system.engine === 'explainer'
-              ? 'These examples are individually documented. A general translator is not yet available for this entry.'
-              : 'The renderer follows the named variant and supports whole numbers in its verified range. Exact arithmetic results remain visible when a representation is unavailable.'}
+              ? 'Selected documented examples; general conversion is unavailable.'
+              : 'Supports whole numbers in the range described here. Unsupported results remain visible in familiar digits.'}
           </p>
         </div>
         <h3 class="eyebrow" style="margin-top:30px">
-          FOLLOW THE SOURCES
+          SOURCES
         </h3>
         <ol class="source-list">
           {system.sources.map((source) => (
@@ -112,19 +110,18 @@ const first =
           ))}
         </ol>
         <p style="font-size:10px;margin-top:18px">
-          Found something to improve?{' '}
+          Correction?{' '}
           <a
             href={`https://github.com/CumputerSluts/ancient-numbers/issues/new?title=${encodeURIComponent(`Source or notation correction: ${system.name}`)}`}
             style="text-decoration:underline"
           >
-            Share a source.
+            Report it.
           </a>
         </p>
       </aside>
     </div>
     <section class="related-section">
-      <span class="eyebrow">KEEP EXPLORING</span>
-      <h2>Another perspective.</h2>
+      <h2>Related systems</h2>
       <div class="preview-grid">
         {related.map((s) => (
           <SystemCard system={s} />

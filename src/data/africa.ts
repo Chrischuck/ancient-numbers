@@ -22,7 +22,7 @@ export const africaSystems: SystemDefinition[] = [
     era: 'Modern',
     structure: 'Positional',
     baseLabel: 'Base 20',
-    summary: 'Twenty distinct digits from a Nigerian spiritual language.',
+    summary: 'Twenty digits used in Medefaidrin, a language and script developed in Nigeria.',
     history:
       'Medefaidrin belongs to the Oberi Okaime community in southeastern Nigeria. Its script developed alongside a spiritual language during the early twentieth century. The encoding proposal includes handwritten numerals supplied by Reverend Richmael Ekit in 2016.',
     howItWorks:
@@ -72,7 +72,7 @@ export const africaSystems: SystemDefinition[] = [
     era: 'Historical',
     structure: 'Multiplicative',
     baseLabel: 'Decimal units & multipliers',
-    summary: 'A right-to-left numeral tradition with subscripts for powers of ten.',
+    summary: 'Right-to-left numerals with subscripts indicating powers of ten.',
     history:
       'Kikakui is an indigenous script for the Mende language. Its numerical repertoire combines nine unit signs with marks for decimal magnitudes and a separate mark for the teens. The numeral arrangement follows the script’s right-to-left reading direction.',
     howItWorks:
@@ -130,9 +130,9 @@ export const africaSystems: SystemDefinition[] = [
     era: 'Living',
     structure: 'Positional',
     baseLabel: 'Base 10',
-    summary: 'Ten numeral forms shared with the Bamum syllabary.',
+    summary: 'Ten signs shared with the Bamum syllabary, used here as decimal digits.',
     history:
-      'King Ibrahim Njoya developed Bamum writing through a succession of forms beginning in the late nineteenth century. This collection uses the final, A-ka-u-ku repertoire. Its last ten letters also serve as numerals, retaining their identity within the writing system.',
+      'King Ibrahim Njoya developed Bamum writing through a succession of forms beginning in the late nineteenth century. This collection uses the final, A-ka-u-ku repertoire. Its last ten letters also serve as numerals.',
     howItWorks:
       'The modern convention assigns the ten signs values zero through nine and writes decimal places from left to right. A digit’s position determines whether it counts units, tens, or hundreds.',
     caveat:
@@ -180,7 +180,7 @@ export const africaSystems: SystemDefinition[] = [
     era: 'Living',
     structure: 'Multiplicative',
     baseLabel: 'Groups of 100',
-    summary: 'Barred signs organized around hundreds and ten-thousands.',
+    summary: 'Signs for units and tens combine with markers for one hundred and ten thousand.',
     history:
       'The numeral signs form part of the Ethiopic writing tradition. Their barred, letter-like forms are related to Greek and Coptic numeral traditions. They survive alongside familiar decimal digits and have their own rules for composing larger quantities.',
     howItWorks:
@@ -278,9 +278,9 @@ export const africaSystems: SystemDefinition[] = [
     era: 'Living',
     structure: 'Positional',
     baseLabel: 'Base 10 · right to left',
-    summary: 'A living decimal system whose numerals read right to left.',
+    summary: 'Decimal digits written from right to left.',
     history:
-      'N’Ko writing was created by Solomana Kanté for Manding languages. Its distinctive decimal digits belong to a living literacy tradition. Unlike Arabic numbers embedded in Arabic prose, N’Ko numerals follow the right-to-left direction of the surrounding script.',
+      'N’Ko writing was created by Solomana Kanté for Manding languages. Unlike Arabic numbers embedded in Arabic prose, N’Ko numerals follow the right-to-left direction of the surrounding script.',
     howItWorks:
       'The mathematics is decimal place value, but the most significant position appears at the right. In a two-digit number, read the tens sign on the right before the units sign on the left. Zero preserves an empty position.',
     caveat:
@@ -327,7 +327,7 @@ export const africaSystems: SystemDefinition[] = [
     era: 'Modern',
     structure: 'Positional',
     baseLabel: 'Base 10',
-    summary: 'A distinct decimal digit set within the Vai writing tradition.',
+    summary: 'Decimal digits from the Vai writing system.',
     history:
       'The Vai syllabary is an indigenous West African writing system. A set of ten numeral signs was devised in the 1920s, giving European decimal digits forms compatible with Vai writing. Script-specific numeral identity does not imply a different numerical base.',
     howItWorks:
@@ -376,7 +376,7 @@ export const africaSystems: SystemDefinition[] = [
     era: 'Modern',
     structure: 'Positional',
     baseLabel: 'Base 10',
-    summary: 'The decimal numerals of Osman Yusuf Kenadid’s Somali script.',
+    summary: 'Decimal digits from Osman Yusuf Kenadid’s Somali script.',
     history:
       'Osmanya is a writing system devised for Somali in the twentieth century by Osman Yusuf Kenadid. Its character repertoire includes ten decimal digits. The forms preserve the visual identity of this writing tradition while expressing familiar decimal mathematics.',
     howItWorks:
@@ -421,7 +421,8 @@ export const africaSystems: SystemDefinition[] = [
     era: 'Living',
     structure: 'Spoken',
     baseLabel: 'Twenties · addition & subtraction',
-    summary: 'Number words that can express subtraction from a coming twenty.',
+    summary:
+      'Number words built around twenties, including subtraction: fifteen is twenty minus five.',
     history:
       'Yorùbá numeration is a spoken language tradition, not an extinct set of written numeral glyphs. Its number names carry mathematical relationships, including multiples of twenty and subtraction from a nearby larger value. Tone marks and underdots belong to the spelling.',
     howItWorks:
@@ -470,7 +471,7 @@ export const africaSystems: SystemDefinition[] = [
     era: 'Ancient',
     structure: 'Additive',
     baseLabel: 'Powers of 10',
-    summary: 'Repeated signs for units, tens, and successively larger powers.',
+    summary: 'Repeated signs represent units, tens, and higher powers of ten.',
     history:
       'Egyptian hieroglyphic notation represents quantities with dedicated signs for powers of ten. The forms include a stroke, a heel-bone shape, a coil of rope, and a lotus. This entry follows the monumental hieroglyphic tradition rather than the separate cursive hieratic numeral repertoire.',
     howItWorks:
@@ -526,7 +527,7 @@ export const africaSystems: SystemDefinition[] = [
     era: 'Historical',
     structure: 'Additive',
     baseLabel: 'Decimal sign-values',
-    summary: 'Distinct manuscript signs for units, tens, and hundreds.',
+    summary: 'Manuscript signs for units, tens, and hundreds.',
     history:
       'Rumi numerals, also called Fasi, belong to a manuscript tradition spanning North Africa and al-Andalus. They appear in accounting, astronomy, and manuscript numbering. Their historical shapes vary; this collection follows the variant represented in the Unicode Rumi repertoire.',
     howItWorks:

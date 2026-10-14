@@ -4,19 +4,11 @@ import SystemCard from '../components/SystemCard.astro';
 import { systems, regions, converters } from '../data/systems';
 ---
 
-<Layout title="The collection — Ancient Numbers" active="collection">
+<Layout title="Collection — Ancient Numbers" active="collection">
   <div class="container">
     <section class="collection-hero">
-      <span class="eyebrow">THE WORLD DOESN’T COUNT JUST ONE WAY</span>
-      <h1>
-        A collection of
-        <br />
-        <em>human ingenuity.</em>
-      </h1>
-      <p>
-        Thirty-six traditions. Written signs, spoken words, cords, and gestures. Find a familiar
-        system—or a perspective you’ve never encountered.
-      </p>
+      <h1>Collection</h1>
+      <p>36 numeral and counting traditions, grouped by region and structure.</p>
     </section>
     <div class="collection-tools">
       <div class="search-wrap">
@@ -30,7 +22,7 @@ import { systems, regions, converters } from '../data/systems';
         <input
           id="collection-search"
           type="search"
-          placeholder="Search a system, place, or idea…"
+          placeholder="Search by name or place…"
           autocomplete="off"
         />
       </div>
@@ -38,7 +30,7 @@ import { systems, regions, converters } from '../data/systems';
         Filter by region
       </label>
       <select id="region-filter">
-        <option value="all">Every region</option>
+        <option value="all">All regions</option>
         {regions.map((r) => (
           <option value={r}>{r}</option>
         ))}
@@ -47,7 +39,7 @@ import { systems, regions, converters } from '../data/systems';
         Filter by structure
       </label>
       <select id="structure-filter">
-        <option value="all">Every structure</option>
+        <option value="all">All structures</option>
         {[
           'Positional',
           'Additive',
@@ -65,8 +57,7 @@ import { systems, regions, converters } from '../data/systems';
       </span>
     </div>
     <p class="collection-key">
-      <span aria-hidden="true">◇</span> {converters.length} working converters. Ten specimen
-      explorers with verified examples. Each entry identifies its notation and limits.
+      {converters.length} converters · 10 entries with selected examples.
     </p>
     <div class="collection-grid" id="collection-grid">
       {[...systems]
@@ -76,8 +67,6 @@ import { systems, regions, converters } from '../data/systems';
         ))}
       <p id="no-results" class="no-results" hidden>
         No traditions match those filters.
-        <br />
-        Try another word or choose every region.
       </p>
     </div>
   </div>

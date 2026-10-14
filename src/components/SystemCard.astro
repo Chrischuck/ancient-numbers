@@ -27,7 +27,5 @@ const base = import.meta.env.BASE_URL;
     <h3>{system.name}</h3>
     <span>{system.baseLabel}</span>
   </div>
-  <span class="sr-only">
-    {system.engine === 'explainer' ? 'Illustrated specimen explorer' : 'Interactive converter'}
-  </span>
+  <span class="sr-only">{system.engine === 'explainer' ? 'Selected examples' : 'Converter'}</span>
 </a>

@@ -10,8 +10,8 @@ interface Props {
   active?: string;
 }
 const {
-  title = 'Ancient Numbers — A world of ways to count',
-  description = 'Explore 36 numeral and counting traditions. Translate numbers, discover their structure, and calculate across cultures with Ancient Numbers.',
+  title = 'Ancient Numbers — Number converter',
+  description = 'Convert and compare numbers in 26 numeral systems, with sourced examples from 10 more counting traditions.',
   active = '',
 } = Astro.props;
 const base = import.meta.env.BASE_URL;
@@ -42,19 +42,17 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         <svg viewBox="0 0 38 38" aria-hidden="true">
           <path d="M19 4V34M5 10L19 4L33 10M5 28L19 34L33 28M5 10V28M33 10V28M5 19H33" />
         </svg>
-        <span>
-          Ancient Numbers<span class="brand-sub">A WORLD OF WAYS TO COUNT</span>
-        </span>
+        <span>Ancient Numbers</span>
       </a>
       <nav aria-label="Main navigation">
         <a href={`${base}#converter`} aria-current={active === 'converter' ? 'page' : undefined}>
           Converter
         </a>
         <a href={`${base}collection/`} aria-current={active === 'collection' ? 'page' : undefined}>
-          The collection
+          Collection
         </a>
         <a href={`${base}about/`} aria-current={active === 'about' ? 'page' : undefined}>
-          Our approach
+          About
         </a>
       </nav>
       <a
@@ -74,16 +72,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         <a class="footer-brand" href={base}>
           Ancient Numbers
         </a>
-        <p>Different symbols. Shared curiosity.</p>
-      </div>
-      <div class="footer-note">
-        An independent, open-source exploration.
-        <br />
-        Made for the love of learning.
       </div>
       <div>
-        <a href={`${base}about/#sources`}>Sources &amp; accuracy ↗</a>
-        <a href="https://github.com/CumputerSluts/ancient-numbers">Explore the code ↗</a>
+        <a href={`${base}about/#sources`}>Sources ↗</a>
+        <a href="https://github.com/CumputerSluts/ancient-numbers">GitHub ↗</a>
       </div>
     </footer>
   </body>

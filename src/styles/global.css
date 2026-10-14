@@ -885,7 +885,7 @@ h2 {
   border-left: 1px solid var(--line);
 }
 .editorial-feature {
-  margin-top: 70px;
+  margin: 70px 0 60px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   border-top: 1px solid var(--line);

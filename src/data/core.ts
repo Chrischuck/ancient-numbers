@@ -35,7 +35,7 @@ export const coreSystems: SystemDefinition[] = [
     structure: 'Positional',
     baseLabel: 'Base 20 · groups of 5',
     summary:
-      'Twenty digits, shaped by the way Iñupiaq counts. A visual system created by students in Arctic Alaska.',
+      'A base-20 system created by students in Kaktovik, Alaska, in 1994. Digit strokes group units and fives.',
     history:
       'In 1994, students at Harold Kaveolook School in Kaktovik developed numeral signs that fit their language’s groups of five and twenty. The signs became part of local teaching and received the endorsement of the Inuit Circumpolar Council in 1998. They are a modern Indigenous invention, rather than an ancient script.',
     howItWorks:
@@ -67,9 +67,10 @@ export const coreSystems: SystemDefinition[] = [
     era: 'Ancient',
     structure: 'Positional',
     baseLabel: 'Base 20',
-    summary: 'Dots, bars, and a shell-shaped zero make a compact visual language of numbers.',
+    summary:
+      'Dots represent one, bars five, and a shell-shaped sign zero. Vertical positions count powers of twenty.',
     history:
-      'Maya scribes recorded numbers in monuments and manuscripts using dots for units, bars for fives, and several forms of zero. Numbers and dates were part of sophisticated astronomical and calendrical traditions. This display uses the familiar dot-and-bar forms rather than the elaborate head variants.',
+      'Maya scribes recorded numbers in monuments and manuscripts using dots for units, bars for fives, and several forms of zero. Numbers were used in astronomical and calendar records. This display uses the familiar dot-and-bar forms rather than the elaborate head variants.',
     howItWorks:
       'Read the vertical stack from top to bottom. Each level is a base-20 position: ones at the bottom, twenties above, then four hundreds. A dot is one and a bar is five.',
     caveat:
@@ -105,7 +106,8 @@ export const coreSystems: SystemDefinition[] = [
     era: 'Historical',
     structure: 'Additive',
     baseLabel: 'Groups of 20',
-    summary: 'A flag for twenty, a feather for four hundred, and a bag for eight thousand.',
+    summary:
+      'Dots count units; flags represent twenty, feathers four hundred, and bags eight thousand.',
     history:
       'Nahua scribes used numerical signs alongside images of objects and tribute goods. The Codex Mendoza and Matrícula de Tributos preserve examples of flags, feather signs, and bags marking large quantities. Their composition is connected to the records in which they occur; it is not simply a replacement font.',
     howItWorks:
@@ -141,7 +143,7 @@ export const coreSystems: SystemDefinition[] = [
     era: 'Historical',
     structure: 'Physical',
     baseLabel: 'Decimal knot positions',
-    summary: 'Place value recorded in cord: numbers you can touch, tie, and keep.',
+    summary: 'Decimal place values recorded with knots on cords.',
     history:
       'Khipus are arrangements of cords and knots used for record keeping in the Andes. A well-understood class of numerical khipus records decimal values through the positions and types of knots. Cord color, attachment, and other features carry additional information that cannot be inferred from a number alone.',
     howItWorks:
@@ -182,7 +184,7 @@ export const coreSystems: SystemDefinition[] = [
     era: 'Ancient',
     structure: 'Additive',
     baseLabel: 'Additive · subtractive',
-    summary: 'A familiar system whose symbols add, and sometimes subtract, their values.',
+    summary: 'Letters represent values that are added or subtracted: XLII = 50 − 10 + 2.',
     history:
       'Roman numeral conventions developed over centuries and varied in inscriptions, manuscripts, and later printing. They remain visible on clocks, monuments, and numbered volumes. This converter uses the common modern subtractive convention, a standardized selection from that wider historical practice.',
     howItWorks:
@@ -210,7 +212,7 @@ export const coreSystems: SystemDefinition[] = [
     era: 'Historical',
     structure: 'Alphabetic',
     baseLabel: 'Letter values',
-    summary: 'An alphabet of numbers, with separate letters for units, tens, and hundreds.',
+    summary: 'Greek letters represent units, tens, and hundreds.',
     history:
       'The alphabetic system, also called Milesian or Ionic, assigns numerical values to twenty-seven letters. Three additional signs retain places in the sequence beyond the standard twenty-four-letter Greek alphabet. Its forms evolved in manuscripts and printing, and Greek numerical letters are still used in particular contexts.',
     howItWorks:
@@ -242,7 +244,7 @@ export const coreSystems: SystemDefinition[] = [
     era: 'Ancient',
     structure: 'Additive',
     baseLabel: 'Acrophonic · groups of 5',
-    summary: 'Number signs drawn from the first sounds of Greek number names.',
+    summary: 'Number signs based on the initial letters of Greek number names.',
     history:
       'The Attic acrophonic system appears in ancient inscriptions, including financial records. Several of its signs derive from initial letters of Greek number words. Regional acrophonic systems also existed; the shapes and values shown here belong to the Attic numerical repertoire.',
     howItWorks:
@@ -280,7 +282,7 @@ export const coreSystems: SystemDefinition[] = [
     era: 'Historical',
     structure: 'Mixed',
     baseLabel: 'Four decimal quadrants',
-    summary: 'Four places gathered around one stem. An entire number in a single sign.',
+    summary: 'Marks in four quadrants combine units, tens, hundreds, and thousands in one sign.',
     history:
       'Medieval monastic number ciphers combine marks around a common staff. Surviving examples occur in manuscripts and on instruments, with considerable regional variation. Historian David A. King documented these traditions in The Ciphers of the Monks. The familiar vertical-staff arrangement is the variant used here.',
     howItWorks:

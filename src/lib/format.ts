@@ -10,12 +10,10 @@ const unsupported = (reason: string): Representation => ({
 export function represent(value: Rational, system: SystemDefinition): Representation {
   const n = value.numerator;
   if (value.denominator !== 1n)
-    return unsupported(
-      'This renderer currently supports whole numbers. The exact fractional result is shown above.',
-    );
+    return unsupported('This converter currently supports whole numbers only.');
   if (n < 0n)
     return unsupported(
-      'This renderer does not add a modern minus sign to historical notation. The exact negative result is shown above.',
+      'Negative results use familiar digits. No minus sign is added to this notation.',
     );
   if (system.engine === 'explainer') {
     const example = system.examples.find((e) => e.value === n.toString());
@@ -25,8 +23,7 @@ export function represent(value: Rational, system: SystemDefinition): Representa
         tokens: [],
         layout: 'words',
         explanation: system.howItWorks,
-        reason:
-          'Explore the verified examples below. A general converter is not available for this entry.',
+        reason: 'Only the listed examples are available for this system.',
       };
     return {
       status: 'explainer',
@@ -37,13 +34,10 @@ export function represent(value: Rational, system: SystemDefinition): Representa
       explanation: example.explanation,
     };
   }
-  if (n === 0n && !system.zero)
-    return unsupported(
-      'This selected notation has no zero sign in its supported convention. The exact value remains 0.',
-    );
+  if (n === 0n && !system.zero) return unsupported('The selected notation has no zero sign.');
   if (n < BigInt(system.min) || n > BigInt(system.max))
     return unsupported(
-      `This renderer supports ${system.min}–${system.max.length > 18 ? `whole numbers of up to ${system.max.length} digits` : Number(system.max).toLocaleString('en-US')}. This is an app limit, not a claim about the tradition’s full range.`,
+      `This renderer supports ${system.min}–${system.max.length > 18 ? `whole numbers of up to ${system.max.length} digits` : Number(system.max).toLocaleString('en-US')}. This is an app limit.`,
     );
   let tokens: RenderToken[] = [];
   let layout: Representation['layout'] = 'row';

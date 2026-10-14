@@ -13,46 +13,19 @@ const base = import.meta.env.BASE_URL;
 <Layout active="converter">
   <div class="container">
     <section class="hero">
-      <div>
-        <div class="eyebrow hero-eyebrow">
-          <span class="mini-line"></span>MATHEMATICS IS A HUMAN STORY
-        </div>
-        <h1>
-          One number.
-          <br />
-          <em>Countless perspectives.</em>
-        </h1>
-      </div>
+      <h1>Convert numbers</h1>
       <div class="hero-aside">
-        <svg class="orbit-mark" viewBox="0 0 72 72" aria-hidden="true">
-          <circle cx="36" cy="36" r="26" />
-          <ellipse cx="36" cy="36" rx="12" ry="26" />
-          <path d="M10 36H62M16 21H56M16 51H56" />
-        </svg>
         <p>
-          We have always found ways to count.
+          {converters.length} numeral converters.
           <br />
-          Discover the symbols, structures, and
-          <br class="desktop-break" /> stories behind them.
+          10 traditions with selected examples.
         </p>
-        <span class="hero-count">
-          36 TRADITIONS <span>·</span> ONE SHARED CURIOSITY
-        </span>
       </div>
     </section>
     <Converter />
     <section class="collection-preview" aria-labelledby="collection-title">
       <div class="section-heading">
-        <div>
-          <span class="eyebrow">02 / THE COLLECTION</span>
-          <h2 id="collection-title">
-            A different way <em>to think.</em>
-          </h2>
-        </div>
-        <p>
-          Beyond the familiar. Meet ingenious traditions
-          <br class="desktop-break" /> from every corner of the world.
-        </p>
+        <h2 id="collection-title">Collection</h2>
       </div>
       <div class="preview-grid">
         {featured.map((system) => (
@@ -60,15 +33,11 @@ const base = import.meta.env.BASE_URL;
         ))}
       </div>
       <a class="collection-cta" href={`${base}collection/`}>
-        Explore all 36 traditions <span aria-hidden="true">↗</span>
-        <span class="cta-note">
-          {converters.length} converters · spoken words · physical counting
-        </span>
+        All 36 traditions <span aria-hidden="true">↗</span>
       </a>
     </section>
     <section class="editorial-feature">
       <div class="feature-art">
-        <span class="eyebrow">FOUR PLACES. ONE SYMBOL.</span>
         <div class="cistercian-diagram">
           <span class="diagram-label tl">TENS</span>
           <span class="diagram-label tr">UNITS</span>
@@ -79,37 +48,14 @@ const base = import.meta.env.BASE_URL;
         <span class="diagram-caption">2026 · CISTERCIAN NUMERALS</span>
       </div>
       <div class="feature-copy">
-        <span class="eyebrow">A LITTLE CHANGE IN PERSPECTIVE</span>
-        <h2>
-          What if a whole number
-          <br />
-          were <em>one single sign?</em>
-        </h2>
+        <h2>Cistercian numerals</h2>
         <p>
-          Medieval monastic ciphers gather four decimal places around a single stem. Elsewhere,
-          numbers live in knots, move across the body, or follow the rhythm of spoken words.
+          One sign records a number from 1 to 9,999. Marks around a central stem indicate units,
+          tens, hundreds, and thousands.
         </p>
-        <p>There is more than one way to see the same quantity.</p>
         <a class="inline-link" href={`${base}systems/cistercian/`}>
-          Discover Cistercian numerals <span aria-hidden="true">↗</span>
+          How to read them <span aria-hidden="true">↗</span>
         </a>
-      </div>
-    </section>
-    <section class="principles">
-      <div>
-        <span class="principle-number">01</span>
-        <h3>Drawn with intention.</h3>
-        <p>A coherent vector collection, carefully shaped from documented references.</p>
-      </div>
-      <div>
-        <span class="principle-number">02</span>
-        <h3>Rooted in real sources.</h3>
-        <p>Specific traditions, honest limits, and references you can follow yourself.</p>
-      </div>
-      <div>
-        <span class="principle-number">03</span>
-        <h3>Free to be curious.</h3>
-        <p>Open source, entirely in your browser, and made for everyone to explore.</p>
       </div>
     </section>
   </div>

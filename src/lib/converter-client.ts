@@ -80,9 +80,7 @@ if (input) {
     el('system-caveat').textContent = system.caveat;
     el<HTMLAnchorElement>('system-source').href = system.sources[0].url;
     el('availability').textContent =
-      system.engine === 'explainer'
-        ? 'Sourced specimen explorer'
-        : 'Verified whole-number conversion';
+      system.engine === 'explainer' ? 'Selected examples only' : 'Whole numbers';
     el('example-chips').innerHTML = system.examples
       .map(
         (e) =>
@@ -109,7 +107,7 @@ if (input) {
     const result = represent(value, system);
     lastExact = formatNumber(value);
     el('exact-value').textContent = lastExact;
-    el('output-equation').textContent = result.explanation || 'Exact mathematical value';
+    el('output-equation').textContent = result.explanation || 'Exact value';
     el('output-message').textContent = result.reason ?? '';
     el('output-message').hidden = !result.reason;
     if (!result.tokens.length) {
@@ -164,7 +162,7 @@ if (input) {
     el('comparisons').innerHTML = cards.join('');
     el<HTMLButtonElement>('add-comparison').disabled = comparisonIds.length >= 2;
     el('add-comparison').textContent =
-      comparisonIds.length >= 2 ? 'Comparing three traditions' : 'Compare a system +';
+      comparisonIds.length >= 2 ? '3 systems compared' : 'Add comparison +';
   }
   function queue() {
     clearTimeout(timer);
@@ -267,7 +265,7 @@ if (input) {
   el('share-button').addEventListener('click', async () => {
     try {
       await clipboard(stateURL().href);
-      status('Link copied. Share this perspective.');
+      status('Link copied.');
     } catch {
       status('Copy the current address to share.');
     }

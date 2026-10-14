@@ -11,11 +11,11 @@ export const americanOralSystems: SystemDefinition[] = [
     structure: 'Additive',
     baseLabel: 'Distinct numerical signs',
     summary:
-      'Sequoyah designed dedicated number signs as well as the celebrated Cherokee syllabary. These graceful numerical forms are a separate invention: they should never be confused with syllabary letters used to spell number words.',
+      'Number signs proposed by Sequoyah in the late 1820s, separate from the Cherokee syllabary.',
     history:
       'The numeral proposal did not enter general use. The Cherokee Nation preserves its forms in an educational poster covering zero to one hundred, while Unicode notes that Sequoyah’s numerical signs are not encoded in the standard.',
     howItWorks:
-      'The selected specimens follow the Cherokee Nation chart. One, two and three each have distinctive forms; forty-two combines the sign for forty with that for two. The custom vector drawings retain the chart’s defining strokes and connections.',
+      'The examples follow the Cherokee Nation chart. Forty-two combines the sign for forty with the sign for two.',
     caveat:
       'This is a bounded specimen exhibit, not a full reconstruction of every arithmetic convention. The signs have no Unicode copy equivalent. Their historical status does not describe contemporary Cherokee language vitality or contemporary number-writing practice.',
     engine: 'explainer',
@@ -80,9 +80,9 @@ export const americanOralSystems: SystemDefinition[] = [
     structure: 'Spoken',
     baseLabel: 'Decimal number words',
     summary:
-      'Choctaw numbers are part of a living language, expressed through words rather than a separate ancient numerical alphabet. Here the first five counting words follow the Choctaw Nation of Oklahoma’s own learning materials.',
+      'The first five counting words, using the Choctaw Nation of Oklahoma’s teaching spelling.',
     history:
-      'Community language programs teach counting together with ordinary vocabulary and sentence formation. Presenting these words alongside written numeral traditions broadens the collection without falsely treating every culture as having used a dedicated set of glyphs.',
+      'The examples use the counting words taught in the Choctaw Nation of Oklahoma’s language lessons.',
     howItWorks:
       'Achʋffa, tuklo, tuchina, ushta and tahlapi name one through five. The exhibit preserves the teaching source’s spelling, including ʋ. These are complete words for quantities; their letters do not individually carry numerical place values.',
     caveat:
@@ -134,10 +134,9 @@ export const americanOralSystems: SystemDefinition[] = [
     era: 'Living',
     structure: 'Spoken',
     baseLabel: 'Decimal number words',
-    summary:
-      'Diné bizaad expresses numbers with a rich spoken decimal structure. Its number words show why translating a quantity requires more care than replacing each familiar digit with a different-looking character.',
+    summary: 'Decimal number words, using forms documented by Diné College.',
     history:
-      'This exhibit follows the reference guide published by Diné College’s Learning Center. Using a tribally controlled educational institution’s material keeps the selected orthography and compound forms connected to their actual teaching context.',
+      'The examples follow the number words and spelling in the reference guide published by Diné College’s Learning Center.',
     howItWorks:
       'The guide lists basic units, specialized tens forms and compounds. Naadiin is twenty; twenty-two adds naaki. From thirty upward, the guide connects the tens and remaining units with dóó bi’aan, as in its expression for forty-two.',
     caveat:
