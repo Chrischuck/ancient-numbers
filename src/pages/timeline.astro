@@ -1,0 +1,316 @@
+---
+import Layout from '../components/Layout.astro';
+import Specimen from '../components/Specimen.astro';
+import { getSystem } from '../data/systems';
+import { timeline, eras, kindLabels, formatYear } from '../data/timeline';
+import '../styles/timeline.css';
+const base = import.meta.env.BASE_URL;
+const position = (year: number) => ((year + 3000) / 5026) * 100;
+const bins = Array.from({ length: 10 }, (_, i) => {
+  const rawStart = -3000 + i * 500;
+  const start = rawStart === 0 ? 1 : rawStart;
+  const end = i === 9 ? 2026 : rawStart + 499;
+  return {
+    start,
+    end,
+    count: timeline.filter((e) => e.year >= start && e.year <= end).length,
+    centuries: Array.from({ length: i === 9 ? 6 : 5 }, (_, j) => {
+      const centuryStart = rawStart + j * 100;
+      return timeline.filter((e) => e.year >= centuryStart && e.year <= centuryStart + 99).length;
+    }),
+  };
+});
+const maxCount = Math.max(...bins.flatMap((b) => b.centuries));
+---
+
+<Layout
+  title="Timeline — Ancient Numbers"
+  description="Explore the history of mathematical notation, numeral systems, and major discoveries, with dated evidence and sources."
+  active="timeline"
+>
+  <div class="container timeline-page" id="timeline-app">
+    <section class="timeline-hero">
+      <div>
+        <span class="eyebrow timeline-kicker">A HISTORY OF MATHEMATICAL IDEAS</span>
+        <h1>
+          Math through <em>time.</em>
+        </h1>
+        <p>
+          From counting marks to the language of infinity. Explore when notation appeared, how it
+          changed, and the ideas that moved mathematics forward.
+        </p>
+      </div>
+      <div class="timeline-hero-mark" aria-hidden="true">
+        <span>⅟n</span>
+        <span>=</span>
+        <span>∫</span>
+        <span>∀</span>
+        <small>MARKS BECOME A LANGUAGE</small>
+      </div>
+    </section>
+
+    <section class="history-overview" aria-labelledby="overview-heading">
+      <div class="overview-top">
+        <h2 id="overview-heading">5,000 years, at a glance</h2>
+        <span>{timeline.length} selected entries · 3 ways to explore</span>
+      </div>
+      <div class="history-histogram" role="group" aria-label="Explore events by historical period">
+        {bins.map((b) => (
+          <button
+            type="button"
+            data-window
+            data-start={b.start}
+            data-end={b.end}
+            disabled={b.count === 0}
+            aria-label={`${formatYear(b.start)} to ${formatYear(b.end)}: ${b.count} entries`}
+            title={`${formatYear(b.start)}–${formatYear(b.end)} · ${b.count} entries`}
+          >
+            {b.centuries.map((count) => (
+              <span
+                aria-hidden="true"
+                class:list={{ 'empty-century': count === 0 }}
+                style={`--height:${Math.max(4, (count / maxCount) * 100)}%`}
+              ></span>
+            ))}
+          </button>
+        ))}
+      </div>
+      <div class="overview-ruler" aria-hidden="true">
+        <span>3000 BCE</span>
+        <span>2000 BCE</span>
+        <span>1000 BCE</span>
+        <span>1 CE</span>
+        <span>1000 CE</span>
+        <span>Present</span>
+      </div>
+      <div class="overview-bottom">
+        <p>
+          Bar height shows entries in this collection, not the pace of discovery. Select a period to
+          explore.
+        </p>
+        <a href="#reading-dates">How to read the dates ↗</a>
+      </div>
+    </section>
+
+    <noscript>
+      <p class="timeline-nojs">
+        The full timeline and sources are available below. Enable JavaScript to search, filter, and
+        compare periods.
+      </p>
+    </noscript>
+    <div class="timeline-controls" data-interactive hidden>
+      <div class="era-buttons" role="group" aria-label="Choose a historical era">
+        {eras.map((era) => (
+          <button
+            type="button"
+            data-era={era.id}
+            data-start={era.start}
+            data-end={era.end}
+            aria-pressed={era.id === 'all' ? 'true' : 'false'}
+          >
+            {era.label}
+          </button>
+        ))}
+      </div>
+      <div class="timeline-filter-row">
+        <div class="timeline-search">
+          <span aria-hidden="true">⌕</span>
+          <label for="timeline-search" class="sr-only">
+            Search timeline
+          </label>
+          <input
+            type="search"
+            id="timeline-search"
+            placeholder="Search symbols, ideas, people, places…"
+            autocomplete="off"
+          />
+        </div>
+        <label class="sr-only" for="timeline-kind">
+          Entry type
+        </label>
+        <select id="timeline-kind">
+          <option value="all">All entry types</option>
+          {Object.entries(kindLabels).map(([value, label]) => (
+            <option value={value}>{label}</option>
+          ))}
+        </select>
+        <label class="sr-only" for="timeline-status">
+          Use today
+        </label>
+        <select id="timeline-status">
+          <option value="all">Any period of use</option>
+          <option value="living">Still in use</option>
+          <option value="historical">Historical traditions</option>
+        </select>
+        <button type="button" class="timeline-reset" id="timeline-reset">
+          Reset filters ↺
+        </button>
+      </div>
+      <div class="timeline-options-row">
+        <form id="timeline-dates" class="timeline-dates">
+          <span>Dates</span>
+          <label class="sr-only" for="timeline-from">
+            From year (negative for BCE)
+          </label>
+          <input id="timeline-from" type="number" min="-3000" max="2026" value="-3000" required />
+          <span aria-hidden="true">—</span>
+          <label class="sr-only" for="timeline-to">
+            To year (negative for BCE)
+          </label>
+          <input id="timeline-to" type="number" min="-3000" max="2026" value="2026" required />
+          <button type="submit">Apply</button>
+          <small>Negative = BCE</small>
+        </form>
+        <div class="timeline-views" role="group" aria-label="Timeline view">
+          <button type="button" id="events-view" aria-pressed="true">
+            Events
+          </button>
+          <button type="button" id="periods-view" aria-pressed="false">
+            Periods of use
+          </button>
+        </div>
+      </div>
+      <p id="timeline-date-error" class="timeline-date-error" role="alert" hidden></p>
+    </div>
+
+    <div class="timeline-results-top">
+      <p id="timeline-count" role="status" aria-live="polite">
+        {timeline.length} entries · all history
+      </p>
+      <div class="timeline-legend">
+        <span class="legend-numerals">Numerals</span>
+        <span class="legend-notation">Notation</span>
+        <span class="legend-milestone">Milestones</span>
+      </div>
+    </div>
+    <p class="period-explainer" id="period-explainer" hidden>
+      Periods are shown on the same 3000 BCE–present scale. Solid bars show selected attested
+      periods; arrows mark living notation. A lone dot means no reliable end date is assigned. The
+      date filter includes periods that overlap your selection; undated endings are matched by their
+      starting evidence only.
+    </p>
+    <div class="timeline-list" id="timeline-list">
+      {timeline.map((entry) => {
+        const system = entry.system ? getSystem(entry.system) : undefined;
+        const end = entry.end ?? (entry.status === 'living' ? 2026 : entry.year);
+        return (
+          <article
+            class={`timeline-entry kind-${entry.kind}`}
+            id={entry.id}
+            data-entry
+            data-year={entry.year}
+            data-end={entry.end}
+            data-kind={entry.kind}
+            data-status={entry.status}
+            data-search={`${entry.title} ${entry.place} ${entry.symbol} ${entry.summary} ${entry.detail}`}
+          >
+            <div class="timeline-date">
+              <span>{entry.date}</span>
+              <small>{entry.place}</small>
+            </div>
+            <div class="timeline-node" aria-hidden="true">
+              <span></span>
+            </div>
+            <details class="timeline-card">
+              <summary>
+                <div class="timeline-symbol" aria-hidden="true">
+                  {system ? (
+                    <Specimen system={system} value={42} compact />
+                  ) : (
+                    <span>{entry.symbol}</span>
+                  )}
+                </div>
+                <div class="timeline-entry-text">
+                  <div class="timeline-entry-meta">
+                    <span>{kindLabels[entry.kind]}</span>
+                    {entry.status !== 'event' && (
+                      <small class:list={['usage-tag', { 'is-living': entry.status === 'living' }]}>
+                        {entry.status === 'living' ? 'Still in use' : 'Historical'}
+                      </small>
+                    )}
+                  </div>
+                  <h2>{entry.title}</h2>
+                  <p>{entry.summary}</p>
+                </div>
+                <span class="timeline-expand" aria-hidden="true">
+                  +
+                </span>
+              </summary>
+              <div class="timeline-entry-detail">
+                <p>{entry.detail}</p>
+                {entry.kind !== 'milestone' && (
+                  <p class="timeline-usage">
+                    <strong>Period of use</strong> {entry.usage}
+                  </p>
+                )}
+                <div class="timeline-entry-links">
+                  {entry.sources.map((source) => (
+                    <a href={source.url} target="_blank" rel="noopener noreferrer">
+                      {source.title} ↗
+                    </a>
+                  ))}
+                  {system && (
+                    <a href={`${base}systems/${system.id}/`}>Explore {system.name} numerals ↗</a>
+                  )}
+                  <a href={`#${entry.id}`} data-permalink>
+                    Link to this entry ↗
+                  </a>
+                </div>
+              </div>
+            </details>
+            <div class="usage-visual" aria-label={entry.usage}>
+              <div class="usage-track">
+                <span
+                  class:list={[
+                    'usage-bar',
+                    {
+                      ongoing: entry.status === 'living',
+                      uncertain: !entry.end && entry.status !== 'living',
+                    },
+                  ]}
+                  style={`left:${position(entry.year)}%;width:${Math.max(0, position(end) - position(entry.year))}%`}
+                ></span>
+              </div>
+              <span class="usage-caption">{entry.usage}</span>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+    <div class="timeline-empty" id="timeline-empty" hidden>
+      <h2>No matching entries.</h2>
+      <p>Try a wider date range or a different search.</p>
+      <button type="button" id="timeline-empty-reset" class="dark-button">
+        Show all history ↗
+      </button>
+    </div>
+    <section class="timeline-notes" id="reading-dates" aria-labelledby="reading-heading">
+      <div>
+        <span class="eyebrow">READING THE RECORD</span>
+        <h2 id="reading-heading">Dates need context.</h2>
+      </div>
+      <div>
+        <p>
+          <strong>Evidence comes first.</strong> “c.” means approximately. A dated inscription,
+          manuscript, or publication is evidence of use; it is rarely proof that nobody used the
+          idea earlier. Illustrative symbols use modern forms unless a linked numeral specimen is
+          shown.
+        </p>
+        <p>
+          <strong>Notation seldom has an expiry date.</strong> A historical period may describe one
+          variant or a surviving set of documents. Traditions can overlap, evolve, decline, or
+          return. A bar’s endpoint is explained in its entry.
+        </p>
+        <p>
+          <strong>A selection, not an exhaustive history.</strong> These {timeline.length} entries
+          introduce numeral traditions, familiar symbols, and major mathematical developments. Many
+          people, regions, and ideas remain to be added. Era labels are browsing aids, not universal
+          historical divisions.
+        </p>
+      </div>
+    </section>
+  </div>
+</Layout>
+<script>
+  import '../lib/timeline-client';
+</script>

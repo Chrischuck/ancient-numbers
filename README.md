@@ -12,6 +12,7 @@ A world of ways to count. A free, static exploration of 36 written, spoken, and 
 - Calculate with exact rational arithmetic: addition, subtraction, multiplication, and division.
 - Compare three traditions, share a calculation, copy encoded numerals, or save self-contained vector artwork.
 - Search the collection by name, location, region, or mathematical structure.
+- Explore the interactive timeline of mathematical notation, numeral traditions, and major milestones, with era filters, shareable searches, and periods of use.
 - Read the source references, notation limits, and selected period on each system page.
 
 The collection includes modern and living traditions as well as ancient ones. Spoken number words are not given invented written glyphs. Physical representations are labeled as modern teaching diagrams.
