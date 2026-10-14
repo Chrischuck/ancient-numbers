@@ -1,0 +1,37 @@
+---
+import type { SystemDefinition } from '../lib/types';
+import { represent } from '../lib/format';
+import { loadGlyphs, findGlyph, glyphSVG } from '../lib/glyphs';
+interface Props {
+  system: SystemDefinition;
+  value?: number;
+  compact?: boolean;
+}
+const { system, value = system.specimen, compact = false } = Astro.props;
+const result = represent({ numerator: BigInt(value), denominator: 1n }, system);
+const glyphs = await loadGlyphs(system.region);
+---
+
+<div
+  class:list={['specimen', `layout-${result.layout}`, { compact: compact }]}
+  role="img"
+  aria-label={`${system.name}: ${value}`}
+>
+  {result.tokens.map((token) =>
+    token.glyph ? (
+      <span class="glyph-cell">
+        {findGlyph(token.glyph, glyphs) && (
+          <Fragment set:html={glyphSVG(findGlyph(token.glyph, glyphs)!)} />
+        )}
+      </span>
+    ) : (
+      <span
+        class="word-specimen"
+        lang={system.id === 'maori' ? 'mi' : system.id === 'hawaiian' ? 'haw' : undefined}
+      >
+        {token.text}
+      </span>
+    ),
+  )}
+  {result.tokens.length === 0 && <span class="word-specimen">{system.baseLabel}</span>}
+</div>

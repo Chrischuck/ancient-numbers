@@ -1,0 +1,113 @@
+---
+import Layout from '../components/Layout.astro';
+import SystemCard from '../components/SystemCard.astro';
+import { systems, regions, converters } from '../data/systems';
+---
+
+<Layout title="The collection — Ancient Numbers" active="collection">
+  <div class="container">
+    <section class="collection-hero">
+      <span class="eyebrow">THE WORLD DOESN’T COUNT JUST ONE WAY</span>
+      <h1>
+        A collection of
+        <br />
+        <em>human ingenuity.</em>
+      </h1>
+      <p>
+        Thirty-six traditions. Written signs, spoken words, cords, and gestures. Find a familiar
+        system—or a perspective you’ve never encountered.
+      </p>
+    </section>
+    <div class="collection-tools">
+      <div class="search-wrap">
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <circle cx="8" cy="8" r="5.5" />
+          <path d="M12 12L18 18" />
+        </svg>
+        <label for="collection-search" class="sr-only">
+          Search traditions
+        </label>
+        <input
+          id="collection-search"
+          type="search"
+          placeholder="Search a system, place, or idea…"
+          autocomplete="off"
+        />
+      </div>
+      <label for="region-filter" class="sr-only">
+        Filter by region
+      </label>
+      <select id="region-filter">
+        <option value="all">Every region</option>
+        {regions.map((r) => (
+          <option value={r}>{r}</option>
+        ))}
+      </select>
+      <label for="structure-filter" class="sr-only">
+        Filter by structure
+      </label>
+      <select id="structure-filter">
+        <option value="all">Every structure</option>
+        {[
+          'Positional',
+          'Additive',
+          'Multiplicative',
+          'Alphabetic',
+          'Spoken',
+          'Physical',
+          'Mixed',
+        ].map((s) => (
+          <option value={s}>{s}</option>
+        ))}
+      </select>
+      <span id="filter-count" class="filter-count" role="status" aria-live="polite">
+        36 traditions
+      </span>
+    </div>
+    <p class="collection-key">
+      <span aria-hidden="true">◇</span> {converters.length} working converters. Ten specimen
+      explorers with verified examples. Each entry identifies its notation and limits.
+    </p>
+    <div class="collection-grid" id="collection-grid">
+      {[...systems]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((s) => (
+          <SystemCard system={s} />
+        ))}
+      <p id="no-results" class="no-results" hidden>
+        No traditions match those filters.
+        <br />
+        Try another word or choose every region.
+      </p>
+    </div>
+  </div>
+</Layout>
+<script>
+  const search = document.getElementById('collection-search') as HTMLInputElement;
+  const region = document.getElementById('region-filter') as HTMLSelectElement;
+  const structure = document.getElementById('structure-filter') as HTMLSelectElement;
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-card]')];
+  const normalize = (s: string) =>
+    s
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .toLowerCase();
+  function filter() {
+    let count = 0;
+    const query = normalize(search.value.trim());
+    cards.forEach((c) => {
+      const show =
+        (!query || normalize(c.dataset.search ?? '').includes(query)) &&
+        (region.value === 'all' || c.dataset.region === region.value) &&
+        (structure.value === 'all' || c.dataset.structure === structure.value);
+      c.hidden = !show;
+      if (show) count++;
+    });
+    document.getElementById('filter-count')!.textContent =
+      `${count} tradition${count === 1 ? '' : 's'}`;
+    document.getElementById('no-results')!.hidden = count > 0;
+  }
+  search.addEventListener('input', filter);
+  region.addEventListener('change', filter);
+  structure.addEventListener('change', filter);
+</script>

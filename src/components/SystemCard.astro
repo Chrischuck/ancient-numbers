@@ -1,0 +1,33 @@
+---
+import type { SystemDefinition } from '../lib/types';
+import Specimen from './Specimen.astro';
+interface Props {
+  system: SystemDefinition;
+}
+const { system } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<a
+  class:list={['system-card', `region-${system.region.toLowerCase()}`]}
+  href={`${base}systems/${system.id}/`}
+  data-card
+  data-region={system.region}
+  data-structure={system.structure}
+  data-search={`${system.name} ${system.localName ?? ''} ${system.location} ${system.baseLabel} ${system.summary}`.toLocaleLowerCase()}
+>
+  <div class="card-top">
+    <span>{system.region}</span>
+    <span aria-hidden="true">↗</span>
+  </div>
+  <div class="card-specimen">
+    <Specimen system={system} compact />
+  </div>
+  <div class="card-bottom">
+    <h3>{system.name}</h3>
+    <span>{system.baseLabel}</span>
+  </div>
+  <span class="sr-only">
+    {system.engine === 'explainer' ? 'Illustrated specimen explorer' : 'Interactive converter'}
+  </span>
+</a>

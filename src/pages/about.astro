@@ -1,0 +1,107 @@
+---
+import Layout from '../components/Layout.astro';
+import Specimen from '../components/Specimen.astro';
+import { systems, getSystem } from '../data/systems';
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="Our approach — Ancient Numbers" active="about">
+  <div class="container">
+    <article class="about-page">
+      <span class="eyebrow">CURIOSITY, WITH CARE</span>
+      <h1>
+        A human story,
+        <br />
+        <em>carefully drawn.</em>
+      </h1>
+      <p class="about-intro">
+        Numbers are a shared idea. The ways we express them are wonderfully particular. Ancient
+        Numbers is an invitation to look closer.
+      </p>
+      <h2>One collection. Many traditions.</h2>
+      <p>
+        This project began with a simple question: what would an everyday number look like in a
+        different system? The answer reaches beyond written digits. Our collection includes number
+        words, knots, gestures, ancient inscriptions, and recent Indigenous inventions. The name
+        Ancient Numbers is a starting point, not a claim that every tradition here is ancient.
+      </p>
+      <h2>A considered visual language.</h2>
+      <p>
+        Every displayed numeral is a vector drawing from our shared artwork collection. Optical
+        scale, spacing, ink weight, and presentation connect the forms across the interface.
+        Meaningful features—stroke counts, wedges, curves, enclosed spaces, and placement—stay
+        distinct. A coherent theme should help you see a tradition, not erase its character.
+      </p>
+      <div class="style-proof">
+        {['kaktovik', 'maya', 'cistercian', 'rods'].map((id) => (
+          <div>
+            <Specimen
+              system={getSystem(id)!}
+              value={id === 'cistercian' ? 2026 : id === 'rods' ? 7 : 12}
+              compact
+            />
+            <small>{getSystem(id)!.name}</small>
+          </div>
+        ))}
+      </div>
+      <p>
+        Geometric forms are custom drawn. Where intricate cursive shapes need a reliable reference,
+        openly licensed font outlines are optically harmonized and credited in the glyph manifest.
+        The collection combines original drawing and attributed adaptation; it does not claim that
+        all historical forms were invented here. Downloads contain vector paths and need no fonts.
+      </p>
+      <h2>Accuracy includes knowing the limits.</h2>
+      <p>
+        Each entry names a specific tradition, variant, source, and supported range. General
+        converters follow documented rules; specimen explorers present individually verified
+        examples. Some implementation ranges are deliberately narrow. We distinguish those app
+        limits from a historical tradition’s capabilities.
+      </p>
+      <p>
+        Labels, cell boundaries, place values, and schematic diagrams are modern reading aids. They
+        are identified as such. Spoken traditions receive authentic words, and physical counting
+        methods receive diagrams. Neither is assigned an invented ancient numeral alphabet.
+      </p>
+      <h2>Arithmetic, without shortcuts.</h2>
+      <p>
+        Calculation uses exact rational arithmetic in your browser. Finite decimals and fractions
+        retain their exact values. When a selected renderer cannot express a result, the
+        mathematical answer stays visible with an explanation. Displaying an operation in a
+        tradition’s notation does not claim to reproduce its historical calculation method.
+      </p>
+      <h2>Free, open, and local.</h2>
+      <p>
+        The entire app is static and runs in your browser. There are no accounts, runtime APIs,
+        tracking scripts, or paid services. The project is published on GitHub Pages, with its
+        original code and artwork available under the MIT license. Adapted artwork retains the
+        applicable Open Font License and attribution.
+      </p>
+      <a class="inline-link" href="https://github.com/CumputerSluts/ancient-numbers">
+        Explore the repository <span aria-hidden="true">↗</span>
+      </a>
+      <h2 id="sources">Follow the evidence.</h2>
+      <p>
+        Community educational publications, museum material, specialist research, and Unicode
+        documentation inform the collection. The individual pages explain which reference supports
+        the selected notation. Historical terminology and dates are presented with their source
+        context.
+      </p>
+      <ul class="about-source-index">
+        {[...systems]
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((s) => (
+            <li>
+              <a href={`${base}systems/${s.id}/`}>{s.name} ↗</a>
+              <small>{s.sources[0].title}</small>
+            </li>
+          ))}
+      </ul>
+      <h2>A collection that can grow.</h2>
+      <p>
+        Corrections are welcome. A useful contribution includes a specific example, a documented
+        variant, and a source someone else can inspect. New systems need verified notation rules or
+        clearly bounded specimens, artwork references, tests, and license information.
+      </p>
+    </article>
+  </div>
+</Layout>

@@ -1,0 +1,90 @@
+---
+import '@fontsource/newsreader/latin-400.css';
+import '@fontsource/newsreader/latin-400-italic.css';
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-500.css';
+import '../styles/global.css';
+interface Props {
+  title?: string;
+  description?: string;
+  active?: string;
+}
+const {
+  title = 'Ancient Numbers — A world of ways to count',
+  description = 'Explore 36 numeral and counting traditions. Translate numbers, discover their structure, and calculate across cultures with Ancient Numbers.',
+  active = '',
+} = Astro.props;
+const base = import.meta.env.BASE_URL;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f5f3ed" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">
+      Skip to content
+    </a>
+    <header class="site-header container">
+      <a class="brand" href={base} title="Ancient Numbers home">
+        <svg viewBox="0 0 38 38" aria-hidden="true">
+          <path d="M19 4V34M5 10L19 4L33 10M5 28L19 34L33 28M5 10V28M33 10V28M5 19H33" />
+        </svg>
+        <span>
+          Ancient Numbers<span class="brand-sub">A WORLD OF WAYS TO COUNT</span>
+        </span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href={`${base}#converter`} aria-current={active === 'converter' ? 'page' : undefined}>
+          Converter
+        </a>
+        <a href={`${base}collection/`} aria-current={active === 'collection' ? 'page' : undefined}>
+          The collection
+        </a>
+        <a href={`${base}about/`} aria-current={active === 'about' ? 'page' : undefined}>
+          Our approach
+        </a>
+      </nav>
+      <a
+        class="source-link"
+        href="https://github.com/CumputerSluts/ancient-numbers"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Open source <span aria-hidden="true">↗</span>
+      </a>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer container">
+      <div>
+        <a class="footer-brand" href={base}>
+          Ancient Numbers
+        </a>
+        <p>Different symbols. Shared curiosity.</p>
+      </div>
+      <div class="footer-note">
+        An independent, open-source exploration.
+        <br />
+        Made for the love of learning.
+      </div>
+      <div>
+        <a href={`${base}about/#sources`}>Sources &amp; accuracy ↗</a>
+        <a href="https://github.com/CumputerSluts/ancient-numbers">Explore the code ↗</a>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,209 @@
+---
+import { systems, regions, getSystem } from '../data/systems';
+import Specimen from './Specimen.astro';
+const initial = getSystem('kaktovik')!;
+const base = import.meta.env.BASE_URL;
+---
+
+<section id="converter" class="converter-section" aria-label="Numeral converter">
+  <div class="converter-top">
+    <div class="tabs" role="tablist" aria-label="Choose a tool">
+      <button
+        id="translate-tab"
+        role="tab"
+        aria-selected="true"
+        aria-controls="input-panel"
+        data-mode="translate"
+      >
+        Translate
+      </button>
+      <button
+        id="calculate-tab"
+        role="tab"
+        aria-selected="false"
+        aria-controls="input-panel"
+        data-mode="calculate"
+        tabindex="-1"
+      >
+        Calculate
+      </button>
+    </div>
+    <span class="section-index">01 / THE CONVERTER</span>
+  </div>
+  <div class="converter-grid">
+    <div id="input-panel" class="input-panel" role="tabpanel" aria-labelledby="translate-tab">
+      <div class="input-heading">
+        <label class="eyebrow" for="number-input">
+          YOUR NUMBER
+        </label>
+        <span class="input-kind">Hindu-Arabic · base 10</span>
+      </div>
+      <input
+        id="number-input"
+        class="number-input"
+        type="text"
+        inputmode="decimal"
+        value="42"
+        maxlength="205"
+        spellcheck="false"
+        autocomplete="off"
+        aria-describedby="input-help input-error"
+      />
+      <div id="arithmetic-fields" class="arithmetic-fields" hidden>
+        <label class="sr-only" for="operation">
+          Operation
+        </label>
+        <select id="operation">
+          <option value="add">+ Add</option>
+          <option value="subtract">− Subtract</option>
+          <option value="multiply">× Multiply</option>
+          <option value="divide">÷ Divide</option>
+        </select>
+        <label class="sr-only" for="second-input">
+          Second number
+        </label>
+        <input
+          id="second-input"
+          type="text"
+          inputmode="decimal"
+          value="8"
+          maxlength="205"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <p id="input-help" class="input-help">
+        A whole number, decimal, or fraction. Try 42 or 3/2.
+      </p>
+      <p id="input-error" class="input-error" role="alert" hidden></p>
+      <div class="system-field">
+        <label class="eyebrow" for="system-select">
+          EXPLORE A DIFFERENT SYSTEM
+        </label>
+        <div class="select-wrap">
+          <select id="system-select">
+            {regions.map((region) => (
+              <optgroup label={region}>
+                {systems
+                  .filter((s) => s.region === region)
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((s) => (
+                    <option value={s.id} selected={s.id === 'kaktovik'}>
+                      {s.name}
+                      {s.engine === 'explainer' ? ' · specimen explorer' : ''}
+                    </option>
+                  ))}
+              </optgroup>
+            ))}
+          </select>
+          <span aria-hidden="true">⌄</span>
+        </div>
+      </div>
+      <div id="example-chips" class="example-chips" aria-label="Try an example">
+        {initial.examples.map((e) => (
+          <button type="button" data-example={e.value}>
+            {e.value}
+          </button>
+        ))}
+      </div>
+      <div class="input-note">
+        <span class="live-dot" aria-hidden="true"></span>
+        <span id="availability">Verified whole-number conversion</span>
+      </div>
+    </div>
+    <div class="output-panel" aria-busy="false">
+      <div class="output-heading">
+        <span id="output-name" class="eyebrow">
+          KAKTOVIK IÑUPIAQ
+        </span>
+        <span id="output-base" class="base-badge">
+          BASE 20
+        </span>
+      </div>
+      <div id="output-value" class="output-value">
+        <Specimen system={initial} value={42} />
+      </div>
+      <div id="output-message" class="output-message" hidden></div>
+      <div class="result-caption">
+        <span id="exact-value">42</span>
+        <span class="result-separator" aria-hidden="true">
+          /
+        </span>
+        <span id="output-equation">2 × 20 + 2 × 1 = 42</span>
+      </div>
+      <div class="output-actions">
+        <button id="copy-button" type="button">
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M7 7H16V17H7ZM4 13H2V2H12V4" />
+          </svg>
+          Copy numeral
+        </button>
+        <button id="download-button" type="button">
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M10 2V12M6 8L10 12L14 8M3 13V17H17V13" />
+          </svg>
+          Save SVG
+        </button>
+        <button id="share-button" type="button">
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M7 10L13 5M7 11L13 15" />
+            <circle cx="5" cy="10" r="2.5" />
+            <circle cx="15" cy="4" r="2.5" />
+            <circle cx="15" cy="16" r="2.5" />
+          </svg>
+          Share
+        </button>
+      </div>
+      <span id="action-status" class="action-status" role="status"></span>
+    </div>
+  </div>
+  <div class="converter-context">
+    <div>
+      <span class="eyebrow">THE IDEA BEHIND THE SYMBOLS</span>
+      <p id="system-summary">{initial.summary}</p>
+    </div>
+    <div class="context-location">
+      <span class="eyebrow">PLACE &amp; TIME</span>
+      <p id="system-location">
+        {initial.location}
+        <br />
+        {initial.period}
+      </p>
+    </div>
+    <a id="learn-link" href={`${base}systems/kaktovik/`}>
+      Meet the system <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+  <details class="notation-details">
+    <summary>
+      How to read this representation <span aria-hidden="true">+</span>
+    </summary>
+    <div>
+      <p id="reading-explanation">{initial.howItWorks}</p>
+      <p id="system-caveat">{initial.caveat}</p>
+      <a id="system-source" href={initial.sources[0].url} target="_blank" rel="noopener noreferrer">
+        Read the primary reference ↗
+      </a>
+    </div>
+  </details>
+  <div class="compare-bar">
+    <div>
+      <span class="eyebrow">SAME NUMBER, ANOTHER PERSPECTIVE</span>
+      <p>See how other traditions express it.</p>
+    </div>
+    <button id="add-comparison" class="text-button" type="button">
+      Compare a system <span aria-hidden="true">+</span>
+    </button>
+  </div>
+  <div id="comparisons" class="comparisons"></div>
+  <div
+    class="sr-only"
+    id="result-announcement"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+  ></div>
+</section>
+<script>
+  import '../lib/converter-client';
+</script>

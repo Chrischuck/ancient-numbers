@@ -1,0 +1,16 @@
+# Core numeral artwork and source ledger
+
+The path definitions in `src/glyphs/core.ts` are original geometric drawings informed by the source references below. They preserve structural features, rather than copying a particular font's outlines. All use the master canvas and stroke specification; filled dots and wedges retain the form needed by their notation.
+
+- **Kaktovik:** Marín Silva, Miller & Strand, Unicode request L2/21-058(2021), pages1–4, https://www.unicode.org/L2/L2021/21058-kaktovik-numerals.pdf. Units occupy the lower portion; the upper strokes count fives. The zero has a distinct loop/crossing form. The empty upper region of small digits is intentional. Digit construction keeps the fives and units joined.
+- **Maya:** Unicode17 chapter22, Maya numerals, https://www.unicode.org/versions/Unicode17.0.0/core-spec/chapter-22/. Original dot/bar construction and a schematic shell-form zero. Ordinary vigesimal position values, not the Long Count calendar variant. Several historical zero forms exist.
+- **Mexica:** University of Oregon Nahua Glyphs, https://blogs.uoregon.edu/nahuaglyphs/numbers/. Geometric dot, flag, feather, and bag specimens. Their linear layout is an educational additive transcription; it does not imitate complete tribute-record composition.
+- **Khipu:** Dr. Sarahh Scher, Smarthistory, https://smarthistory.org/inka-khipu/. Original schematic cord and knot diagrams distinguish overhand groups from the units figure-eight and long-turn knot. The135 example is explicitly documented. These are modern teaching diagrams, not facsimiles or a complete encoding of non-numerical information.
+- **Roman:** Unicode17 chapter22. Original geometric capitals. The selected1–3,999 convention uses six familiar subtractive pairs; it is not a universal description of Roman inscriptions.
+- **Greek alphabetic:** Unicode17 chapter22. Original uppercase letterforms with stigma, koppa, sampi, and the following numeral mark. Cap999 avoids extrapolating unimplemented thousands layouts. Source forms were visually checked, including the distinct sampi construction.
+- **Greek Attic:** Unicode acrophonic proposal N2612-3 and the Unicode17 Ancient Greek Numbers chart, https://www.unicode.org/wg2/docs/n2612-3.pdf and https://www.unicode.org/Public/17.0.0/charts/PDF/U10140.pdf. Original acrophonic signs including the short right limb of the five sign and the embedded decimal-power signs. Uses abstract integers, not specialist monetary signs.
+- **Cistercian:** David A. King, The Ciphers of the Monks(2001), https://books.google.com/books?id=PapljPXaSbwC. Vertical-staff quadrant family with the triangular five variant; right upperunits, left uppertens, right lowerhundreds, left lowerthousands. Original stroke construction. No whole-number zero is introduced.
+
+## Oral and body-counting entries
+
+`src/data/oceania.ts` and `src/data/american-oral.ts` retain the relevant community or researcher sources and exact specimen explanations. `src/glyphs/oral.ts` contains original redraws of selected Cherokee numerical signs and original Oksapmin teaching diagrams. The latter are explicitly not historical glyphs. Māori, Hawaiian, Mangarevan, Choctaw, Diné, and Yorùbá examples use authentic words, never invented numeral icons.

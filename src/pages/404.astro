@@ -1,0 +1,16 @@
+---
+import Layout from '../components/Layout.astro';
+---
+
+<Layout title="Page not found — Ancient Numbers">
+  <div class="container error-page">
+    <span class="eyebrow">404 / A MISSING PLACE</span>
+    <h1>
+      Another way <em>back.</em>
+    </h1>
+    <p>This page isn’t in the collection. There are still 36 traditions to explore.</p>
+    <a class="dark-button" href={`${import.meta.env.BASE_URL}collection/`}>
+      Explore the collection ↗
+    </a>
+  </div>
+</Layout>

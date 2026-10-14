@@ -1,0 +1,161 @@
+---
+import Layout from '../../components/Layout.astro';
+import Specimen from '../../components/Specimen.astro';
+import SystemCard from '../../components/SystemCard.astro';
+import { systems } from '../../data/systems';
+export function getStaticPaths() {
+  return systems.map((system) => ({ params: { id: system.id }, props: { system } }));
+}
+const { system } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const related = systems.filter((s) => s.id !== system.id && s.region === system.region).slice(0, 3);
+const first =
+  system.examples.find((e) => e.value === String(system.specimen)) ?? system.examples[0];
+---
+
+<Layout title={`${system.name} — Ancient Numbers`} description={system.summary} active="collection">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href={`${base}collection/`}>The collection</a>
+      <span aria-hidden="true">/</span>
+      <span>{system.region}</span>
+      <span aria-hidden="true">/</span>
+      <span>{system.name}</span>
+    </div>
+    <section class="system-hero">
+      <div>
+        <span class="eyebrow">
+          {system.era.toUpperCase()} · {system.baseLabel.toUpperCase()}
+        </span>
+        <h1>{system.name}</h1>
+        {system.localName && <p class="local-name">{system.localName}</p>}
+        <p class="lead">{system.summary}</p>
+        <a
+          class="dark-button"
+          href={`${base}?system=${system.id}&number=${system.specimen}#converter`}
+        >
+          {system.engine === 'explainer' ? 'Explore the specimens' : 'Try the converter'}{' '}
+          <span aria-hidden="true">↗</span>
+        </a>
+        <dl class="system-facts">
+          <div>
+            <dt>Place</dt>
+            <dd>{system.location}</dd>
+          </div>
+          <div>
+            <dt>Period / variant</dt>
+            <dd>{system.period}</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="system-showcase" data-system={system.id}>
+        <span class="eyebrow">
+          {system.engine === 'explainer' ? 'VERIFIED SPECIMEN' : 'A NUMBER, ANOTHER PERSPECTIVE'}
+        </span>
+        <div id="detail-specimen">
+          <Specimen system={system} />
+        </div>
+        <p id="detail-caption" class="specimen-caption">
+          {system.specimen} · {system.baseLabel}
+        </p>
+        <div class="detail-examples" aria-label="Choose an example">
+          {system.examples.map((e) => (
+            <button
+              type="button"
+              data-detail-example={e.value}
+              aria-pressed={e.value === String(system.specimen)}
+            >
+              {e.value}
+            </button>
+          ))}
+        </div>
+        <p id="detail-description" class="detail-description">
+          {first.explanation}
+        </p>
+      </div>
+    </section>
+    <div class="system-article">
+      <article>
+        <h2>Where it comes from.</h2>
+        <p>{system.history}</p>
+        <h2>How to read it.</h2>
+        <p>{system.howItWorks}</p>
+        <h2>What makes it different.</h2>
+        <p>{system.caveat}</p>
+        <a
+          class="inline-link"
+          href={`${base}?system=${system.id}&number=${system.specimen}#converter`}
+        >
+          See it alongside another tradition <span aria-hidden="true">↗</span>
+        </a>
+      </article>
+      <aside class="system-aside">
+        <div class="note-box">
+          <h3>{system.engine === 'explainer' ? 'A specimen explorer' : 'About this converter'}</h3>
+          <p>
+            {system.engine === 'explainer'
+              ? 'These examples are individually documented. A general translator is not yet available for this entry.'
+              : 'The renderer follows the named variant and supports whole numbers in its verified range. Exact arithmetic results remain visible when a representation is unavailable.'}
+          </p>
+        </div>
+        <h3 class="eyebrow" style="margin-top:30px">
+          FOLLOW THE SOURCES
+        </h3>
+        <ol class="source-list">
+          {system.sources.map((source) => (
+            <li>
+              <a href={source.url} target="_blank" rel="noopener noreferrer">
+                {source.title} ↗
+              </a>
+              {source.detail && <p>{source.detail}</p>}
+            </li>
+          ))}
+        </ol>
+        <p style="font-size:10px;margin-top:18px">
+          Found something to improve?{' '}
+          <a
+            href={`https://github.com/CumputerSluts/ancient-numbers/issues/new?title=${encodeURIComponent(`Source or notation correction: ${system.name}`)}`}
+            style="text-decoration:underline"
+          >
+            Share a source.
+          </a>
+        </p>
+      </aside>
+    </div>
+    <section class="related-section">
+      <span class="eyebrow">KEEP EXPLORING</span>
+      <h2>Another perspective.</h2>
+      <div class="preview-grid">
+        {related.map((s) => (
+          <SystemCard system={s} />
+        ))}
+      </div>
+    </section>
+  </div>
+</Layout>
+<script>
+  import { getSystem } from '../../data/systems';
+  import { represent } from '../../lib/format';
+  import { loadGlyphs } from '../../lib/glyphs';
+  import { renderRepresentation } from '../../lib/render';
+  const showcase = document.querySelector<HTMLElement>('[data-system]')!;
+  const system = getSystem(showcase.dataset.system!)!;
+  let serial = 0;
+  showcase.addEventListener('click', async (event) => {
+    const button = (event.target as Element).closest<HTMLButtonElement>('[data-detail-example]');
+    if (!button) return;
+    const current = ++serial;
+    const value = button.dataset.detailExample!;
+    const result = represent({ numerator: BigInt(value), denominator: 1n }, system);
+    const glyphs = await loadGlyphs(system.region);
+    if (current !== serial) return;
+    document.getElementById('detail-specimen')!.innerHTML = renderRepresentation(result, glyphs);
+    document.getElementById('detail-caption')!.textContent = `${value} · ${system.baseLabel}`;
+    document.getElementById('detail-description')!.textContent = system.examples.find(
+      (e) => e.value === value,
+    )!.explanation;
+    showcase
+      .querySelectorAll<HTMLButtonElement>('[data-detail-example]')
+      .forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+  });
+</script>
