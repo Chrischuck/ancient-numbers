@@ -42,6 +42,25 @@ test('every tradition loads its specimen without client errors', async ({ page }
   }
   expect(errors).toEqual([]);
 });
+test('Sinhala thousands work in shared links, examples, and calculations', async ({ page }) => {
+  await page.goto('?system=sinhala&number=1987');
+  await expect(page.locator('#output-name')).toHaveText('SINHALA ILLAKKAM');
+  await expect(page.locator('#output-value .numeral-glyph')).toHaveCount(5);
+  await expect(page.locator('#output-message')).toBeHidden();
+  await expect(page.locator('#output-equation')).toHaveText('1,000 + 9 × 100 + 80 + 7 = 1,987');
+  await page.getByRole('button', { name: '2010', exact: true }).click();
+  await expect(page.locator('#output-value .numeral-glyph')).toHaveCount(3);
+  await expect(page.locator('#output-equation')).toHaveText('2 × 1,000 + 10 = 2,010');
+  await page.getByRole('tab', { name: 'Calculate' }).click();
+  await page.locator('#number-input').fill('1000');
+  await page.locator('#second-input').fill('987');
+  await expect(page.locator('#exact-value')).toHaveText('1987');
+  await expect(page.locator('#output-value .numeral-glyph')).toHaveCount(5);
+  await page.locator('#number-input').fill('9999');
+  await page.locator('#second-input').fill('1');
+  await expect(page.locator('#exact-value')).toHaveText('10000');
+  await expect(page.locator('#output-message')).toContainText('9,999');
+});
 test('SVGdownload contains paths and no font dependency', async ({ page }) => {
   await page.goto('');
   await ready(page);
@@ -111,7 +130,14 @@ for (const route of ['', 'collection/', 'systems/mende-kikakui/', 'about/'])
   });
 test('mobile layouts have no horizontal page overflow', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  for (const path of ['', 'collection/', 'systems/kharoshthi/', 'systems/navajo/', 'about/']) {
+  for (const path of [
+    '',
+    '?system=sinhala&number=9999',
+    'collection/',
+    'systems/kharoshthi/',
+    'systems/navajo/',
+    'about/',
+  ]) {
     await page.goto(path);
     await page.evaluate(() => document.fonts.ready);
     expect(

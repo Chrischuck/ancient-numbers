@@ -74,8 +74,13 @@ test('SVGexports are selfcontained drawings and reject word-only specimens', asy
 
 test('adapted artwork exports retain source attribution and full OFL license', async () => {
   const s = systems.find((s) => s.id === 'sinhala')!;
-  const svg = exportSVG(represent(parseNumber('42'), s), await loadGlyphs(s.region), s.name)!;
+  const glyphs = await loadGlyphs(s.region);
+  const result = represent(parseNumber('1987'), s);
+  assert.equal(copyText(result, glyphs, s), '𑇴𑇩𑇳𑇱𑇧');
+  const svg = exportSVG(result, glyphs, s.name)!;
   assert.ok(svg.includes('SIL OPEN FONT LICENSE'));
   assert.ok(svg.includes('Copyright 2016-2022 Google Inc.'));
   assert.ok(svg.includes('<metadata>'));
+  assert.ok(svg.includes('U+111F3'));
+  assert.ok(svg.includes('U+111F4'));
 });

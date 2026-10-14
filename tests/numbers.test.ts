@@ -105,6 +105,52 @@ test('Tamil multiplicative source examples156 and3782', () => {
     'tamil-2',
   ]);
 });
+test('Sinhala reproduces the SLSI N3888 page 4 compound examples', () => {
+  const fixtures: [string, number[]][] = [
+    ['100', [100]],
+    ['101', [100, 1]],
+    ['102', [100, 2]],
+    ['109', [100, 9]],
+    ['110', [100, 10]],
+    ['111', [100, 10, 1]],
+    ['222', [2, 100, 20, 2]],
+    ['333', [3, 100, 30, 3]],
+    ['444', [4, 100, 40, 4]],
+    ['555', [5, 100, 50, 5]],
+    ['666', [6, 100, 60, 6]],
+    ['777', [7, 100, 70, 7]],
+    ['888', [8, 100, 80, 8]],
+    ['999', [9, 100, 90, 9]],
+    ['1000', [1000]],
+    ['1987', [1000, 9, 100, 80, 7]],
+    ['2010', [2, 1000, 10]],
+  ];
+  for (const [value, signs] of fixtures)
+    assert.deepEqual(
+      ids('sinhala', value),
+      signs.map((sign) => `sinhala-${sign}`),
+      value,
+    );
+  assert.equal(rep('sinhala', '1987').explanation, '1,000 + 9 × 100 + 80 + 7 = 1,987');
+});
+test('Sinhala omits empty groups and bounds the verified four-place composition', () => {
+  // Rule-derived cases; these values are not claimed as printed source examples.
+  for (const [value, signs] of [
+    ['1001', [1000, 1]],
+    ['1010', [1000, 10]],
+    ['1100', [1000, 100]],
+    ['2000', [2, 1000]],
+    ['9009', [9, 1000, 9]],
+    ['9999', [9, 1000, 9, 100, 90, 9]],
+  ] as [string, number[]][])
+    assert.deepEqual(
+      ids('sinhala', value),
+      signs.map((sign) => `sinhala-${sign}`),
+      value,
+    );
+  for (const value of ['0', '-1', '1/2', '10000'])
+    assert.equal(rep('sinhala', value).status, 'unsupported', value);
+});
 test('Suzhou archival examples alternate runs of firstthree', () => {
   assert.deepEqual(ids('suzhou', '123'), ['suzhou-1', 'suzhou-horizontal-2', 'suzhou-3']);
   assert.deepEqual(ids('suzhou', '312'), ['suzhou-3', 'suzhou-horizontal-1', 'suzhou-2']);

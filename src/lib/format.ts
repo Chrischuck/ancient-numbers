@@ -149,14 +149,36 @@ export function represent(value: Rational, system: SystemDefinition): Representa
           'Coefficients combine with hundred and ten-thousand signs. Empty groups are omitted.';
         break;
       }
-      case 'tamil':
       case 'sinhala': {
-        const prefix = system.engine;
         let rest = n;
-        if (prefix === 'sinhala') {
-          additive(rest);
-          break;
+        const terms: string[] = [];
+        // SLSI N3888 p. 4: 101, 222, 999, 1987, and 2010.
+        // Hundreds/thousands take a unit multiplier; a multiplier of one is implicit.
+        for (const power of [1000n, 100n]) {
+          const coefficient = rest / power;
+          if (coefficient) {
+            if (coefficient !== 1n) push(`sinhala-${coefficient}`);
+            push(`sinhala-${power}`);
+            const magnitude = power.toLocaleString('en-US');
+            terms.push(coefficient === 1n ? magnitude : `${coefficient} × ${magnitude}`);
+          }
+          rest %= power;
         }
+        const tens = (rest / 10n) * 10n;
+        if (tens) {
+          push(`sinhala-${tens}`);
+          terms.push(tens.toString());
+        }
+        const units = rest % 10n;
+        if (units) {
+          push(`sinhala-${units}`);
+          terms.push(units.toString());
+        }
+        explanation = `${terms.join(' + ')} = ${n.toLocaleString('en-US')}`;
+        break;
+      }
+      case 'tamil': {
+        let rest = n;
         for (const power of [1000, 100, 10]) {
           const c = rest / BigInt(power);
           if (c) {

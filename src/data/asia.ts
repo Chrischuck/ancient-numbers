@@ -189,20 +189,19 @@ export const asiaSystems: SystemDefinition[] = [
     location: 'Sri Lanka',
     period: 'Archaic numerals · in use before 1815',
     era: 'Historical',
-    structure: 'Additive',
-    baseLabel: 'Decimal sign values',
-    summary: 'Historical Sri Lankan signs for units and multiples of ten.',
+    structure: 'Multiplicative',
+    baseLabel: 'Decimal with multipliers',
+    summary: 'Unit and tens signs combine with hundred and thousand multipliers.',
     history:
       'Sinhala Illakkam survives in royal documents and artifacts, including material from the Kandyan period. Sri Lankan research distinguished this non-positional set from the zero-bearing astrological numerals called Lith Illakkam.',
     howItWorks:
-      'The repertoire has nine unit signs, separate signs for ten through ninety, and signs for hundred and thousand. This converter composes the documented units and tens in the additive range 1–99.',
+      'Read left to right. A digit before the hundred or thousand sign multiplies its value; one is omitted. Tens and units are added. For example, 1,987 = 1,000 + 9 × 100 + 80 + 7.',
     caveat:
-      'Sinhala Illakkam has no zero digit. The app currently limits composition to values below 100 while larger historical combinations await a separate rule study. Its hundred and thousand signs appear in the reference collection; do not confuse these with modern Sinhala astrological digits.',
+      'There is no zero sign: empty groups are omitted. This converter supports 1–9,999 using the composition shown in the Sri Lankan standards proposal. Larger forms are not implemented. Sinhala Lith Illakkam is a separate, positional system.',
     engine: 'sinhala',
     min: '1',
-    max: '99',
+    max: '9999',
     zero: false,
-    values: descending('sinhala', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90]),
     specimen: 42,
     examples: [
       { value: '10', glyphs: ['sinhala-10'], explanation: 'The distinct archaic ten sign.' },
@@ -212,13 +211,38 @@ export const asiaSystems: SystemDefinition[] = [
         explanation: '40 + 2, combining a tens sign and a unit sign.',
       },
       { value: '90', glyphs: ['sinhala-90'], explanation: 'A single sign stands for ninety.' },
+      {
+        value: '101',
+        glyphs: ['sinhala-100', 'sinhala-1'],
+        explanation: '100 + 1. The leading one before hundred is omitted, as in the source chart.',
+      },
+      {
+        value: '222',
+        glyphs: ['sinhala-2', 'sinhala-100', 'sinhala-20', 'sinhala-2'],
+        explanation: '2 × 100 + 20 + 2; shown in the Sri Lankan standards proposal.',
+      },
+      {
+        value: '1987',
+        glyphs: ['sinhala-1000', 'sinhala-9', 'sinhala-100', 'sinhala-80', 'sinhala-7'],
+        explanation: '1,000 + 9 × 100 + 80 + 7; shown in the source chart without a leading one.',
+      },
+      {
+        value: '2010',
+        glyphs: ['sinhala-2', 'sinhala-1000', 'sinhala-10'],
+        explanation: '2 × 1,000 + 10. No zero placeholders; shown in the source chart.',
+      },
     ],
     sources: [
       {
         title: 'Sri Lanka Standards Institution · Sinhala numeral proposal',
         url: 'https://www.unicode.org/L2/L2010/10337-n3888-sinhala.pdf',
         detail:
-          'Pages 9–10: archaic numeral repertoire, royal-document use, numerical values, and Sri Lankan research references.',
+          'Page 4: compound examples 101–111, repeated-digit hundreds (222–999), 1,000, 1,987, and 2,010. The leading one before hundred/thousand is omitted. Pages 9–10: encoded repertoire.',
+      },
+      {
+        title: 'Proposal to Encode Sinhala Archaic Numerals and Numbers (L2/10-312)',
+        url: 'https://www.unicode.org/L2/L2010/10312-sinhala-num.pdf',
+        detail: 'Page 4: one hundred, multiples 200–900, and one thousand.',
       },
       unicode(
         13,

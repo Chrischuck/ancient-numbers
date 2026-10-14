@@ -60,7 +60,7 @@ Open Graph and Twitter metadata use `public/social-card-v1.png`, a 1200 × 630 i
 
 ## Accuracy and limits
 
-Conversion follows named variants with explicit ranges. Some historically rich systems currently support a narrow interval (for example, Brahmi and Sinhala Illakkam below 100). Those are app limits, not historical claims. Ten entries intentionally offer individually verified specimens rather than an arbitrary-number converter.
+Conversion follows named variants with explicit ranges. Some systems currently support a narrow interval (for example, Brahmi below 100). Sinhala Illakkam supports 1–9,999 using documented hundred and thousand multipliers. Those are app limits, not historical claims. Ten entries intentionally offer individually verified specimens rather than an arbitrary-number converter.
 
 A modern cell grid fixes the integer scale for Old Babylonian notation and makes empty counting-rod positions visible. Ordinary Maya base-20 notation is kept separate from Long Count calendar notation. The calculator does not claim to reproduce historical arithmetic procedures. Fractional and negative answers remain exact even when their historical rendering is unavailable.
 
