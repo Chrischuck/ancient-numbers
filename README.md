@@ -54,6 +54,10 @@ Astro is configured with `site: 'https://cumputersluts.github.io'`, `base: '/anc
 
 There is no framework runtime in the browser. Content is generated as HTML; small TypeScript modules handle interactions. Regional glyph chunks load only when needed. Fonts are hosted locally. Inputs allow at most 100 digits, and representations at most 256 elements.
 
+## Link previews
+
+Open Graph and Twitter metadata use `public/social-card-v1.png`, a 1200 × 630 image. The three examples encode 69 in Kaktovik, Maya, and Cistercian numerals. Regenerate the PNG and path-only SVG with `npm run generate:preview`; the script reuses the converter rules, glyphs, and local interface fonts. The preview adds no image download to normal page loads.
+
 ## Accuracy and limits
 
 Conversion follows named variants with explicit ranges. Some historically rich systems currently support a narrow interval (for example, Brahmi and Sinhala Illakkam below 100). Those are app limits, not historical claims. Ten entries intentionally offer individually verified specimens rather than an arbitrary-number converter.
