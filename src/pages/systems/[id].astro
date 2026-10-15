@@ -76,8 +76,13 @@ const first =
       <article>
         <h2>History</h2>
         <p>{system.history}</p>
-        <h2>Notation</h2>
+        <h2>How to read it</h2>
         <p>{system.howItWorks}</p>
+        <ol class="reading-steps">
+          {system.readingSteps.map((step) => (
+            <li>{step}</li>
+          ))}
+        </ol>
         <h2>Limits</h2>
         <p>{system.caveat}</p>
         <a

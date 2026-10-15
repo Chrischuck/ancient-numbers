@@ -26,7 +26,13 @@ export const africaSystems: SystemDefinition[] = [
     history:
       'Medefaidrin belongs to the Oberi Okaime community in southeastern Nigeria. Its script developed alongside a spiritual language during the early twentieth century. The encoding proposal includes handwritten numerals supplied by Reverend Richmael Ekit in 2016.',
     howItWorks:
-      'Each position is worth twenty times the one to its right. There are individual signs for every value from zero to nineteen: 42 is two twenties and two units; 400 is one four-hundred and two empty places.',
+      'Use groups of twenty instead of groups of ten. Each digit has its own sign, from zero through nineteen.',
+    readingSteps: [
+      'Read the positions from the right: ones, twenties, then four hundreds. Moving one position left makes its value twenty times larger.',
+      'For 42, the left sign is 2 in the twenties position. Two twenties make 40.',
+      'The right sign is 2 in the ones position. Add 40 + 2 = 42.',
+      'For 400, use 1 in the four-hundreds position, then two zero signs. The zeros keep the empty twenties and ones positions visible.',
+    ],
     caveat:
       'Ordinary digit shapes are used here. Simplified forms of one, two, and three also occur in compound numbers, but community examples establish that they are optional. The 100-digit input limit belongs to this app.',
     engine: 'positional',
@@ -76,7 +82,13 @@ export const africaSystems: SystemDefinition[] = [
     history:
       'Kikakui is an indigenous script for the Mende language. Its numerical repertoire combines nine unit signs with marks for decimal magnitudes and a separate mark for the teens. The numeral arrangement follows the script’s right-to-left reading direction.',
     howItWorks:
-      'A subscript beneath a digit changes its value. Four with the teens mark means fourteen, while two with the tens mark means twenty. Compound number units are added, with the largest on the right. The specimens preserve the complete combinations.',
+      'Read a digit together with the small mark beneath it. That mark changes how much the digit is worth.',
+    readingSteps: [
+      'A small mark below a digit is called a subscript. The teens mark turns four into fourteen; the tens mark turns two into twenty.',
+      'For 27, start with the larger group on the right: two with the tens mark means 20.',
+      'The other group contributes seven. Add 20 + 7 = 27.',
+      'For 206, the groups mean two hundreds and six ones: 200 + 6 = 206. No zero is inserted for the missing tens. The examples preserve the complete sign combinations.',
+    ],
     caveat:
       'This entry offers verified whole-number specimens rather than a general converter. Combining marks must attach to their numeral; displaying a separate multiplier beside it would misrepresent the writing.',
     engine: 'explainer',
@@ -134,7 +146,13 @@ export const africaSystems: SystemDefinition[] = [
     history:
       'King Ibrahim Njoya developed Bamum writing through a succession of forms beginning in the late nineteenth century. This collection uses the final, A-ka-u-ku repertoire. Its last ten letters also serve as numerals.',
     howItWorks:
-      'The modern convention assigns the ten signs values zero through nine and writes decimal places from left to right. A digit’s position determines whether it counts units, tens, or hundreds.',
+      'In the modern convention shown here, Bamum signs work as decimal digits. Read their positions like familiar groups of ten.',
+    readingSteps: [
+      'Each sign represents a digit from zero to nine. Read the number from left to right.',
+      'For 42, the left digit 4 sits in the tens position. It means four tens, or 40.',
+      'The right digit 2 sits in the ones position. Add 40 + 2 = 42.',
+      'For 10, use the digit 1 followed by the zero digit. The zero keeps the empty ones position visible. These examples use the modern decimal convention.',
+    ],
     caveat:
       'This is the modern decimal convention. Koghom, used here for zero, formerly meant ten. It should not be read as zero when interpreting an earlier Bamum document.',
     engine: 'positional',
@@ -184,7 +202,16 @@ export const africaSystems: SystemDefinition[] = [
     history:
       'The numeral signs form part of the Ethiopic writing tradition. Their barred, letter-like forms are related to Greek and Coptic numeral traditions. They survive alongside familiar decimal digits and have their own rules for composing larger quantities.',
     howItWorks:
-      'Signs for one to nine and ten to ninety combine with hundred and ten-thousand markers. Read 2,345 as (20 + 3) × 100 + 40 + 5. There is no zero sign: absent values are omitted, and one before a magnitude marker is normally implicit.',
+      'Think of 2,345 as “23 hundreds, plus 45.” Ethiopic writes how many hundreds there are, then the amount left over.',
+    readingSteps: [
+      'Learn the building blocks: there are separate signs for 1–9 and for 10, 20, 30, through 90. The hundred marker ፻ means “multiply the amount before me by 100.”',
+      'Start with 2,345. Set aside the last two digits, 45. The remaining 23 tells you how many hundreds you have: 23 hundreds make 2,300.',
+      'Write 23 with the twenty sign ፳ and the three sign ፫. Together they mean 20 + 3 = 23.',
+      'Put the hundred marker after them: ፳፫፻. It applies to the whole 23, so this group means 23 × 100 = 2,300.',
+      'Write the leftover 45 with the forty sign ፵ and the five sign ፭. These add 40 + 5 = 45.',
+      'Now read the whole numeral ፳፫፻፵፭ as 2,300 + 45 = 2,345.',
+      'For 100, write just ፻: the one before it is understood. The separate marker ፼ means 10,000. There is no zero sign; for 105, write ፻፭, meaning 100 + 5, with nothing for the missing tens.',
+    ],
     caveat:
       'This converter uses the numeral-only convention, without Amharic words or Geʽez conjunctions. The app supports positive integers through 99,999,999; that limit is not a historical ceiling.',
     engine: 'ethiopic',
@@ -235,7 +262,13 @@ export const africaSystems: SystemDefinition[] = [
     history:
       'Epact numerals developed in the Coptic-Arabic community and appear in astronomical and administrative manuscripts. Their forms derive from cursive Coptic letters, but constitute a distinct number repertoire rather than the ordinary Coptic alphabetic numeral convention.',
     howItWorks:
-      'There are separate signs for one through nine, the tens, and the hundreds. Add their values from left to right, with the largest first. Two hundred plus five produces 205 without a zero placeholder.',
+      'Each sign names a whole amount, such as five, twenty, or two hundred. Add the signs to get the number.',
+    readingSteps: [
+      'There are separate signs for 1–9, 10–90, and 100–900. A two-hundred sign already means 200.',
+      'For 205, read the two-hundred sign first: it contributes 200.',
+      'Read the five sign next: it contributes 5. Add 200 + 5 = 205.',
+      'There are no tens to add, so no tens sign is written. No zero placeholder is needed. Read the signs from left to right, largest first.',
+    ],
     caveat:
       'The converter covers 1–999. Larger quantities use a sublinear thousands mark, and manuscripts can add a wavy number mark above the sequence. Those extensions and historical fraction forms are not implemented here.',
     engine: 'additive',
@@ -281,8 +314,13 @@ export const africaSystems: SystemDefinition[] = [
     summary: 'Decimal digits written from right to left.',
     history:
       'N’Ko writing was created by Solomana Kanté for Manding languages. Unlike Arabic numbers embedded in Arabic prose, N’Ko numerals follow the right-to-left direction of the surrounding script.',
-    howItWorks:
-      'The mathematics is decimal place value, but the most significant position appears at the right. In a two-digit number, read the tens sign on the right before the units sign on the left. Zero preserves an empty position.',
+    howItWorks: 'Use familiar groups of ten, but begin reading the number at the right-hand end.',
+    readingSteps: [
+      'Each sign is a digit from zero to nine. In this layout, the rightmost digit has the largest place value.',
+      'For 42, begin with the 4 on the right. It is in the tens position, so it means four tens: 40.',
+      'Move left to the 2 in the ones position. Add 40 + 2 = 42.',
+      'A zero keeps an empty position visible. In 100, the rightmost 1 means one hundred, and the two zeros to its left mean no tens and no ones.',
+    ],
     caveat:
       'The artwork is arranged in visual reading order; copied Unicode retains most-significant-first logical order. This entry covers cardinal whole numbers, without ordinal diacritics or locale-specific grouping punctuation.',
     engine: 'positional',
@@ -330,8 +368,13 @@ export const africaSystems: SystemDefinition[] = [
     summary: 'Decimal digits from the Vai writing system.',
     history:
       'The Vai syllabary is an indigenous West African writing system. A set of ten numeral signs was devised in the 1920s, giving European decimal digits forms compatible with Vai writing. Script-specific numeral identity does not imply a different numerical base.',
-    howItWorks:
-      'Digits zero through nine form ordinary decimal positions. Read from left to right: each position is ten times the position to its right. Forty-two therefore uses the Vai four and two, while one hundred includes two zero placeholders.',
+    howItWorks: 'The digit shapes are Vai, and the positions work like familiar decimal numbers.',
+    readingSteps: [
+      'Read from left to right. For a two-digit number, the left digit counts tens and the right digit counts ones.',
+      'For 42, the Vai digit 4 on the left means four tens, or 40.',
+      'The Vai digit 2 on the right means two ones. Add 40 + 2 = 42.',
+      'For 100, write the digit 1 followed by two zero signs. The zeros hold the empty tens and ones positions.',
+    ],
     caveat:
       'This entry demonstrates the encoded Vai digit repertoire. Its existence should not be taken to mean that these digits are preferred in every contemporary Vai context; familiar decimal digits are also used.',
     engine: 'positional',
@@ -380,7 +423,13 @@ export const africaSystems: SystemDefinition[] = [
     history:
       'Osmanya is a writing system devised for Somali in the twentieth century by Osman Yusuf Kenadid. Its character repertoire includes ten decimal digits. The forms preserve the visual identity of this writing tradition while expressing familiar decimal mathematics.',
     howItWorks:
-      'A digit is multiplied by a power of ten according to its position. The sequence is read left to right, with hundreds before tens before units. Zero marks a position that contributes nothing, so 105 keeps the empty tens position visible.',
+      'Read the Osmanya digits from left to right. Their positions count hundreds, tens, and ones just as in familiar decimal notation.',
+    readingSteps: [
+      'For 105, identify the three digits: 1, 0, and 5, written with Osmanya signs.',
+      'The left digit is in the hundreds position. One hundred contributes 100.',
+      'The middle digit is in the tens position. Zero means there are no tens to add.',
+      'The right digit contributes five ones. Add 100 + 0 + 5 = 105. Keep the zero: without it, the digits would mean 15.',
+    ],
     caveat:
       'This converter uses the encoded Osmanya digits for nonnegative whole numbers. It demonstrates a script-specific decimal repertoire rather than claiming that Somali counting has a different base.',
     engine: 'positional',
@@ -426,7 +475,13 @@ export const africaSystems: SystemDefinition[] = [
     history:
       'Yorùbá numeration is a spoken language tradition, not an extinct set of written numeral glyphs. Its number names carry mathematical relationships, including multiples of twenty and subtraction from a nearby larger value. Tone marks and underdots belong to the spelling.',
     howItWorks:
-      'Twenty is Ogún; forty is Ogójì, two twenties. Fifteen can be analyzed as five taken from twenty. Counting words can change with grammatical context: the form used to count a sequence differs from the form used to count objects.',
+      'Some Yorùbá number expressions build on groups of twenty. Work out whether the expression adds to a group or takes away from it.',
+    readingSteps: [
+      'Begin with Ogún, meaning twenty.',
+      'The example for fifteen describes taking five away from twenty. Start at 20 and take away 5: 20 − 5 = 15.',
+      'Ogójì means forty: think of two groups of twenty, 20 + 20 = 40.',
+      'These are selected language examples. The words used for counting in sequence can differ from those used for counting objects, so keep the example’s wording and context together.',
+    ],
     caveat:
       'These are selected language examples with source orthography preserved, not a general translator. Pronunciation, dialect, tone marking, and noun context matter; abstract number names are shown here.',
     engine: 'explainer',
@@ -475,7 +530,13 @@ export const africaSystems: SystemDefinition[] = [
     history:
       'Egyptian hieroglyphic notation represents quantities with dedicated signs for powers of ten. The forms include a stroke, a heel-bone shape, a coil of rope, and a lotus. This entry follows the monumental hieroglyphic tradition rather than the separate cursive hieratic numeral repertoire.',
     howItWorks:
-      'Repeat each magnitude sign up to nine times and add the values. Forty-two needs four ten signs and two unit strokes. No zero placeholder is needed because each sign carries its magnitude independently.',
+      'Each kind of sign has a fixed value. Count the signs of each kind, then add the totals.',
+    readingSteps: [
+      'A unit stroke means 1, a ten sign means 10, and a lotus sign means 1,000. Each kind can be repeated up to nine times in this layout.',
+      'For 42, count the four ten signs: four tens make 40.',
+      'Count the two unit strokes: two ones make 2.',
+      'Add 40 + 2 = 42. A lotus alone means 1,000. Because the signs carry their own values, missing amounts need no zero placeholder.',
+    ],
     caveat:
       'The display uses a consistent descending row for comparison. Historical inscriptions also arrange signs in compact groups and can reverse their direction. Fractions and the different hieratic notation are outside this converter.',
     engine: 'additive',
@@ -531,7 +592,13 @@ export const africaSystems: SystemDefinition[] = [
     history:
       'Rumi numerals, also called Fasi, belong to a manuscript tradition spanning North Africa and al-Andalus. They appear in accounting, astronomy, and manuscript numbering. Their historical shapes vary; this collection follows the variant represented in the Unicode Rumi repertoire.',
     howItWorks:
-      'Choose a sign for each nonzero decimal order and add its value. Forty-two combines forty and two. Two hundred and five uses two signs, not three decimal positions, because there is no intervening zero glyph.',
+      'Read each sign as a complete amount, then add. A sign for forty already contributes forty.',
+    readingSteps: [
+      'Choose signs for the hundreds, tens, and ones that are present in the number.',
+      'For 42, the forty sign contributes 40 and the two sign contributes 2. Add 40 + 2 = 42.',
+      'For 205, the two-hundred sign contributes 200 and the five sign contributes 5.',
+      'Add 200 + 5 = 205. There are no tens, so leave out the tens sign; there is no zero sign between the other two.',
+    ],
     caveat:
       'This converter covers positive integers from 1 to 999 in descending sign-value order. The broader tradition includes fractional signs and manuscript-specific conventions that this app does not yet render.',
     engine: 'additive',

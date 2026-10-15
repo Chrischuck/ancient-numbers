@@ -59,7 +59,10 @@ test('period view distinguishes overlapping use from dated events', async ({ pag
   await expect(page.locator('#wiles')).toBeVisible();
   await page.getByRole('button', { name: 'Periods of use', exact: true }).click();
   await page.getByLabel('Use today', { exact: true }).selectOption('historical');
-  await expect(page.locator('#timeline-empty')).toBeVisible();
+  await expect(page.locator('#vai-numerals')).toBeVisible();
+  await expect(page.locator('#osmanya-numerals')).toBeVisible();
+  await expect(page.locator('#equals')).toBeHidden();
+  await expect(page.locator('#cistercian-numerals')).toBeHidden();
 });
 
 test('entry links expand their sources, are keyboard accessible, and survive filtering', async ({
@@ -110,4 +113,20 @@ test('timeline remains readable without JavaScript', async ({ browser }) => {
   await expect(page.locator('#equals .timeline-entry-links')).toBeVisible();
   await expect(page.locator('.timeline-controls')).toBeHidden();
   await context.close();
+});
+
+test('all supported systems are linked and unknown origins respect date filters', async ({
+  page,
+}) => {
+  await page.goto('timeline/?type=numerals');
+  await expect(
+    page.locator('[data-entry]:visible .timeline-entry-links a[href*="/systems/"]'),
+  ).toHaveCount(36);
+  await expect(page.locator('#yoruba-numerals')).toContainText('Origin unknown');
+  await page.getByLabel('Search timeline', { exact: true }).fill('Yoruba');
+  await expect(page.locator(visible)).toHaveCount(1);
+  await page.getByRole('button', { name: 'Ancient', exact: true }).click();
+  await expect(page.locator('#yoruba-numerals')).toBeHidden();
+  await page.getByRole('button', { name: 'Reset filters' }).click();
+  await expect(page.locator('#yoruba-numerals')).toBeVisible();
 });

@@ -50,6 +50,7 @@ export interface SystemDefinition {
   summary: string;
   history: string;
   howItWorks: string;
+  readingSteps: string[];
   caveat: string;
   engine: Engine;
   min: string;

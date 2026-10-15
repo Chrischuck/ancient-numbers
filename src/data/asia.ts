@@ -22,7 +22,13 @@ export const asiaSystems: SystemDefinition[] = [
     history:
       'Old Babylonian scribes pressed reed styluses into clay. Their mathematical tablets combine a base-sixty place system with additive groups of tens and ones. The square-root tablet YBC 7289 is an extraordinary surviving example.',
     howItWorks:
-      'A vertical wedge contributes one; a corner wedge contributes ten. Within a place, combine up to five tens and nine ones. Moving one place to the left multiplies the value by sixty. Our separated cells and place labels fix the integer scale.',
+      'Count the wedges inside each group first. Then read the groups using positions worth sixty times one another.',
+    readingSteps: [
+      'Inside one group, a vertical wedge means 1 and a corner wedge means 10. Four ten-wedges and two one-wedges make 40 + 2 = 42.',
+      'One position can hold a value from 0 to 59. Once you reach sixty, you need another position.',
+      'For 61, the left group has one wedge in the sixties position. That means one group of sixty: 60.',
+      'The right group has one wedge in the ones position. Add 60 + 1 = 61. Our separated cells and labels show which place is which; historical readings also depended on context.',
+    ],
     caveat:
       'This is an educational transcription of Old Babylonian notation. Empty places are blank cells, not a historical zero sign. The cells and integer scale labels are modern aids: historical notation could leave the scale ambiguous. Later placeholder conventions are not mixed into this earlier variant.',
     engine: 'babylonian',
@@ -77,7 +83,13 @@ export const asiaSystems: SystemDefinition[] = [
     history:
       'Brahmi was used across the Indian subcontinent and developed many regional forms. Its earlier numeral repertoire uses separate signs for ones and tens; a later positional digit set belongs to a different stage of the tradition.',
     howItWorks:
-      'For the supported range 1–99, write the tens sign first and then the ones sign. Forty-two is the sign for forty followed by two. The components add; they are not place-value digits.',
+      'In the supported range of 1–99, a tens sign names the whole tens amount. Add the ones sign after it.',
+    readingSteps: [
+      'For 42, separate the number into forty and two.',
+      'Write the dedicated forty sign first. This one sign contributes all 40.',
+      'Write the two sign next. Add the values: 40 + 2 = 42.',
+      'For 90, use just the ninety sign. You do not add a zero after it, because the sign itself already means ninety.',
+    ],
     caveat:
       'This converter covers the verified unligated range 1–99. Historical hundreds and thousands use multiplicative ligatures and regional variants; those forms need a separate drawing and rules study. The range limit is an app limit, not the historical limit of Brahmi.',
     engine: 'additive',
@@ -130,7 +142,13 @@ export const asiaSystems: SystemDefinition[] = [
     history:
       'Kharoshthi accompanied Gāndhārī manuscripts and inscriptions in the northwest of the Indian subcontinent. The numeral shapes here follow the first-century manuscript tradition documented by Unicode.',
     howItWorks:
-      'Read from right to left. Units are assembled from signs for one through four. Repeated twenties and a ten make the tens. A unit multiplier before the hundred sign specifies hundreds; thousands are repeated before the remaining amount.',
+      'Begin at the right-hand end. Read small groups of signs, then add the amounts those groups represent.',
+    readingSteps: [
+      'For 42, start on the right with a twenty sign, then another twenty sign: 20 + 20 = 40.',
+      'Continue left to the two sign. Add 40 + 2 = 42.',
+      'Units use signs for 1–4. For six, combine a four sign and a two sign: 4 + 2 = 6. Tens use repeated twenties and, when needed, a ten.',
+      'For hundreds, first read the small-number group that comes before the hundred sign in reading order, then multiply that amount by 100. Thousands use repeated thousand signs. Add these larger groups to the rest; there is no zero sign.',
+    ],
     caveat:
       'There is no zero sign and no separate five-to-nine signs. The app supports positive integers through 9,999; fractional and later regional practices are outside this implementation. Display order follows the script rather than reversing the arithmetic explanation.',
     engine: 'kharoshthi',
@@ -195,7 +213,13 @@ export const asiaSystems: SystemDefinition[] = [
     history:
       'Sinhala Illakkam survives in royal documents and artifacts, including material from the Kandyan period. Sri Lankan research distinguished this non-positional set from the zero-bearing astrological numerals called Lith Illakkam.',
     howItWorks:
-      'Read left to right. A digit before the hundred or thousand sign multiplies its value; one is omitted. Tens and units are added. For example, 1,987 = 1,000 + 9 × 100 + 80 + 7.',
+      'Read left to right. A small number before a hundred or thousand sign tells you how many hundreds or thousands to count.',
+    readingSteps: [
+      'For 1,987, the thousand sign alone contributes 1,000. The leading one is understood, so it is not written.',
+      'Next, nine before the hundred sign means nine hundreds: 9 × 100 = 900.',
+      'The eighty sign contributes 80, and the seven sign contributes 7.',
+      'Add 1,000 + 900 + 80 + 7 = 1,987. Missing amounts are omitted: 2,010 uses two × thousand, then ten, with no zero placeholders.',
+    ],
     caveat:
       'There is no zero sign: empty groups are omitted. This converter supports 1–9,999 using the composition shown in the Sri Lankan standards proposal. Larger forms are not implemented. Sinhala Lith Illakkam is a separate, positional system.',
     engine: 'sinhala',
@@ -264,7 +288,13 @@ export const asiaSystems: SystemDefinition[] = [
     history:
       'Traditional Tamil numerals retain distinct signs for ten, hundred, and thousand. This additive-multiplicative notation differs from modern positional writing with Tamil digits and a zero.',
     howItWorks:
-      'Put a multiplier before each power sign, omitting a multiplier of one. Add the resulting groups from large to small. Thus 156 is hundred + five × ten + six; 3782 is three × thousand + seven × hundred + eight × ten + two.',
+      'Read left to right. A number before a ten, hundred, or thousand sign tells you how many of that amount to count.',
+    readingSteps: [
+      'For 156, start with the hundred sign. Written alone, it means one hundred; the one is understood.',
+      'Next read five followed by the ten sign. This means five tens: 5 × 10 = 50.',
+      'The final six sign contributes six ones.',
+      'Add 100 + 50 + 6 = 156. The same pattern builds 3,782: three thousands, seven hundreds, eight tens, and two ones. Leave out groups with no value.',
+    ],
     caveat:
       'The app supports the traditional whole-number notation through 9,999. Larger forms, specialized fractions, measures, and accounting signs exist but need additional adapters. A modern Tamil zero is not inserted into the traditional notation.',
     engine: 'tamil',
@@ -318,7 +348,13 @@ export const asiaSystems: SystemDefinition[] = [
     history:
       'Counting rods were arranged on a board to perform mathematics. The app adopts the Song-period forms used in Unicode’s chart; earlier Han texts can exchange the orientations.',
     howItWorks:
-      'Units, hundreds, and other even powers of ten use the unit-form set. Tens, thousands, and odd powers use the alternate set. Five rods become a crossbar; the remaining rods contribute ones. An empty cell contributes zero.',
+      'Read the rod groups by their positions. Alternating rod directions helps keep neighboring digits separate.',
+    readingSteps: [
+      'First read a digit’s shape: the five-bar contributes five, and the extra rods add ones. A five-bar with two extra rods is 7.',
+      'The rightmost position counts ones, then tens, hundreds, and thousands as you move left. Ones and hundreds use one rod orientation; tens and thousands use the other.',
+      'For 42, the 4 in the tens position means 40. The 2 in the ones position means 2. Add 40 + 2 = 42.',
+      'For 6,708, read six thousands, seven hundreds, a blank tens position, and eight ones: 6,000 + 700 + 0 + 8. The blank represents zero; the cells and labels are teaching aids.',
+    ],
     caveat:
       'A blank cell is intentional. Our separated cells and place labels are a modern teaching aid, not additional historical signs. The overall zero is shown as an empty board cell. Negative-rod color conventions and fractional board layouts are outside this adapter.',
     engine: 'rods',
@@ -372,7 +408,13 @@ export const asiaSystems: SystemDefinition[] = [
     history:
       'Suzhou numerals appear extensively in surviving Chinese merchant account books. Related to counting-rod notation, they became a compact companion to abacus bookkeeping and persisted in some later commercial settings.',
     howItWorks:
-      'Read digit values from left to right. Within a run of ones, twos, and threes, alternate vertical Suzhou forms with horizontal Chinese forms, beginning with vertical. Other digits break the run. For example, 123 is vertical one, horizontal two, vertical three.',
+      'Read the digits from left to right using decimal place value. Some digits change orientation to keep adjacent strokes readable.',
+    readingSteps: [
+      'For 123, begin with the three digit values: 1, 2, and 3.',
+      'In a consecutive run of ones, twos, and threes, start with a vertical form, then alternate horizontal and vertical forms. Here the signs are 〡, 二, 〣.',
+      'Read their positions: the first digit means one hundred, the next two tens, and the last three ones.',
+      'Add 100 + 20 + 3 = 123. A different digit breaks the alternating run, so in 42 the two uses the vertical form.',
+    ],
     caveat:
       'This converter renders the integer digit row. Full commercial labels may include a separate scale and unit line; those are not generated here. The horizontal-first alternative is also documented, but the app consistently uses vertical-first. Glyph variants occur in handwritten sources.',
     engine: 'suzhou',
@@ -431,7 +473,13 @@ export const asiaSystems: SystemDefinition[] = [
     history:
       'Old Persian script was developed for royal monumental inscriptions associated with Darius I. Its wedge-shaped signs are a distinct writing system, not simply Babylonian cuneiform with the same mathematical rules.',
     howItWorks:
-      'Read from left to right. Add signs for hundred, twenty, ten, two, and one, writing the larger values first. Forty-two uses twenty + twenty + two.',
+      'Read left to right and add the signs. Repeated signs each contribute their full value.',
+    readingSteps: [
+      'The signs used here mean 100, 20, 10, 2, and 1.',
+      'For 42, read the first twenty sign, then the second: 20 + 20 = 40.',
+      'Read the two sign next. Add 40 + 2 = 42.',
+      'For 120, use a hundred sign and a twenty sign: 100 + 20 = 120. These signs already carry their amounts, so no zero placeholder is needed.',
+    ],
     caveat:
       'The app supports additive whole numbers through 999; this is an implementation bound. It uses the five encoded numeral values and does not invent a positional zero or transfer Babylonian base-sixty rules into Old Persian.',
     engine: 'additive',
@@ -477,8 +525,13 @@ export const asiaSystems: SystemDefinition[] = [
     summary: 'Right-to-left additive notation with signs for units, ten, twenty, and one hundred.',
     history:
       'Phoenician writing spread across Mediterranean networks and continued in Punic forms. Its numerical notation uses repeated signs, with dedicated marks for ten, twenty, and hundred alongside small tally groups.',
-    howItWorks:
-      'Read right to left. Add the values of the repeated numeral signs. Twenty + twenty + ten + three + two makes 55. Our converter uses the smallest available tally groups for units.',
+    howItWorks: 'Begin at the right-hand end and add the sign values as you move left.',
+    readingSteps: [
+      'For 55, start with two twenty signs: 20 + 20 = 40.',
+      'Continue to the ten sign. The running total becomes 40 + 10 = 50.',
+      'The remaining three and two signs add five: 50 + 3 + 2 = 55.',
+      'For 42, use two twenties and a two: 20 + 20 + 2. The converter groups unit tallies into the fewest available signs.',
+    ],
     caveat:
       'The app supports the straightforward additive range 1–99. Larger inscriptions can involve additional conventions, so the hundred sign is documented without extrapolating a general hundreds algorithm. There is no zero digit.',
     engine: 'additive',
@@ -526,7 +579,13 @@ export const asiaSystems: SystemDefinition[] = [
     history:
       'Ottoman Siyaq belonged to specialized accounting and administrative practice. Its numeral repertoire has primary units, tens, hundreds, larger orders, alternate historical forms, and selected fractions.',
     howItWorks:
-      'Individual signs stand for complete decimal amounts. Compound number sequences have script-specific right-to-left order and shaping. The marratan multiplier participates in large values; one-half and one-sixth have their own encoded signs.',
+      'Start with the individual examples shown here. A single sign can stand for a complete amount such as forty or one thousand.',
+    readingSteps: [
+      'Choose the example for 1: the displayed sign means one by itself.',
+      'Choose 40: this is a different sign whose whole value is forty. You do not need to combine a four digit with a zero.',
+      'Choose 1,000: the single thousand sign contributes the whole amount.',
+      'Longer numbers use special right-to-left ordering, joined shapes, and rules for large amounts. This exhibit provides selected signs rather than a general conversion rule. One-half and one-sixth also have their own signs.',
+    ],
     caveat:
       'This is a sourced specimen explorer, not a general converter. Standalone signs below are securely identified, but full compound layout, alternate forms, and financial context need additional specialist review before arbitrary values can be rendered accurately.',
     engine: 'explainer',

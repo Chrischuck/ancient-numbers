@@ -15,7 +15,14 @@ export const oceaniaSystems: SystemDefinition[] = [
     history:
       'Bender and Beller’s 2013 analysis draws especially on Te Rangi Hiroa’s ethnography. The specialized system counted valued goods alongside an ordinary decimal system; it was not a universal replacement for decimal counting.',
     howItWorks:
-      'Takau, paua, tataua and varu name 10, 20, 40 and 80 counting units. Two units at one of these levels regroup into the next. The basic unit, tauga, depends on the commodity: one turtle, two fish, four coconuts, or eight octopuses.',
+      'First decide what one counting unit contains. Then build the total from groups of 10, 20, 40, and 80 counting units.',
+    readingSteps: [
+      'The basic unit depends on the object: one turtle, two fish, four coconuts, or eight octopuses. Keep counting units separate from the number of objects.',
+      'Takau means 10 counting units, paua 20, tataua 40, and varu 80 in this grouping context. Each of these amounts is twice the previous one.',
+      'For the documented 273 example, toru varu gives three groups of 80: 3 × 80 = 240.',
+      'Add paua (20), takau (10), and the final toru (3): 240 + 20 + 10 + 3 = 273 counting units.',
+      'Convert units to objects last. If counting fish in pairs, 273 counting units represents 273 × 2 = 546 fish.',
+    ],
     caveat:
       'Examples mean counting units, not automatically individual objects. The displayed words are verbal forms, not an ancient script. Historical accounts differ; this exhibit follows the variant analyzed by Bender and Beller.',
     engine: 'explainer',
@@ -73,8 +80,13 @@ export const oceaniaSystems: SystemDefinition[] = [
       'Contemporary Māori number words: rua tekau means two tens; mā joins additional units.',
     history:
       'Modern counting belongs to a living language. Earlier practices cannot simply be read back from today’s terminology: Te Aka records that tekau, now ten, originally denoted twenty, as related forms still do in other eastern Polynesian languages.',
-    howItWorks:
-      'The examples use contemporary cardinal forms. Tekau mā rua combines ten and two; rua tekau combines two and ten. Context can add particles or change how a number is used in a sentence, so isolated counting words are shown here.',
+    howItWorks: 'Read the words as groups of tens and extra ones. The order of the words matters.',
+    readingSteps: [
+      'Learn two building blocks: tekau means ten and rua means two in these contemporary examples.',
+      'For tekau mā rua, begin with ten. The joining word mā introduces the extra two: 10 + 2 = 12.',
+      'For rua tekau, begin with two groups of ten: 2 × 10 = 20.',
+      'The same addition pattern gives tekau mā rima: ten plus five is 15. These are isolated counting forms; wording can change in a sentence.',
+    ],
     caveat:
       'This exhibit does not claim a separate ancient Māori numeral alphabet. Historical pair counting and contemporary decimal counting should be distinguished. Macrons are part of the spelling.',
     engine: 'explainer',
@@ -133,7 +145,13 @@ export const oceaniaSystems: SystemDefinition[] = [
     history:
       'ʻŌlelo Online teaches these terms for grouping objects, distinguishing a group name from a number, much as English distinguishes a dozen from twelve.',
     howItWorks:
-      'The exhibit presents the documented grouping values 4, 40, 400 and 4,000. A group label describes the collection being counted. Larger traditional expressions can also carry a sense of abundance rather than a strictly numerical value in every context.',
+      'These examples name groups of objects. Read each word as one whole group of the stated size.',
+    readingSteps: [
+      'Kāuna names a group of four objects. One such group gives 4.',
+      'Kaʻau names a group of forty. Think of ten groups of four: 10 × 4 = 40.',
+      'Lau has the conventional grouping value 400, and mano has the conventional grouping value 4,000. Each is ten times the preceding grouping value.',
+      'Use these as selected group names. In some contexts, larger terms can express abundance, so the surrounding language matters when deciding whether a precise count is intended.',
+    ],
     caveat:
       'These are selected grouping terms, not general number translations or written numeral glyphs. The ʻokina and kahakō are meaningful parts of Hawaiian spelling.',
     engine: 'explainer',
@@ -184,7 +202,13 @@ export const oceaniaSystems: SystemDefinition[] = [
     history:
       'Geoffrey Saxe’s field research documents both the counting practice and its changes through trade, currency and schooling. Traditional enumeration and later arithmetic strategies are related but historically distinct uses of the same body sequence.',
     howItWorks:
-      'The first thumb is position 1, the nose is 14, and the other little finger is 27. Either side can begin the count. Completion may be marked by raised fists and the expression tit fu!, while extensions beyond one traversal follow additional conventions.',
+      'Count along an ordered path of body parts. The place reached on that path gives the number.',
+    readingSteps: [
+      'Begin at the thumb of either hand. Touching that starting point counts 1.',
+      'Continue along the body-counting path, counting one more at each point. The nose is the fourteenth point, so it represents 14.',
+      'Continue along the other side. The opposite little finger is point 27, completing one traversal.',
+      'A completed traversal may be marked with raised fists and tit fu! Going beyond 27 uses further conventions; do not treat a body point as a decimal digit.',
+    ],
     caveat:
       'Twenty-seven positions do not make this a positional base-27 numeral notation. The diagrams are modern teaching illustrations of documented gestures, not historical written glyphs. This exhibit limits its interactive examples to the first traversal.',
     engine: 'explainer',

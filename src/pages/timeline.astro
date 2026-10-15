@@ -1,7 +1,7 @@
 ---
 import Layout from '../components/Layout.astro';
 import Specimen from '../components/Specimen.astro';
-import { getSystem } from '../data/systems';
+import { systems, getSystem } from '../data/systems';
 import { timeline, eras, kindLabels, formatYear } from '../data/timeline';
 import '../styles/timeline.css';
 const base = import.meta.env.BASE_URL;
@@ -13,10 +13,12 @@ const bins = Array.from({ length: 10 }, (_, i) => {
   return {
     start,
     end,
-    count: timeline.filter((e) => e.year >= start && e.year <= end).length,
+    count: timeline.filter((e) => e.year !== null && e.year >= start && e.year <= end).length,
     centuries: Array.from({ length: i === 9 ? 6 : 5 }, (_, j) => {
       const centuryStart = rawStart + j * 100;
-      return timeline.filter((e) => e.year >= centuryStart && e.year <= centuryStart + 99).length;
+      return timeline.filter(
+        (e) => e.year !== null && e.year >= centuryStart && e.year <= centuryStart + 99,
+      ).length;
     }),
   };
 });
@@ -37,7 +39,8 @@ const maxCount = Math.max(...bins.flatMap((b) => b.centuries));
         </h1>
         <p>
           From counting marks to the language of infinity. Explore when notation appeared, how it
-          changed, and the ideas that moved mathematics forward.
+          changed, and the ideas that moved mathematics forward. Every numeral system in the
+          collection is included, with approximate origins or dated evidence where known.
         </p>
       </div>
       <div class="timeline-hero-mark" aria-hidden="true">
@@ -52,7 +55,9 @@ const maxCount = Math.max(...bins.flatMap((b) => b.centuries));
     <section class="history-overview" aria-labelledby="overview-heading">
       <div class="overview-top">
         <h2 id="overview-heading">5,000 years, at a glance</h2>
-        <span>{timeline.length} selected entries · 3 ways to explore</span>
+        <span>
+          {systems.length} numeral systems · {timeline.length} entries · 3 ways to explore
+        </span>
       </div>
       <div class="history-histogram" role="group" aria-label="Explore events by historical period">
         {bins.map((b) => (
@@ -86,7 +91,7 @@ const maxCount = Math.max(...bins.flatMap((b) => b.centuries));
       <div class="overview-bottom">
         <p>
           Bar height shows entries in this collection, not the pace of discovery. Select a period to
-          explore.
+          explore. Traditions with unknown origins appear after the dated entries.
         </p>
         <a href="#reading-dates">How to read the dates ↗</a>
       </div>
@@ -186,12 +191,13 @@ const maxCount = Math.max(...bins.flatMap((b) => b.centuries));
     <p class="period-explainer" id="period-explainer" hidden>
       Periods are shown on the same 3000 BCE–present scale. Solid bars show selected attested
       periods; arrows mark living notation. A lone dot means no reliable end date is assigned. The
-      date filter includes periods that overlap your selection; undated endings are matched by their
-      starting evidence only.
+      date filter includes periods that overlap your selection; unknown origins appear only with all
+      history selected; undated endings are matched by their starting evidence only.
     </p>
     <div class="timeline-list" id="timeline-list">
       {timeline.map((entry) => {
         const system = entry.system ? getSystem(entry.system) : undefined;
+        const year = entry.year;
         const end = entry.end ?? (entry.status === 'living' ? 2026 : entry.year);
         return (
           <article
@@ -215,7 +221,7 @@ const maxCount = Math.max(...bins.flatMap((b) => b.centuries));
               <summary>
                 <div class="timeline-symbol" aria-hidden="true">
                   {system ? (
-                    <Specimen system={system} value={42} compact />
+                    <Specimen system={system} value={system.specimen} compact />
                   ) : (
                     <span>{entry.symbol}</span>
                   )}
@@ -268,7 +274,12 @@ const maxCount = Math.max(...bins.flatMap((b) => b.centuries));
                       uncertain: !entry.end && entry.status !== 'living',
                     },
                   ]}
-                  style={`left:${position(entry.year)}%;width:${Math.max(0, position(end) - position(entry.year))}%`}
+                  style={
+                    year !== null && end !== null
+                      ? `left:${position(year)}%;width:${Math.max(0, position(end) - position(year))}%`
+                      : undefined
+                  }
+                  hidden={year === null}
                 ></span>
               </div>
               <span class="usage-caption">{entry.usage}</span>
@@ -302,10 +313,13 @@ const maxCount = Math.max(...bins.flatMap((b) => b.centuries));
           return. A bar’s endpoint is explained in its entry.
         </p>
         <p>
-          <strong>A selection, not an exhaustive history.</strong> These {timeline.length} entries
-          introduce numeral traditions, familiar symbols, and major mathematical developments. Many
-          people, regions, and ideas remain to be added. Era labels are browsing aids, not universal
-          historical divisions.
+          <strong>Every system in this collection.</strong> All {systems.length} supported numeral
+          systems appear here alongside selected symbols and mathematical milestones. “Origin
+          unknown” means the sources do not establish a reliable starting date; those traditions
+          appear after the dated entries and are omitted from the histogram and narrower date
+          ranges. Evidence dates and broad period boundaries do not claim an exact invention year.
+          Many other people, regions, and ideas remain to be added. Era labels are browsing aids,
+          not universal historical divisions.
         </p>
       </div>
     </section>

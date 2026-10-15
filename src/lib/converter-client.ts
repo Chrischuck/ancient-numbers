@@ -1,5 +1,5 @@
 import { getSystem, systems } from '../data/systems';
-import { calculate, parseNumber, formatNumber } from './numbers';
+import { calculate, parseNumber, formatNumber, baseDigits } from './numbers';
 import { represent } from './format';
 import { loadGlyphs, escapeHTML } from './glyphs';
 import { renderRepresentation, copyText, exportSVG } from './render';
@@ -57,6 +57,7 @@ if (input) {
     el('output-message').hidden = false;
     el('exact-value').textContent = '—';
     el('output-equation').textContent = '';
+    el('conversion-guide').hidden = true;
     el<HTMLButtonElement>('copy-button').disabled = true;
     el<HTMLButtonElement>('download-button').disabled = true;
     el('comparisons').innerHTML = '';
@@ -77,6 +78,13 @@ if (input) {
     );
     el<HTMLAnchorElement>('learn-link').href = `${import.meta.env.BASE_URL}systems/${system.id}/`;
     el('reading-explanation').textContent = system.howItWorks;
+    el('reading-steps').replaceChildren(
+      ...system.readingSteps.map((step) => {
+        const item = document.createElement('li');
+        item.textContent = step;
+        return item;
+      }),
+    );
     el('system-caveat').textContent = system.caveat;
     el<HTMLAnchorElement>('system-source').href = system.sources[0].url;
     el('availability').textContent =
@@ -88,10 +96,15 @@ if (input) {
       )
       .join('');
     let value: Rational;
+    let firstValue: Rational;
+    let secondValue: Rational | undefined;
     try {
-      value = parseNumber(input.value);
-      if (mode === 'calculate')
-        value = calculate(value, parseNumber(second.value), operation.value);
+      firstValue = parseNumber(input.value);
+      value = firstValue;
+      if (mode === 'calculate') {
+        secondValue = parseNumber(second.value);
+        value = calculate(value, secondValue, operation.value);
+      }
       el('input-error').hidden = true;
       input.removeAttribute('aria-invalid');
       second.removeAttribute('aria-invalid');
@@ -118,6 +131,62 @@ if (input) {
     try {
       const glyphs = await loadGlyphs(system.region);
       if (current !== serial) return;
+      const symbol =
+        { add: '+', subtract: '−', multiply: '×', divide: '÷' }[operation.value as 'add'] ?? '+';
+      const steps: { title: string; text: string }[] = [
+        {
+          title: mode === 'calculate' ? 'Calculate the value' : 'Start with the value',
+          text:
+            mode === 'calculate'
+              ? `${formatNumber(firstValue)} ${symbol} ${formatNumber(secondValue!)} = ${lastExact}. Calculate with the exact input values, then write the answer in ${system.name}.`
+              : `${lastExact} is the value in familiar base-10 notation. The value stays the same when its notation changes.`,
+        },
+      ];
+      if (result.tokens.length) {
+        const radix = system.engine === 'babylonian' ? 60 : (system.radix ?? 10);
+        const positional = ['positional', 'babylonian', 'rods', 'suzhou', 'khipu'].includes(
+          system.engine,
+        );
+        let method = system.howItWorks;
+        if (positional) {
+          const digits = baseDigits(value.numerator, radix);
+          const divisions: string[] = [];
+          let remaining = value.numerator;
+          do {
+            divisions.push(
+              `${remaining} ÷ ${radix} = ${remaining / BigInt(radix)}, remainder ${remaining % BigInt(radix)}`,
+            );
+            remaining /= BigInt(radix);
+          } while (remaining > 0n);
+          method = `Divide repeatedly by ${radix} and keep each remainder: ${divisions.join('; ')}. Read the remainders in reverse order to get the digits ${digits.join(', ')}. Each place is worth ${radix} times the next. ${system.howItWorks}`;
+        }
+        steps.push({ title: 'Build the numeral', text: method });
+        steps.push({
+          title: 'Read it back',
+          text: `${result.explanation} The signs above encode ${lastExact}.`,
+        });
+      } else {
+        steps.push({
+          title: 'Check the notation’s limits',
+          text: result.reason ?? system.howItWorks,
+        });
+      }
+      el('conversion-steps').innerHTML = steps
+        .map(
+          (step) =>
+            `<li><strong>${escapeHTML(step.title)}</strong><p>${escapeHTML(step.text)}</p></li>`,
+        )
+        .join('');
+      el('conversion-guide').hidden = false;
+      const equation = el('translated-equation');
+      equation.hidden = mode !== 'calculate';
+      if (mode === 'calculate') {
+        const operand = (v: Rational) => {
+          const r = represent(v, system);
+          return `<div class="equation-term">${r.tokens.length ? renderRepresentation(r, glyphs) : '<span>Not available in this notation</span>'}<small>${escapeHTML(formatNumber(v))}</small></div>`;
+        };
+        equation.innerHTML = `<h3>The equation in ${escapeHTML(system.name)}</h3><div class="equation-numerals">${operand(firstValue)}<span class="equation-operator">${symbol}</span>${operand(secondValue!)}<span class="equation-operator">=</span>${operand(value)}</div><p>The numerals use the selected notation; +, −, ×, ÷ and = are modern operators. This shows the equation’s translation, not a historical calculation method.</p>`;
+      }
       lastGlyphs = glyphs;
       lastResult = result;
       el('output-value').innerHTML = renderRepresentation(result, glyphs);

@@ -15,7 +15,13 @@ export const americanOralSystems: SystemDefinition[] = [
     history:
       'The numeral proposal did not enter general use. The Cherokee Nation preserves its forms in an educational poster covering zero to one hundred, while Unicode notes that Sequoyah’s numerical signs are not encoded in the standard.',
     howItWorks:
-      'The examples follow the Cherokee Nation chart. Forty-two combines the sign for forty with the sign for two.',
+      'Read the selected original numeral signs using the Cherokee Nation chart. For forty-two, combine two signs and add their values.',
+    readingSteps: [
+      'First identify the dedicated forty sign. It represents all forty, rather than just the digit four.',
+      'Next identify the separate two sign.',
+      'Put forty followed by two: add 40 + 2 = 42.',
+      'The examples for 1, 2, and 3 each use a single original numeral sign. These selected chart examples do not supply a general rule for every number.',
+    ],
     caveat:
       'This is a bounded specimen exhibit, not a full reconstruction of every arithmetic convention. The signs have no Unicode copy equivalent. Their historical status does not describe contemporary Cherokee language vitality or contemporary number-writing practice.',
     engine: 'explainer',
@@ -84,7 +90,13 @@ export const americanOralSystems: SystemDefinition[] = [
     history:
       'The examples use the counting words taught in the Choctaw Nation of Oklahoma’s language lessons.',
     howItWorks:
-      'Achʋffa, tuklo, tuchina, ushta and tahlapi name one through five. The exhibit preserves the teaching source’s spelling, including ʋ. These are complete words for quantities; their letters do not individually carry numerical place values.',
+      'Learn each counting word as the name of a whole quantity, just as “two” names a quantity in English.',
+    readingSteps: [
+      'Achʋffa means one, and tuklo means two. Each complete word names its amount.',
+      'Tuchina means three, ushta means four, and tahlapi means five.',
+      'To read tuklo, recognize the whole word and match it to 2. You do not add the individual letters.',
+      'This introductory set covers one through five using the community teaching source’s spelling, including ʋ. It does not provide a rule for translating larger numbers.',
+    ],
     caveat:
       'The interactive specimens cover five verified words, not the full productive Choctaw number system. Spelling varies across sources and communities. The selected forms follow the named community source rather than blending alternative spellings into a new standardized form.',
     engine: 'explainer',
@@ -138,7 +150,13 @@ export const americanOralSystems: SystemDefinition[] = [
     history:
       'The examples follow the number words and spelling in the reference guide published by Diné College’s Learning Center.',
     howItWorks:
-      'The guide lists basic units, specialized tens forms and compounds. Naadiin is twenty; twenty-two adds naaki. From thirty upward, the guide connects the tens and remaining units with dóó bi’aan, as in its expression for forty-two.',
+      'Read the complete number expression, then identify its tens and ones. These examples preserve the Diné College guide’s wording.',
+    readingSteps: [
+      'Begin with naaki, meaning two, and naadiin, meaning twenty.',
+      'For naadiin naaki, read twenty followed by two: 20 + 2 = 22.',
+      'For dízdiin dóó bi’aan naaki, read dízdiin as forty. The linking expression dóó bi’aan connects it to the final naaki, or two.',
+      'Add 40 + 2 = 42. The guide uses this linking expression from thirty upward; its twenty-two example joins the words without it. Keep the documented phrases rather than assembling unfamiliar forms yourself.',
+    ],
     caveat:
       'These are authentic written number words, not an invented Navajo numeral script. Accent marks, ł and apostrophes matter. The exhibit offers selected verified examples rather than claiming complete coverage of the language’s grammatical or spelling variation.',
     engine: 'explainer',

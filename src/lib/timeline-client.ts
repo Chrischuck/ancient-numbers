@@ -46,13 +46,18 @@ if (app) {
     const query = normalize(search.value.trim());
     let visible = 0;
     for (const entry of entries) {
+      const undated = !entry.dataset.year;
       const year = Number(entry.dataset.year);
       const periodEnd = entry.dataset.end
         ? Number(entry.dataset.end)
         : entry.dataset.status === 'living'
           ? 2026
           : year;
-      const inRange = periods ? year <= end && periodEnd >= start : year >= start && year <= end;
+      const inRange = undated
+        ? start === -3000 && end === 2026
+        : periods
+          ? year <= end && periodEnd >= start
+          : year >= start && year <= end;
       const show =
         inRange &&
         (!query || text.get(entry)!.includes(query)) &&

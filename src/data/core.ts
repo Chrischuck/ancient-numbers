@@ -39,7 +39,13 @@ export const coreSystems: SystemDefinition[] = [
     history:
       'In 1994, students at Harold Kaveolook School in Kaktovik developed numeral signs that fit their language’s groups of five and twenty. The signs became part of local teaching and received the endorsement of the Inuit Circumpolar Council in 1998. They are a modern Indigenous invention, rather than an ancient script.',
     howItWorks:
-      'Read from left to right. Each position is worth twenty times the position to its right. Within a digit, up to three horizontal strokes count fives and up to four downward strokes count the remaining units.',
+      'Think in groups of twenty. A sign’s shape gives its digit, and its position tells you how much that digit is worth.',
+    readingSteps: [
+      'First read one digit: each horizontal stroke adds five, and each downward stroke adds one. Three fives and four ones make the digit 19.',
+      'Look at the positions from the right: ones, then twenties, then four hundreds. Each position is worth twenty times the previous one.',
+      'To read 42, start with the left digit 2 in the twenties position: two groups of twenty make 40.',
+      'The right digit 2 adds two ones. Add 40 + 2 = 42. A zero sign holds any empty position; 20 is one twenty followed by zero ones.',
+    ],
     caveat:
       'These are Kaktovik numerals, not a universal Inuit writing system. This converter currently renders whole numbers; the documented fractional notation is not implemented.',
     engine: 'positional',
@@ -72,7 +78,13 @@ export const coreSystems: SystemDefinition[] = [
     history:
       'Maya scribes recorded numbers in monuments and manuscripts using dots for units, bars for fives, and several forms of zero. Numbers were used in astronomical and calendar records. This display uses the familiar dot-and-bar forms rather than the elaborate head variants.',
     howItWorks:
-      'Read the vertical stack from top to bottom. Each level is a base-20 position: ones at the bottom, twenties above, then four hundreds. A dot is one and a bar is five.',
+      'Read a stack of number signs. First count the dots and bars on each level, then use the level’s value.',
+    readingSteps: [
+      'A dot means one and a bar means five. Three bars and four dots on the same level make 15 + 4 = 19.',
+      'Start at the bottom of this base-20 teaching layout: the bottom level counts ones, the next counts twenties, and the next counts four hundreds.',
+      'For 42, the upper level has two dots. Those mean two twenties, giving 40.',
+      'The bottom level has two dots, giving two ones. Add 40 + 2 = 42. A zero sign keeps an empty level in place.',
+    ],
     caveat:
       'This is ordinary vigesimal notation. The Long Count calendar uses a modified third position worth 360, which this converter does not use. The shell is one of several attested zero forms.',
     engine: 'positional',
@@ -111,7 +123,13 @@ export const coreSystems: SystemDefinition[] = [
     history:
       'Nahua scribes used numerical signs alongside images of objects and tribute goods. The Codex Mendoza and Matrícula de Tributos preserve examples of flags, feather signs, and bags marking large quantities. Their composition is connected to the records in which they occur; it is not simply a replacement font.',
     howItWorks:
-      'This educational additive transcription repeats each sign as needed: dots for ones, flags for twenties, feathers for four hundreds, and bags for eight thousands. Add their values to read the result.',
+      'Count how many of each kind of sign you see, then add their values. This exhibit uses a simplified additive layout.',
+    readingSteps: [
+      'Learn the values: a dot is 1, a flag is 20, a feather is 400, and a bag is 8,000.',
+      'For 42, count the two flags first: 20 + 20 = 40.',
+      'Count the two dots next: 1 + 1 = 2.',
+      'Add the groups: 40 + 2 = 42. Each sign already carries its value, so you do not need a zero to hold an empty place.',
+    ],
     caveat:
       'A linear arrangement is used for comparison here. Manuscripts arrange signs in relation to counted objects and use additional conventions. No zero sign is supplied.',
     engine: 'additive',
@@ -147,7 +165,13 @@ export const coreSystems: SystemDefinition[] = [
     history:
       'Khipus are arrangements of cords and knots used for record keeping in the Andes. A well-understood class of numerical khipus records decimal values through the positions and types of knots. Cord color, attachment, and other features carry additional information that cannot be inferred from a number alone.',
     howItWorks:
-      'Read one schematic pendant from top to bottom. Higher positions use groups of single overhand knots. In the units position, a figure-eight knot represents one and a long knot has two to nine turns. An empty position represents zero.',
+      'Read the knots on one hanging cord. Where a knot sits tells you whether it counts hundreds, tens, or ones.',
+    readingSteps: [
+      'In this schematic, read from the higher positions down toward the ones position. Groups of single knots count hundreds, tens, and other higher places.',
+      'For 135, one single knot in the hundreds position means 100.',
+      'Three single knots in the tens position mean three tens, or 30.',
+      'At the bottom, a long knot with five turns means 5. Add 100 + 30 + 5 = 135. A figure-eight knot means one in the ones position; an empty position means zero.',
+    ],
     caveat:
       'This is a labeled schematic of the common numerical convention, not a reconstruction of a complete historical khipu. Other knot conventions and non-numerical records exist.',
     engine: 'khipu',
@@ -188,7 +212,13 @@ export const coreSystems: SystemDefinition[] = [
     history:
       'Roman numeral conventions developed over centuries and varied in inscriptions, manuscripts, and later printing. They remain visible on clocks, monuments, and numbered volumes. This converter uses the common modern subtractive convention, a standardized selection from that wider historical practice.',
     howItWorks:
-      'I, V, X, L, C, D, and M represent 1, 5, 10, 50, 100, 500, and 1,000. Most symbols add. The pairs IV, IX, XL, XC, CD, and CM subtract the smaller value from the larger.',
+      'Read Roman numerals in small groups. Most signs add, but a few specific pairs mean subtraction.',
+    readingSteps: [
+      'Learn the sign values: I = 1, V = 5, X = 10, L = 50, C = 100, D = 500, and M = 1,000.',
+      'Look for these pairs first: IV = 4, IX = 9, XL = 40, XC = 90, CD = 400, and CM = 900. In each pair, take the smaller value away from the larger.',
+      'For XLII, read XL together: L is 50 and X is 10, so this pair means 50 − 10 = 40.',
+      'The two remaining I signs add one each. Add 40 + 1 + 1 = 42. For MCMXCIV, the groups are M, CM, XC, IV: 1,000 + 900 + 90 + 4 = 1,994.',
+    ],
     caveat:
       'The supported modern convention is 1–3,999. Additive inscriptional variants such as IIII and large-number overbars are outside this renderer. There is no zero sign.',
     engine: 'roman',
@@ -216,7 +246,13 @@ export const coreSystems: SystemDefinition[] = [
     history:
       'The alphabetic system, also called Milesian or Ionic, assigns numerical values to twenty-seven letters. Three additional signs retain places in the sequence beyond the standard twenty-four-letter Greek alphabet. Its forms evolved in manuscripts and printing, and Greek numerical letters are still used in particular contexts.',
     howItWorks:
-      'The first nine numerical letters represent 1–9, the next nine 10–90, and the last nine 100–900. Add them from largest to smallest. A following numeral sign distinguishes the sequence from an ordinary word.',
+      'Certain Greek letters also have number values. Read each letter’s value and add them.',
+    readingSteps: [
+      'The numerical letters come in three sets: nine for 1–9, nine for 10–90, and nine for 100–900. A tens letter already means a whole amount such as forty.',
+      'For 42, the first letter is mu, worth 40.',
+      'The next letter is beta, worth 2. Add 40 + 2 = 42.',
+      'The numeral mark after the letters tells you to read them as a number. It adds no value. Missing amounts are simply left out.',
+    ],
     caveat:
       'This uses an uppercase typographic convention through 999, including stigma, koppa, and sampi. Thousands markers and manuscript overlines are not implemented; the range limit belongs to this app.',
     engine: 'greek',
@@ -248,7 +284,13 @@ export const coreSystems: SystemDefinition[] = [
     history:
       'The Attic acrophonic system appears in ancient inscriptions, including financial records. Several of its signs derive from initial letters of Greek number words. Regional acrophonic systems also existed; the shapes and values shown here belong to the Attic numerical repertoire.',
     howItWorks:
-      'Signs represent one, five, ten, one hundred, one thousand, and ten thousand. Compound five signs represent fifty, five hundred, five thousand, and fifty thousand. Add the signs, largest first.',
+      'Each sign has a fixed value. Count repeated signs and add them, starting with the largest.',
+    readingSteps: [
+      'The basic signs mean 1, 5, 10, 100, 1,000, and 10,000. Special combined signs mean 50, 500, 5,000, and 50,000.',
+      'For 42, count four ten signs: 10 + 10 + 10 + 10 = 40.',
+      'Count two one signs: 1 + 1 = 2.',
+      'Add 40 + 2 = 42. A combined five-hundred sign is worth 500 by itself. These signs carry their own values; empty amounts need no zero placeholder.',
+    ],
     caveat:
       'This renders abstract integer quantities, not the specialized signs for currency, weight, or fractions also found in inscriptions. There is no zero sign.',
     engine: 'additive',
@@ -286,7 +328,13 @@ export const coreSystems: SystemDefinition[] = [
     history:
       'Medieval monastic number ciphers combine marks around a common staff. Surviving examples occur in manuscripts and on instruments, with considerable regional variation. Historian David A. King documented these traditions in The Ciphers of the Monks. The familiar vertical-staff arrangement is the variant used here.',
     howItWorks:
-      'The upper right records units, upper left tens, lower right hundreds, and lower left thousands. Reflecting a digit’s strokes into these quadrants combines four decimal places in one composite sign.',
+      'One sign holds up to four digits around a central upright line. Read each corner separately.',
+    readingSteps: [
+      'Locate the four places: upper right = ones, upper left = tens, lower right = hundreds, lower left = thousands.',
+      'For 42, read the digit shape at the upper left as 4. Because it sits in the tens corner, it contributes 40.',
+      'Read the digit shape at the upper right as 2. In the ones corner, it contributes 2.',
+      'Add the corners: 40 + 2 = 42. The lower corners have no digit strokes, so there are no hundreds or thousands to add.',
+    ],
     caveat:
       'This is one documented family of variants, not a uniform standard used by every monastery. The whole number zero is not supplied. These signs were primarily notation, rather than a historical algorithm for arithmetic.',
     engine: 'cistercian',

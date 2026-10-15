@@ -77,7 +77,14 @@ export function represent(value: Rational, system: SystemDefinition): Representa
       }
       case 'additive':
         additive(n);
-        explanation = 'Add the value of each sign, from the largest group to the smallest.';
+        let remainder = n;
+        const groups: string[] = [];
+        for (const { value } of system.values ?? []) {
+          const count = remainder / BigInt(value);
+          if (count) groups.push(`${count} × ${value.toLocaleString('en-US')}`);
+          remainder %= BigInt(value);
+        }
+        explanation = `${groups.join(' + ')} = ${n.toLocaleString('en-US')}. Repeat each sign the indicated number of times, then add their values.`;
         if (system.id === 'phoenician') tokens.reverse();
         break;
       case 'greek':
@@ -103,12 +110,14 @@ export function represent(value: Rational, system: SystemDefinition): Representa
           [4, 'IV'],
           [1, 'I'],
         ];
+        const groups: string[] = [];
         for (const [v, s] of roman)
           while (rest >= v) {
+            groups.push(`${s} (${v})`);
             for (const c of s) push(`roman-${c}`);
             rest -= v;
           }
-        explanation = 'Read the subtractive pairs first; add the remaining values.';
+        explanation = `${groups.join(' + ')} = ${n.toLocaleString('en-US')}. In a subtractive pair, subtract the smaller sign from the larger (for example, IV = 5 − 1). Add the resulting groups.`;
         break;
       }
       case 'cistercian':

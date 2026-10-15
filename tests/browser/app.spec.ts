@@ -161,3 +161,20 @@ test('tool tabs follow keyboard focus and Home/End semantics', async ({ page }) 
   await translate.press('ArrowRight');
   await expect(calculate).toBeFocused();
 });
+
+test('conversion steps and translated arithmetic explain the current inputs', async ({ page }) => {
+  await page.goto('?system=kaktovik&number=42');
+  await expect(page.locator('#conversion-steps')).toContainText('42 ÷ 20 = 2, remainder 2');
+  await expect(page.locator('#translated-equation')).toBeHidden();
+  await page.getByRole('tab', { name: 'Calculate' }).click();
+  await expect(page.locator('#conversion-steps')).toContainText('42 + 8 = 50');
+  await expect(page.locator('#translated-equation .equation-term')).toHaveCount(3);
+  await expect(page.locator('#translated-equation')).toContainText('modern operators');
+  await page.locator('#operation').selectOption('subtract');
+  await expect(page.locator('#conversion-steps')).toContainText('42 − 8 = 34');
+  await page.locator('#second-input').fill('100');
+  await expect(page.locator('#conversion-steps')).toContainText('42 − 100 = -58');
+  await expect(page.locator('#conversion-steps')).toContainText('notation’s limits');
+  await page.locator('#second-input').fill('invalid');
+  await expect(page.locator('#conversion-guide')).toBeHidden();
+});

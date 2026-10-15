@@ -1,6 +1,9 @@
 /** Curated historical events. Negative years are BCE; there is no year zero.
  * A period's end is an evidence/usage boundary, never a claim of universal extinction.
  */
+import { systems } from './systems';
+import { systemOrigins } from './system-origins';
+
 export type TimelineKind = 'numerals' | 'notation' | 'milestone';
 export type TimelineStatus = 'living' | 'historical' | 'event';
 export interface TimelineSource {
@@ -9,7 +12,7 @@ export interface TimelineSource {
 }
 export interface TimelineEntry {
   id: string;
-  year: number;
+  year: number | null;
   date: string;
   title: string;
   kind: TimelineKind;
@@ -88,7 +91,7 @@ const milestone = (
   usage: 'Dated milestone',
   sources: [source],
 });
-export const timeline = [
+const curatedTimeline: TimelineEntry[] = [
   {
     id: 'egyptian-numerals',
     year: -3000,
@@ -657,7 +660,33 @@ export const timeline = [
     bio('Wiles', 'Andrew Wiles'),
   ),
 ] satisfies TimelineEntry[];
-timeline.sort((a, b) => a.year - b.year || a.id.localeCompare(b.id));
+// Keep curated entries and their stable permalinks; require origin metadata for all others.
+const represented = new Set(curatedTimeline.map((entry) => entry.system));
+export const timeline: TimelineEntry[] = [
+  ...curatedTimeline,
+  ...systems
+    .filter((system) => !represented.has(system.id))
+    .map((system): TimelineEntry => {
+      const origin = systemOrigins[system.id];
+      if (!origin) throw new Error(`Missing timeline origin for ${system.id}`);
+      return {
+        id: `${system.id}-numerals`,
+        system: system.id,
+        year: origin.year,
+        date: origin.date,
+        title: system.name,
+        kind: 'numerals',
+        place: system.location,
+        symbol: system.baseLabel,
+        summary: system.summary,
+        detail: `${origin.detail} ${system.history}`,
+        status: origin.status,
+        usage: system.period,
+        sources: [...(origin.sources ?? []), ...system.sources],
+      };
+    }),
+];
+timeline.sort((a, b) => (a.year ?? Infinity) - (b.year ?? Infinity) || a.id.localeCompare(b.id));
 
 export const eras = [
   { id: 'all', label: 'All history', start: -3000, end: 2026 },
