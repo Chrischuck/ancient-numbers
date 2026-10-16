@@ -194,7 +194,10 @@ test('Egyptian fractional division still works through doubled whole multiples a
     const html = await rendered('egyptian', fixture.dividend, fixture.divisor, 'divide');
     const text = stripMarkup(html);
     assert.match(html, /class="math-table"/);
-    assert.equal((html.match(/<tr class="selected">/g) ?? []).length, fixture.selectedRows);
+    assert.equal(
+      (html.match(/<tr role="row" class="selected">/g) ?? []).length,
+      fixture.selectedRows,
+    );
     for (const expected of [fixture.counts, fixture.amounts, fixture.remainder, fixture.result])
       assert.ok(text.includes(expected), `Missing numerical division step: ${expected}`);
     assert.match(text, /Another whole copy.*larger than this remainder/);

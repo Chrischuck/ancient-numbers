@@ -338,10 +338,10 @@ test('doubling table renders Egyptian signs and selected amounts for the user ex
     },
     await loadGlyphs(entry.region),
   );
-  assert.match(html, /<table>/);
-  assert.match(html, /<th scope="col">Copies<\/th>/);
-  assert.match(html, /<th scope="col">Amount<\/th>/);
-  assert.equal((html.match(/<tr class="selected">/g) ?? []).length, 3);
+  assert.match(html, /<table role="table">/);
+  assert.match(html, /<th scope="col" role="columnheader">Copies<\/th>/);
+  assert.match(html, /<th scope="col" role="columnheader">Amount<\/th>/);
+  assert.equal((html.match(/<tr role="row" class="selected">/g) ?? []).length, 3);
   assert.match(html, /Selected amounts: 24 \+ 96 \+ 192 = 312/);
   assert.match(html, /<svg/);
   assert.doesNotMatch(html, /Subtraction|Division ·|formation-steps/);
@@ -376,12 +376,20 @@ test('Babylonian multiplication builds a missing product from table multiples, w
   const html = worked('babylonian', 47n, 7n, 'multiply');
   assert.match(html, /Multiplication tables supplied/);
   assert.match(html, /47 = 40 \+ 7/);
-  assert.match(html, /40 × 7 = 4, 40/);
+  assert.match(html, /40 × 7 = 280 \(base 60: \[4, 40\] = 4 × 60 \+ 40\)/);
   assert.match(html, /7 × 7 = 49/);
-  assert.match(html, /47 × 7 = 5, 29/);
+  assert.match(html, /47 × 7 = 329 \(base 60: \[5, 29\] = 5 × 60 \+ 29\)/);
   assert.match(html, /47 × 7 = 329/);
   assert.match(html, /Documented tools, reconstructed working/);
   assert.doesNotMatch(html, /reciprocal|Division ·|formation-steps/);
+});
+
+test('Babylonian products cannot be mistaken for decimal values separated by a comma', () => {
+  const html = worked('babylonian', 42n, 8n, 'multiply');
+  assert.match(html, /40 × 8 = 320 \(base 60: \[5, 20\] = 5 × 60 \+ 20\)/);
+  assert.match(html, /320 \+ 16 = 336/);
+  assert.match(html, /42 × 8 = 336 \(base 60: \[5, 36\] = 5 × 60 \+ 36\)/);
+  assert.doesNotMatch(html, /40 × 8 = 5, 20|42 × 8 = 5, 36/);
 });
 
 test('rod multiplication follows Sunzi’s rows, while division shifts a divisor and retains its remainder', async () => {

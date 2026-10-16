@@ -2391,6 +2391,9 @@ h2 {
 .math-table th {
   font-weight: 500;
 }
+.math-cell-label {
+  display: none;
+}
 .math-table tr.selected {
   background: var(--green-light);
 }
@@ -2451,9 +2454,63 @@ h2 {
   .bases-guide-link {
     font-size: 11px;
   }
-  .math-table th,
+  .math-reasoning p,
+  .math-reasoning li {
+    font-size: 15px;
+  }
+  .math-reasoning .math-evidence,
+  .math-reasoning .math-method-sources {
+    font-size: 13px;
+  }
+  .math-table table,
+  .math-table[data-columns='4'] table {
+    display: block;
+    min-width: 0;
+    font-size: 15px;
+  }
+  .math-table caption {
+    display: block;
+  }
+  .math-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .math-table tbody {
+    display: block;
+  }
+  .math-table tbody tr {
+    display: block;
+    margin: 16px 0;
+    padding: 4px 14px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--white);
+  }
   .math-table td {
-    padding: 10px 6px;
+    display: block;
+    padding: 14px 0;
+  }
+  .math-table td:last-child {
+    border-bottom: 0;
+  }
+  .math-cell-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .math-table tr.selected {
+    background: var(--green-light);
+  }
+  .math-table tr.selected td:first-child {
+    color: var(--ink);
+    font-weight: 400;
   }
 }
 .gesture-grid {

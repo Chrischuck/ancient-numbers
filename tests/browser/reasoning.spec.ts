@@ -244,3 +244,45 @@ test('illustrated lessons, spoken guides and gesture guides fit accessible small
     expect(accessibility.violations.map((violation) => violation.id)).toEqual([]);
   }
 });
+
+for (const width of [320, 390, 1440]) {
+  test(`Babylonian 42 times 8 has readable labeled products at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('?system=babylonian&number=42&mode=calculate&operation=multiply&second=8');
+    await expect(page.locator('#exact-value')).toHaveText('336');
+    const table = page.locator('#math-reasoning .math-table');
+    await expect(table).toContainText('40 × 8 = 320 (base 60: [5, 20] = 5 × 60 + 20)');
+    await expect(table).toContainText('320 + 16 = 336');
+    await expect(table).not.toContainText('40 × 8 = 5, 20');
+    const cells = table.locator('tbody tr').first().locator('td');
+    const boxes = await cells.evaluateAll((elements) =>
+      elements.map((element) => {
+        const { x, y, width, height } = element.getBoundingClientRect();
+        return { x, y, width, height };
+      }),
+    );
+    if (width < 600) {
+      await expect(cells.nth(0).locator('.math-cell-label')).toHaveText('Table product');
+      await expect(cells.nth(1).locator('.math-cell-label')).toHaveText('Place weight');
+      await expect(cells.nth(2).locator('.math-cell-label')).toHaveText('Partial product');
+      await expect(cells.first().locator('.math-cell-label')).toBeVisible();
+      expect(boxes[0].width).toBeGreaterThan(200);
+      expect(boxes[1].y).toBeGreaterThanOrEqual(boxes[0].y + boxes[0].height - 1);
+      expect(boxes[2].y).toBeGreaterThanOrEqual(boxes[1].y + boxes[1].height - 1);
+      expect(await table.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
+        true,
+      );
+    } else {
+      await expect(cells.first().locator('.math-cell-label')).toBeHidden();
+      expect(boxes[0].y).toBeCloseTo(boxes[1].y, 0);
+      expect(boxes[1].x).toBeGreaterThan(boxes[0].x);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+    const accessibility = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+      .analyze();
+    expect(accessibility.violations.map((violation) => violation.id)).toEqual([]);
+  });
+}

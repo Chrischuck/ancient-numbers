@@ -323,6 +323,18 @@ function reciprocal(n: bigint): string {
   return `${sexagesimal(1n / n)}${parts.length ? `; ${parts.join(', ')}` : ''}${remainder ? ', …' : ''}`;
 }
 
+function sexagesimalProduct(value: bigint): string {
+  if (value < 60n) return String(value);
+  const digits = baseDigits(value, 60);
+  const expansion = digits
+    .map((digit, index) => {
+      const place = 60n ** BigInt(digits.length - index - 1);
+      return place === 1n ? String(digit) : `${digit} × ${place}`;
+    })
+    .join(' + ');
+  return `${value} (base 60: [${sexagesimal(value)}] = ${expansion})`;
+}
+
 function babylonian(
   system: SystemDefinition,
   a: bigint,
@@ -372,16 +384,19 @@ function babylonian(
         const xParts = [Math.floor(left[i] / 10) * 10, left[i] % 10].filter(Boolean);
         const yParts = [Math.floor(right[j] / 10) * 10, right[j] % 10].filter(Boolean);
         const lookups = xParts.flatMap((x) =>
-          yParts.map((y) => `${x} × ${y} = ${sexagesimal(BigInt(x * y))}`),
+          yParts.map((y) => `${x} × ${y} = ${sexagesimalProduct(BigInt(x * y))}`),
         );
-        const decomposition = `${xParts.length > 1 ? `${left[i]} = ${xParts.join(' + ')}. ` : ''}${yParts.length > 1 ? `${right[j]} = ${yParts.join(' + ')}. ` : ''}${lookups.join('; ')}.${lookups.length > 1 ? ` Add these table multiples: ${left[i]} × ${right[j]} = ${sexagesimal(product)}.` : ''}`;
+        const decomposition = `${xParts.length > 1 ? `${left[i]} = ${xParts.join(' + ')}. ` : ''}${yParts.length > 1 ? `${right[j]} = ${yParts.join(' + ')}. ` : ''}${lookups.join('; ')}.${lookups.length > 1 ? ` Add these table multiples: ${xParts.flatMap((x) => yParts.map((y) => x * y)).join(' + ')} = ${product}. Therefore ${left[i]} × ${right[j]} = ${sexagesimalProduct(product)}.` : ''}`;
         partials.push(product * place);
         if (rows.length < 10)
           rows.push({
             cells: [
               { text: decomposition, tokens: tokens(system, product) },
               { text: `× ${place}` },
-              { text: sexagesimal(product * place), tokens: tokens(system, product * place) },
+              {
+                text: sexagesimalProduct(product * place),
+                tokens: tokens(system, product * place),
+              },
             ],
           });
       }
@@ -393,13 +408,13 @@ function babylonian(
       equation,
       sources: babylonianSources,
       table: {
-        caption: `Products are in modern sexagesimal transcription (comma-separated places).${partials.length > 10 ? ` The first 10 of ${partials.length} nonzero partial products are shown.` : ''}`,
+        caption: `Products are shown in decimal, with base-60 digits in brackets. For example, [5, 20] means 5 × 60 + 20 = 320.${partials.length > 10 ? ` The first 10 of ${partials.length} nonzero partial products are shown.` : ''}`,
         headings: ['Table product', 'Place weight', 'Partial product'],
         rows,
       },
       parts: [
         {
-          text: `${partials.length > 10 ? 'All partial products, including those omitted from the table,' : 'Add the partial products:'} ${partials.length <= 10 ? partials.map(sexagesimal).join(' + ') || '0' : ''}${partials.length <= 10 ? ' =' : ' total'} ${sexagesimal(a * b)} (decimal ${a * b}).`,
+          text: `${partials.length > 10 ? 'All partial products, including those omitted from the table,' : 'Add the partial products in decimal:'} ${partials.length <= 10 ? partials.join(' + ') || '0' : ''}${partials.length <= 10 ? ' =' : ' total'} ${sexagesimalProduct(a * b)}.`,
           tokens: tokens(system, a * b),
         },
       ],
