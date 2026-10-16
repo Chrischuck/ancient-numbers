@@ -1,5 +1,5 @@
 ---
-import { systems, regions, getSystem } from '../data/systems';
+import { systems, regions, regionLabel, getSystem } from '../data/systems';
 import Specimen from './Specimen.astro';
 import { represent } from '../lib/format';
 import { loadGlyphs } from '../lib/glyphs';
@@ -88,7 +88,7 @@ const base = import.meta.env.BASE_URL;
         <div class="select-wrap">
           <select id="system-select">
             {regions.map((region) => (
-              <optgroup label={region}>
+              <optgroup label={regionLabel(region)}>
                 {systems
                   .filter((s) => s.region === region)
                   .sort((a, b) => a.name.localeCompare(b.name))
@@ -134,7 +134,7 @@ const base = import.meta.env.BASE_URL;
               aria-autocomplete="list"
               aria-expanded="false"
               aria-controls="system-options"
-              placeholder="Search systems or regions…"
+              placeholder="Search systems or groups…"
               autocomplete="off"
               spellcheck="false"
             />

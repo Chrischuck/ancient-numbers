@@ -904,6 +904,9 @@ h2 {
 .region-europe {
   background: #eae5dc;
 }
+.region-global {
+  background: #e2e8eb;
+}
 .card-top {
   display: flex;
   justify-content: space-between;
@@ -2368,6 +2371,9 @@ h2 {
   border-collapse: collapse;
   text-align: left;
   font-size: 13px;
+}
+.math-table[data-columns='4'] table {
+  min-width: 560px;
 }
 .math-table caption {
   text-align: left;

@@ -2,15 +2,19 @@ import type { Rational, RenderToken, Source, SystemDefinition } from './types';
 import { baseDigits, calculate, rational } from './numbers';
 import { represent } from './format';
 import { oksapminPositions } from './pacific-counts';
+import type { CalculationWorkspace } from './arithmetic-workspace';
+import type { EvidenceKind } from './arithmetic-evidence';
 
 export interface OperationPart {
   text: string;
   tokens?: RenderToken[];
+  workspace?: CalculationWorkspace;
 }
 export interface OperationLesson {
   title: string;
   text: string;
   evidence: string;
+  evidenceKind?: EvidenceKind;
   equation: string;
   parts?: OperationPart[];
   notes?: string[];
@@ -99,7 +103,7 @@ function repeated(glyph: string, count: bigint, label: string): RenderToken[] | 
   return Array.from({ length: Number(count) }, () => ({ glyph, label }));
 }
 
-interface ColumnChange {
+export interface ColumnChange {
   place: bigint;
   x: bigint;
   y: bigint;
@@ -111,7 +115,12 @@ interface ColumnChange {
 }
 
 /** Actual exchanges across empty columns, rather than an unexplained negative carry. */
-function columns(a: bigint, b: bigint, base: number, subtract: boolean): ColumnChange[] {
+export function arithmeticColumns(
+  a: bigint,
+  b: bigint,
+  base: number,
+  subtract: boolean,
+): ColumnChange[] {
   const radix = BigInt(base);
   const changes: ColumnChange[] = [];
   if (!subtract) {
@@ -159,6 +168,7 @@ function columns(a: bigint, b: bigint, base: number, subtract: boolean): ColumnC
   }
   return changes;
 }
+const columns = arithmeticColumns;
 
 const egyptianSign = (place: bigint): string =>
   ({
@@ -241,35 +251,13 @@ function egyptian(
   const multiplying = operation === 'multiply';
   const count = multiplying ? a : b ? a / b : 0n;
   const amount = b;
+  const remainder = multiplying ? 0n : a % b;
   const evidence =
     'Documented method: the Rhind papyrus uses selected multiples, often built by doubling. The table below applies that method to your operands in hieroglyphic transcription; the papyrus itself uses hieratic.';
-  if (!multiplying && a % b !== 0n)
-    return {
-      title: 'Division · finding the missing multiplier',
-      text: 'Egyptian division asks which multiples of the divisor add to the dividend. Nonintegral answers can require unit fractions. This lesson shows the whole-number stage and does not reconstruct the papyrus’s fraction procedures.',
-      evidence,
-      equation,
-      parts: [
-        {
-          text: `${a / b} whole copies of ${b} make ${(a / b) * b}; ${a % b} remains. The exact modern answer is ${a}/${b} = ${textValue(rational(a, b))}.`,
-        },
-      ],
-      sources: egyptianSources,
-    };
-  if (count > 1023n)
-    return {
-      title: multiplying
-        ? 'Multiplication · doubling and selecting'
-        : 'Division · finding the missing multiplier',
-      text: 'Double the copy count and its amount together, then select the required rows. This input needs more than the ten rows illustrated here; the exact answer is retained below.',
-      evidence,
-      equation,
-      sources: egyptianSources,
-    };
   const keptCounts: bigint[] = [];
   const keptAmounts: bigint[] = [];
   const rows: NonNullable<OperationLesson['table']>['rows'] = [];
-  for (let copies = 1n; copies <= count; copies *= 2n) {
+  for (let copies = 1n; copies <= count || (!multiplying && copies === 1n); copies *= 2n) {
     const selected = Boolean(count & copies);
     const value = copies * amount;
     if (selected) {
@@ -285,28 +273,41 @@ function egyptian(
       ],
     });
   }
+  const displayedRows = rows.length > 10 ? [...rows.slice(0, 5), ...rows.slice(-5)] : rows;
+  const parts: OperationPart[] = [
+    { text: `Selected copy counts: ${keptCounts.join(' + ') || '0'} = ${count}.` },
+    {
+      text: `Selected amounts: ${keptAmounts.join(' + ') || '0'} = ${count * amount}.`,
+      tokens: tokens(system, count * amount),
+    },
+  ];
+  if (!multiplying && remainder)
+    parts.push(
+      {
+        text: `Complete the whole-number stage: ${a} − ${count * amount} = ${remainder} remains. Another whole copy of ${b} is larger than this remainder, so ${count} is the whole-number quotient.`,
+        tokens: tokens(system, remainder),
+      },
+      {
+        text: `The exact modern annotation is ${count} + ${remainder}/${b} = ${textValue(rational(a, b))}. The signs show only the ${count} whole copies. Egyptian scribes could continue with unit fractions; this exhibit does not reconstruct their fractional completion procedure or invent its signs.`,
+        tokens: tokens(system, count),
+      },
+    );
   return {
     title: multiplying
       ? 'Multiplication · doubling and selecting'
       : 'Division · finding the missing multiplier',
     text: multiplying
       ? `Make ${a} copies of ${b}. Begin with one copy; double both columns, then keep the rows whose copy counts total ${a}.`
-      : `Double the divisor ${b}. Keep rows whose amounts total the dividend ${a}; the sum of their copy counts is the quotient.`,
+      : `Double the divisor ${b}. ${remainder ? `Keep the largest combination of whole multiples that does not exceed the dividend ${a}; then identify the remainder.` : `Keep rows whose amounts total the dividend ${a}.`} The sum of the kept copy counts is the whole-number quotient.`,
     evidence,
     equation,
     sources: egyptianSources,
     table: {
-      caption: 'Each row doubles the preceding row. Keep marks are modern teaching aids.',
+      caption: `Each successive row doubles both columns.${rows.length > 10 ? ` The middle ${rows.length - 10} rows are abbreviated; all selected amounts are included below.` : ''} Keep marks are modern teaching aids.`,
       headings: ['Use', 'Copies', 'Amount'],
-      rows,
+      rows: displayedRows,
     },
-    parts: [
-      { text: `Selected copy counts: ${keptCounts.join(' + ') || '0'} = ${count}.` },
-      {
-        text: `Selected amounts: ${keptAmounts.join(' + ') || '0'} = ${count * amount}.`,
-        tokens: tokens(system, count * amount),
-      },
-    ],
+    parts,
     notes: ['Tables beyond ten rows and dense sign groups are abbreviated.'],
   };
 }
@@ -706,15 +707,27 @@ function twentyBased(
     let remainder = a;
     const parts: OperationPart[] = [
       {
+        workspace: {
+          kind: 'inupiaq-abacus',
+          value: String(a),
+          caption: 'The Iñupiaq abacus holds the dividend in twenties.',
+        },
         text: `Look for copies of divisor ${b} in dividend ${a}. Begin with the divisor shifted to its largest fitting base-twenty place.`,
         tokens: tokens(system, a),
       },
     ];
     do {
+      const before = remainder;
       const shifted = b * place;
       const count = remainder / shifted;
       remainder -= count * shifted;
       parts.push({
+        workspace: {
+          kind: 'inupiaq-abacus',
+          value: String(remainder),
+          previous: String(before),
+          caption: 'Remove the selected divisor groups; this board tracks the dividend remaining.',
+        },
         text: `At place ${place}, trace ${count} copies of the shifted divisor (${shifted}) and remove those strokes, regrouping if needed. This supplies ${count * place} to the quotient; ${remainder} remains.${place > 1n ? ' Move one place right.' : ''}`,
         tokens: tokens(system, remainder),
       });
@@ -748,14 +761,27 @@ function twentyBased(
     };
   const unit = kaktovik ? 'unit stroke' : 'dot';
   const five = kaktovik ? 'five-stroke' : 'bar';
-  const parts = columns(a, b, 20, subtract).map((c): OperationPart => {
+  let previousBoard = a;
+  const parts = columns(a, b, 20, subtract).map((c, index): OperationPart => {
     const exchange = c.exchanges
       .map(
         ({ from, to }) =>
           `Open one group worth ${from} into twenty at place ${to}, represented by four ${five}s.`,
       )
       .join(' ');
+    const before = previousBoard;
+    previousBoard = c.board;
     return {
+      workspace:
+        kaktovik && (index === 0 || before !== c.board)
+          ? {
+              kind: 'inupiaq-abacus',
+              value: String(c.board),
+              previous: String(before),
+              caption:
+                'Exchange five unit beads for one five-bead, and four fives for one in the next twenty-place.',
+            }
+          : undefined,
       text: subtract
         ? `${exchange}${exchange ? ' ' : ''}At place ${c.place}, remove the shape for ${c.y} from ${c.x}.${c.x % 5n < c.y % 5n ? ` Exchange one ${five} for five ${unit}s first.` : ''} Leave ${c.digit / 5n} ${five}s and ${c.digit % 5n} ${unit}s: ${c.x} − ${c.y} = ${c.digit}.`
         : `At place ${c.place}: ${c.x} + ${c.y}${c.carry ? ` + ${c.carry} carried` : ''} = ${c.raw}. Join like marks; five ${unit}s make one ${five}, and four ${five}s make one in the next place. Leave ${c.digit / 5n} ${five}s and ${c.digit % 5n} ${unit}s here.`,

@@ -33,6 +33,8 @@ export async function loadGlyphs(region: Region): Promise<GlyphSet> {
             };
           case 'Europe':
             return { ...coreGlyphs, ...(await import('../glyphs/hands')).handGlyphs };
+          case 'Global':
+            return { ...coreGlyphs, ...(await import('../glyphs/modern')).modernGlyphs };
           default:
             return coreGlyphs;
         }

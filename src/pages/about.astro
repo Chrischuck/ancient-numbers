@@ -1,5 +1,6 @@
 ---
 import Layout from '../components/Layout.astro';
+import ArithmeticCoverage from '../components/ArithmeticCoverage.astro';
 import { systems, converters } from '../data/systems';
 const base = import.meta.env.BASE_URL;
 ---
@@ -36,6 +37,7 @@ const base = import.meta.env.BASE_URL;
         </a>{' '}
         explains place value, base conversion, binary, and hexadecimal.
       </p>
+      <ArithmeticCoverage />
       <h2>Code</h2>
       <p>
         The app runs in your browser with no accounts or tracking. Original code and artwork use the

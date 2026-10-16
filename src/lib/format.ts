@@ -19,7 +19,9 @@ export function represent(value: Rational, system: SystemDefinition): Representa
     return unsupported('This converter currently supports whole numbers only.');
   if (n < 0n)
     return unsupported(
-      'Negative results use familiar digits. No minus sign is added to this notation.',
+      system.region === 'Global'
+        ? 'This converter currently supports nonnegative whole numbers only.'
+        : 'Negative results use familiar digits. No minus sign is added to this notation.',
     );
   if (system.engine === 'explainer') {
     const example = system.examples.find((e) => e.value === n.toString());
@@ -80,7 +82,10 @@ export function represent(value: Rational, system: SystemDefinition): Representa
         tokens = digits.map((d, i) => ({
           glyph: system.digits![d],
           place: (BigInt(base) ** BigInt(digits.length - i - 1)).toString(),
-          label: `Digit ${d}`,
+          label:
+            system.id === 'hexadecimal' && d >= 10
+              ? `Digit ${d.toString(16).toUpperCase()} (${d})`
+              : `Digit ${d}`,
         }));
         explanation =
           digits

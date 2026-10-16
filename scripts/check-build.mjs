@@ -17,8 +17,8 @@ const files = await walk(fileURLToPath(root));
 const html = files.filter((f) => f.endsWith('.html'));
 assert.equal(
   html.length,
-  44,
-  'Home, bases, collection, timeline, about, 404, and 38 system pages must be generated.',
+  46,
+  'Home, bases, collection, timeline, about, 404, and 40 system pages must be generated.',
 );
 for (const p of html) {
   const text = await readFile(p, 'utf8');

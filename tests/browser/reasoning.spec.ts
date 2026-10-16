@@ -154,8 +154,9 @@ test('changing the operator replaces the historical method without a base-conver
   await page.locator('#second-input').fill('1');
   await page.locator('#operation').selectOption('subtract');
   await expect(page.locator('#exact-value')).toHaveText('99');
-  await expect(lesson).toContainText(/exchange/i);
-  await expect(lesson).toContainText(/remove|cancel/i);
+  await expect(lesson).toContainText(/complete/i);
+  await expect(lesson).toContainText('1 + 9 = 10');
+  await expect(lesson).toContainText('10 + 90 = 100');
   await expect(lesson.locator('[data-operation]')).toHaveAttribute('data-operation', 'subtract');
   await expect(lesson).not.toContainText('doubling and selecting');
 

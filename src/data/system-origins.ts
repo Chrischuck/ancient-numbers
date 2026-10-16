@@ -1,4 +1,5 @@
 import type { TimelineSource, TimelineStatus } from './timeline';
+import { binaryHistorySource } from './modern';
 
 interface SystemOrigin {
   year: number | null;
@@ -33,6 +34,16 @@ const dated = (
  * Null means the linked evidence does not establish an origin date; never invent a plotting year.
  */
 export const systemOrigins: Record<string, SystemOrigin> = {
+  binary: dated(
+    1703,
+    '1703 · Leibniz’s account',
+    'Leibniz describes arithmetic using only 0 and 1 in this dated account. This is a documented mathematical milestone, not a claim that binary was invented in 1703 or that digital computing existed then.',
+    'living',
+    [binaryHistorySource],
+  ),
+  hexadecimal: unknown(
+    'This entry uses the modern computing alphabet 0–9 and A–F. The linked references document its rules and use without establishing a single invention date.',
+  ),
   'medieval-finger-counting': dated(
     725,
     '725 CE · Bede’s account',

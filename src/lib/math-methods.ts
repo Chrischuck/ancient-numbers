@@ -9,6 +9,14 @@ import { renderRepresentation } from './render';
 import { spokenNumberLesson } from './spoken-lesson';
 import { spokenLesson } from './worked-spoken-lesson';
 import { operationLesson } from './operation-lessons';
+import type { OperationPart } from './operation-lessons';
+import { completeOperationLesson } from './complete-operation-lessons';
+import { arithmeticProfiles } from '../data/arithmetic-profiles';
+import type { ArithmeticOperation, EvidenceKind } from './arithmetic-evidence';
+import { renderArithmeticWorkspace } from './arithmetic-workspace';
+import { mayaProductLesson } from './maya-product-lesson';
+import { mangarevanOperationLesson } from './mangarevan-operation-lesson';
+import { oksapminOperationLesson } from './oksapmin-operation-lesson';
 
 export interface ReasoningCalculation {
   first: Rational;
@@ -21,13 +29,14 @@ interface Explanation {
   equation?: string;
   notes?: string[];
   sources?: Source[];
-  parts?: { text: string; tokens?: RenderToken[] }[];
+  parts?: OperationPart[];
 }
 
 interface Method extends Explanation {
   title: string;
   steps?: string[];
   evidence?: string;
+  evidenceKind?: EvidenceKind;
   table?: {
     caption: string;
     headings: string[];
@@ -117,6 +126,11 @@ function formation(system: SystemDefinition, value: Rational): Explanation {
     };
   }
   if (!whole(value)) {
+    if (system.region === 'Global')
+      return {
+        text: `The exact result is ${valueText(value)}. This converter currently illustrates nonnegative whole numbers only.`,
+        notes: [system.caveat],
+      };
     return {
       text: `The exact modern result is ${valueText(value)}. This exhibit does not supply historical ${value.numerator < 0n ? 'negative-number' : 'fractional'} notation for this entry.`,
       notes: [
@@ -133,7 +147,10 @@ function formation(system: SystemDefinition, value: Rational): Explanation {
       ],
     };
   }
-  if (n > FORMATION_LIMIT) {
+  if (
+    n > FORMATION_LIMIT ||
+    (system.engine === 'positional' && baseDigits(n, system.radix ?? 10).length >= MAX_STEPS)
+  ) {
     return {
       text: system.howItWorks,
       notes: [
@@ -390,112 +407,62 @@ function formation(system: SystemDefinition, value: Rational): Explanation {
   return { text: specimen.explanation || system.howItWorks };
 }
 
-function canWork(calculation: ReasoningCalculation): boolean {
-  return (
+function method(system: SystemDefinition, calculation: ReasoningCalculation): Method {
+  const operation = calculation.operation as ArithmeticOperation;
+  const profile = arithmeticProfiles[system.id];
+  if (!profile) throw new Error(`Missing researched arithmetic profile: ${system.id}`);
+  const withinWorkedRange =
     whole(calculation.first) &&
     whole(calculation.second) &&
     calculation.first.numerator <= WORKED_LIMIT &&
-    calculation.second.numerator <= WORKED_LIMIT
-  );
-}
-
-function method(system: SystemDefinition, calculation: ReasoningCalculation): Method {
-  const { first, second, operation } = calculation;
-  const result = calculate(first, second, operation);
-  const equation = `${valueText(first)} ${SIGNS[operation]} ${valueText(second)} = ${valueText(result)}`;
-  const operationNames: Record<string, string> = {
-    add: 'Addition',
-    subtract: 'Subtraction',
-    multiply: 'Multiplication',
-    divide: 'Division',
-  };
-  const name = operationNames[operation];
-  const general: Method = {
-    title: `${name} in ${system.name}`,
-    text: `The cited sources for this entry describe the notation but do not establish a specific ${name.toLowerCase()} procedure using these signs. The equation below is the calculator’s exact modern result.`,
-    evidence:
-      'Evidence limit: a way of writing or naming numbers does not by itself tell us how its users performed an operation. This does not imply that the community could not calculate.',
-    equation,
-  };
-  if (!canWork(calculation))
-    return {
-      ...general,
-      text: `The worked ${name.toLowerCase()} examples here cover nonnegative whole-number operands of at most nine digits. Your exact modern result is retained below; these inputs do not extend the historical demonstration.`,
-    };
-  const historical = operationLesson(system, calculation);
-  if (historical) return historical;
-  const a = first.numerator;
-  const b = second.numerator;
-
-  if (system.id === 'yoruba') {
-    const anchor = ((a + 19n) / 20n) * 20n;
-    const gap = anchor - a;
-    const steps: string[] = [];
-    if (a > 0n && gap && operation === 'add') {
-      steps.push(
-        `Use a nearby multiple of twenty: ${a} = ${anchor} − ${gap}. Then ${a} + ${b} = ${anchor} + ${b} − ${gap} = ${valueText(result)}.`,
-      );
-    } else if (a > 0n && gap && operation === 'subtract') {
-      steps.push(
-        `Use a nearby multiple of twenty: ${a} = ${anchor} − ${gap}. Then ${a} − ${b} = ${anchor} − (${gap} + ${b}) = ${valueText(result)}.`,
-      );
-    } else if (a > 0n && gap && operation === 'multiply') {
-      steps.push(
-        `A complement simplifies this multiplication: (${anchor} − ${gap}) × ${b} = ${anchor * b} − ${gap * b} = ${valueText(result)}.`,
-      );
-    } else return { ...general, sources: [yorubaSource] };
-    return {
-      title: `${name} · using a complement of twenty`,
-      text: 'Yorùbá number names often use a nearby multiple of twenty. That structure can suggest a convenient complement for this calculation.',
-      evidence:
-        'Modern mathematical illustration: the name constructions are documented linguistic patterns. They do not establish this as a historical arithmetic procedure or every speaker’s mental method.',
-      equation,
-      steps,
-      sources: [yorubaSource],
-    };
-  }
-
-  if (system.id === 'mangarevan') {
-    if (a > 799n || b > 799n)
+    calculation.second.numerator <= WORKED_LIMIT &&
+    calculate(calculation.first, calculation.second, operation).numerator >= 0n;
+  if (withinWorkedRange) {
+    if (system.id === 'oksapmin' && (operation === 'multiply' || operation === 'divide'))
       return {
-        ...general,
-        title: `${name} · regrouping through binary steps`,
-        text: 'The verified mixed-system illustration covers counts through 799 counting units. Its special groups double through 10, 20, 40, and 80; this input is beyond the illustrated vocabulary range.',
-        sources: [mangarevanSource],
+        ...oksapminOperationLesson(
+          system,
+          calculation.first.numerator,
+          calculation.second.numerator,
+          operation,
+        ),
+        evidenceKind: 'reconstruction',
       };
-    const steps = [
-      `Keep the object-dependent counting unit fixed. First count: ${additiveTerms(a, [80, 40, 20, 10, 1]).join(' + ') || '0'}; second count: ${additiveTerms(b, [80, 40, 20, 10, 1]).join(' + ') || '0'}.`,
-    ];
-    if (operation === 'add' || operation === 'subtract') {
-      steps.push(
-        operation === 'add'
-          ? 'Combine like groups. Ten units form one takau; two takau form one paua; two paua form one tataua; two tataua form one varu.'
-          : 'Remove like groups. When needed, split a varu into two tataua, a tataua into two paua, or a paua into two takau.',
-      );
-    } else if (operation === 'multiply') {
-      steps.push(
-        'Doubling shifts takau (10) to paua (20), paua to tataua (40), and tataua to varu (80). Other factors can combine doubling and addition.',
-      );
-    } else {
-      steps.push(
-        'Halving reverses the binary grouping steps: varu to tataua, tataua to paua, and paua to takau. Other divisors need further grouping or arithmetic.',
-      );
+    if (system.id === 'mangarevan')
+      return {
+        ...mangarevanOperationLesson(
+          system,
+          calculation.first.numerator,
+          calculation.second.numerator,
+          operation,
+        ),
+        evidenceKind: 'reconstruction',
+      };
+    if (system.id === 'maya' && operation === 'multiply')
+      return {
+        ...mayaProductLesson(system, calculation.first.numerator, calculation.second.numerator),
+        evidenceKind: 'reconstruction',
+      };
+    if (
+      !['roman', 'mangarevan', 'yoruba'].includes(system.id) &&
+      !(system.id === 'egyptian' && operation === 'subtract')
+    ) {
+      const specialized = operationLesson(system, calculation);
+      if (specialized) {
+        if (specialized.parts?.length) {
+          const initial = represent(calculation.first, system);
+          if (!specialized.parts.some((part) => part.tokens?.length) && initial.tokens.length <= 32)
+            specialized.parts[0].tokens = initial.tokens;
+          const result = calculate(calculation.first, calculation.second, operation);
+          const final = represent(result, system);
+          if (final.tokens.length && final.tokens.length <= 32)
+            specialized.parts[specialized.parts.length - 1].tokens = final.tokens;
+        }
+        return { ...specialized, evidenceKind: profile.evidence[operation] };
+      }
     }
-    steps.push(
-      `The modern exact result is ${valueText(result)}${whole(result) && result.numerator <= 799n ? ` counting units = ${additiveTerms(result.numerator, [80, 40, 20, 10, 1]).join(' + ') || '0'}` : ''}.`,
-    );
-    return {
-      title: `${name} · regrouping through binary steps`,
-      text: 'Work with the groups of 10, 20, 40, and 80, keeping the counting unit fixed.',
-      equation,
-      steps,
-      evidence:
-        'Analytical reconstruction: these operations follow Bender and Beller’s analysis of the recorded vocabulary. Historical performance of these calculations was not observed.',
-      sources: [mangarevanSource],
-    };
   }
-
-  return general;
+  return completeOperationLesson(system, { ...calculation, operation }, profile);
 }
 
 function renderExplanation(explanation: Explanation, glyphs?: GlyphSet): string {
@@ -516,7 +483,7 @@ function renderExplanation(explanation: Explanation, glyphs?: GlyphSet): string 
 function renderOperation(worked: Method, glyphs?: GlyphSet): string {
   const illustration = (tokens: RenderToken[] | undefined, text: string): string =>
     glyphs && tokens?.length
-      ? `<div class="math-step-signs formation-sign${tokens.some((token) => token.glyph?.startsWith('oksapmin-')) ? ' formation-body' : ''}">${renderRepresentation({ status: 'ok', layout: tokens[0].text !== undefined ? 'words' : 'row', tokens, explanation: text }, glyphs)}</div>`
+      ? `<div class="math-step-signs formation-sign${tokens.some((token) => token.glyph?.startsWith('oksapmin-')) ? ' formation-body' : ''}">${renderRepresentation({ status: 'ok', layout: tokens[0].text !== undefined ? 'words' : tokens.some((token) => token.glyph?.startsWith('maya-')) ? 'stack' : tokens.some((token) => token.glyph?.startsWith('khipu-')) ? 'cord' : 'row', tokens, explanation: text }, glyphs)}</div>`
       : '';
   const parts: Explanation['parts'] = worked.parts ?? worked.steps?.map((text) => ({ text }));
   const steps = parts?.length
@@ -524,15 +491,15 @@ function renderOperation(worked: Method, glyphs?: GlyphSet): string {
         .slice(0, MAX_STEPS)
         .map(
           (part) =>
-            `<li>${illustration(part.tokens, part.text)}<p>${escapeHTML(part.text)}</p></li>`,
+            `<li>${part.workspace ? renderArithmeticWorkspace(part.workspace) : ''}${illustration(part.tokens, part.text)}<p>${escapeHTML(part.text)}</p></li>`,
         )
         .join('')}</ol>`
     : '';
   const table = worked.table
-    ? `<div class="math-table" role="region" aria-label="${escapeHTML(worked.table.caption)}" tabindex="0"><table><caption>${escapeHTML(worked.table.caption)}</caption><thead><tr>${worked.table.headings.map((heading) => `<th scope="col">${escapeHTML(heading)}</th>`).join('')}</tr></thead><tbody>${worked.table.rows.map((row) => `<tr${row.selected ? ' class="selected"' : ''}>${row.cells.map((cell) => `<td>${illustration(cell.tokens, cell.text)}<span>${escapeHTML(cell.text)}</span></td>`).join('')}</tr>`).join('')}</tbody></table></div>`
+    ? `<div class="math-table" data-columns="${worked.table.headings.length}" role="region" aria-label="${escapeHTML(worked.table.caption)}" tabindex="0"><table><caption>${escapeHTML(worked.table.caption)}</caption><thead><tr>${worked.table.headings.map((heading) => `<th scope="col">${escapeHTML(heading)}</th>`).join('')}</tr></thead><tbody>${worked.table.rows.map((row) => `<tr${row.selected ? ' class="selected"' : ''}>${row.cells.map((cell) => `<td>${illustration(cell.tokens, cell.text)}<span>${escapeHTML(cell.text)}</span></td>`).join('')}</tr>`).join('')}</tbody></table></div>`
     : '';
   const methodSources = (worked.sources ?? []).filter((source) => /^https?:\/\//.test(source.url));
-  return `<h3>${escapeHTML(worked.title)}</h3><p>${escapeHTML(worked.text)}</p>${worked.evidence ? `<p class="math-evidence">${escapeHTML(worked.evidence)}</p>` : ''}${table}${steps}${worked.equation ? `<p class="math-equation">${escapeHTML(worked.equation)}</p>` : ''}${methodSources.length ? `<p class="math-method-sources">${methodSources.map((source) => `<a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.title)}</a>`).join(' · ')}</p>` : ''}`;
+  return `<h3>${escapeHTML(worked.title)}</h3><p>${escapeHTML(worked.text)}</p>${worked.evidence ? `<p class="math-evidence"${worked.evidenceKind ? ` data-evidence="${worked.evidenceKind}"` : ''}>${escapeHTML(worked.evidence)}</p>` : ''}${table}${steps}${worked.equation ? `<p class="math-equation">${escapeHTML(worked.equation)}</p>` : ''}${methodSources.length ? `<p class="math-method-sources">${methodSources.map((source) => `<a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.title)}</a>`).join(' · ')}</p>` : ''}`;
 }
 
 /** Render a bounded, source-linked worked example without changing calculator arithmetic. */

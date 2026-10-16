@@ -1,0 +1,181 @@
+---
+import { systems } from '../data/systems';
+import { arithmeticProfiles } from '../data/arithmetic-profiles';
+import { arithmeticOperations } from '../lib/arithmetic-evidence';
+const base = import.meta.env.BASE_URL;
+const labels = {
+  documented: 'Documented',
+  reconstruction: 'Reconstruction',
+  modern: 'Modern',
+  recording: 'Recording',
+};
+const operationNames = {
+  add: 'Addition',
+  subtract: 'Subtraction',
+  multiply: 'Multiplication',
+  divide: 'Division',
+};
+---
+
+<section
+  id="arithmetic-coverage"
+  class="arithmetic-coverage"
+  aria-labelledby="arithmetic-coverage-title"
+>
+  <h2 id="arithmetic-coverage-title">Arithmetic research and walkthroughs</h2>
+  <p>
+    Each calculator has a worked lesson for each operator. The evidence label describes the
+    procedure’s relationship to the sources; a reconstruction remains a worked example, with its
+    limits stated.
+  </p>
+  <dl class="coverage-key">
+    <div>
+      <dt>Documented</dt>
+      <dd>
+        A source establishes the practice; the input numbers and drawings are a new application.
+      </dd>
+    </div>
+    <div>
+      <dt>Reconstruction</dt>
+      <dd>
+        The lesson works through the notation or tool, with an explicitly reconstructed procedure.
+      </dd>
+    </div>
+    <div>
+      <dt>Modern</dt>
+      <dd>
+        A contemporary mathematical or language-based example, without an ancestral-method claim.
+      </dd>
+    </div>
+    <div>
+      <dt>Recording</dt>
+      <dd>The notation records quantities; the calculating workspace is shown separately.</dd>
+    </div>
+  </dl>
+  <details>
+    <summary>Inspect {systems.length} calculators × 4 operators</summary>
+    <div
+      class="coverage-scroll"
+      role="region"
+      aria-label="Arithmetic research coverage"
+      tabindex="0"
+    >
+      <table>
+        <caption>
+          Open any operation to try its worked example. Individual input restrictions can change the
+          evidence label, such as Coptic division outside its surviving tables.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">System</th>
+            {arithmeticOperations.map((operation) => (
+              <th scope="col">{operationNames[operation]}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {systems.map((system) => {
+            const profile = arithmeticProfiles[system.id];
+            return (
+              <tr>
+                <th scope="row">
+                  <a href={`${base}systems/${system.id}/`}>{system.name}</a>
+                </th>
+                {arithmeticOperations.map((operation) => {
+                  const copticTable = system.id === 'coptic-epact' && operation === 'divide';
+                  const first = copticTable
+                    ? '95'
+                    : system.id === 'cistercian-gestures'
+                      ? '2'
+                      : '6';
+                  const second = copticTable
+                    ? '12'
+                    : system.id === 'cistercian-gestures'
+                      ? '1'
+                      : '3';
+                  const url = `${base}?system=${system.id}&mode=calculate&operation=${operation}&number=${first}&second=${second}#conversion-guide`;
+                  return (
+                    <td>
+                      <a
+                        href={url}
+                        title={profile.operationNotes[operation]}
+                        aria-label={`${system.name}: ${operationNames[operation]}, ${labels[profile.evidence[operation]]}`}
+                      >
+                        {labels[profile.evidence[operation]]}
+                      </a>
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </details>
+</section>
+
+<style>
+  .coverage-key {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 28px;
+    margin: 24px 0;
+  }
+  .coverage-key dt {
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 500;
+  }
+  .coverage-key dd {
+    margin: 6px 0 0;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .arithmetic-coverage summary {
+    cursor: pointer;
+    padding: 16px 0;
+    color: var(--green);
+  }
+  .coverage-scroll {
+    max-width: 100%;
+    overflow: auto;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 11px;
+    line-height: 1.7;
+  }
+  caption {
+    text-align: left;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 12px 0;
+  }
+  th,
+  td {
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+  th {
+    font-weight: 500;
+  }
+  td a,
+  th a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  @media (max-width: 600px) {
+    .coverage-key {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    th,
+    td {
+      padding: 10px 8px;
+    }
+  }
+</style>

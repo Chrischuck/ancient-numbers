@@ -57,9 +57,9 @@ test('Yorùbá explains the words in its subtractive number name', () => {
   const fiftyFour = renderMathReasoning(system('yoruba'), rational(54n));
   assert.match(fiftyFour, /\(3 × 20 − 10\) \+ 4 = 54/);
   const addition = worked('yoruba', 54n, 6n, 'add');
-  assert.match(addition, /54 = 60 − 6/);
-  assert.match(addition, /Modern mathematical illustration/);
-  assert.match(addition, /60 \+ 6 − 6 = 60/);
+  assert.match(addition, /five-shell batches/);
+  assert.match(addition, /Combine the singles: 4 \+ 1 = 5/);
+  assert.match(addition, /3 twenties, 0 fives, and 0 singles/);
 });
 
 test('Babylonian lessons count the two wedge types and preserve an empty internal place', async () => {
@@ -285,7 +285,7 @@ test('each operator renders only its operation lesson and translate retains nume
   assert.match(renderMathReasoning(system('egyptian'), rational(58n)), /formation-steps/);
 });
 
-test('Egyptian addition combines actual signs and subtraction exchanges across empty magnitudes', async () => {
+test('Egyptian addition combines actual signs and subtraction completes the deficit', async () => {
   const entry = system('egyptian');
   const glyphs = await loadGlyphs(entry.region);
   const addition = renderMathReasoning(
@@ -306,9 +306,9 @@ test('Egyptian addition combines actual signs and subtraction exchanges across e
   assert.match(addition, /Teaching reconstruction:.*hieratic writing/);
   assert.doesNotMatch(addition, /doubling|reciprocal|class="math-table"/);
   const subtraction = worked('egyptian', 100n, 1n, 'subtract');
-  assert.match(subtraction, /Exchange one hundred sign \(rope coil\) for ten ten sign \(hobble\)s/);
-  assert.match(subtraction, /Exchange one ten sign \(hobble\) for ten unit strokes/);
-  assert.match(subtraction, /10 − 1 = 9 remain/);
+  assert.match(subtraction, /1 \+ 9 = 10/);
+  assert.match(subtraction, /10 \+ 90 = 100/);
+  assert.match(subtraction, /9 \+ 90 = 99/);
   assert.match(subtraction, /100 − 1 = 99/);
   assert.doesNotMatch(subtraction, /doubling|reciprocal/);
   // A carry beyond the repertoire is explained without referring to missing artwork.
@@ -430,10 +430,10 @@ test('Kaktovik lessons use documented classroom strokes and graphical quotient c
   assert.match(division, /At place 20, trace 5 copies/);
   assert.match(division, /501 whole copies fit/);
   const multiplication = worked('kaktovik', 13n, 24n, 'multiply');
-  assert.match(
-    multiplication,
-    /cited sources.*do not establish a specific multiplication procedure/,
-  );
+  assert.match(multiplication, /13 × 20 = 260/);
+  assert.match(multiplication, /13 × 4 = 52/);
+  assert.match(multiplication, /13 × 24 = 312/);
+  assert.match(multiplication, /data-evidence="modern"/);
 });
 
 test('Oksapmin addition and subtraction track the actual body path as a modern ethnographic adaptation', async () => {
@@ -479,13 +479,19 @@ test('Oksapmin addition and subtraction track the actual body path as a modern e
     [28n, 1n, 'subtract'],
   ] as const) {
     const html = worked('oksapmin', a, b, operation);
-    assert.match(html, /first-traversal exhibit boundary/);
+    assert.match(
+      html,
+      operation === 'subtract' && a < b
+        ? /Exact modern continuation/
+        : /first-traversal exhibit boundary/,
+    );
     assert.doesNotMatch(html, /Count added step|Count removal|undefined|NaN/);
   }
-  assert.match(
-    worked('oksapmin', 9n, 7n, 'multiply'),
-    /do not establish a specific multiplication procedure/,
-  );
+  const multiplication = worked('oksapmin', 9n, 7n, 'multiply');
+  assert.match(multiplication, /Make 7 blocks of 9 positions/);
+  assert.match(multiplication, /positions 10–18/);
+  assert.match(multiplication, /9 × 7 = 63/);
+  assert.match(multiplication, /data-evidence="reconstruction"/);
 });
 
 test('rod-board examples explain carries and borrowing in actual operands', () => {
@@ -528,10 +534,10 @@ test('Maya exercises carry twenty while Roman writing exposes subtractive groups
 
 test('Mangarevan reasoning preserves counting units and marks reconstructed algorithms', () => {
   const html = worked('mangarevan', 273n, 219n, 'add');
-  assert.match(html, /6 × 80 \+ 10 \+ 2/);
+  assert.match(html, /6 varu \+ 1 takau \+ 2 ordinary units/);
   assert.match(html, /object-dependent counting unit/);
   assert.match(html, /Analytical reconstruction/);
-  assert.match(html, /two takau form one paua/);
+  assert.match(html, /takau.*paua/);
   assert.match(
     worked('mangarevan', 1000n, 2n, 'multiply'),
     /beyond the illustrated vocabulary range/,
@@ -546,10 +552,11 @@ test('gesture reasoning distinguishes decimal communication, hours, and written 
   assert.match(renderMathReasoning(bede, rational(54n)), /left hand/);
   assert.match(renderMathReasoning(bede, rational(54n)), /5 × 10 \+ 4 = 54/);
   assert.match(renderMathReasoning(trappist, rational(3n, 2n)), /1 hour \+ 1\/2 hour = 3\/2 hours/);
-  assert.match(
-    worked('cistercian', 27n, 15n, 'add'),
-    /cited sources.*do not establish a specific addition procedure/,
-  );
+  const cipherAddition = worked('cistercian', 27n, 15n, 'add');
+  assert.match(cipherAddition, /data-evidence="recording"/);
+  assert.match(cipherAddition, /7 and 5: 12/);
+  assert.match(cipherAddition, /27 \+ 15 = 42/);
+  assert.match(cipherAddition, /workspace-svg/);
 });
 
 test('signed, fractional, zero, malformed, and huge inputs stay safe and bounded', () => {
@@ -569,6 +576,16 @@ test('signed, fractional, zero, malformed, and huge inputs stay safe and bounded
   assert.match(html, /2001 digits/);
   assert.doesNotMatch(html, /undefined|NaN|Infinity/);
   assert.ok(stepCount(worked('egyptian', 1023n, 999999999n, 'multiply'), 'math-steps') <= 14);
+});
+
+test('negative differences retain worked steps instead of stopping at a historical scope notice', () => {
+  for (const id of ['egyptian', 'kaktovik', 'maya', 'rods', 'babylonian', 'mangarevan']) {
+    const html = worked(id, 3n, 6n, 'subtract');
+    assert.match(html, /Exact modern continuation/, id);
+    assert.match(html, /3 − 6 = -3/, id);
+    assert.ok(stepCount(html, 'math-steps') >= 3, id);
+    assert.match(html, /data-evidence="modern"/, id);
+  }
 });
 
 test('example-only dictionaries and injected source content are not silently extended', () => {

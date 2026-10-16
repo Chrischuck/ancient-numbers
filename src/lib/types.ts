@@ -1,4 +1,4 @@
-export type Region = 'Africa' | 'Americas' | 'Oceania' | 'Asia' | 'Europe';
+export type Region = 'Africa' | 'Americas' | 'Oceania' | 'Asia' | 'Europe' | 'Global';
 export interface Source {
   title: string;
   url: string;

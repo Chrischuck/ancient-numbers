@@ -6,10 +6,10 @@ import { parseNumber } from '../src/lib/numbers';
 import { loadGlyphs, findGlyph } from '../src/lib/glyphs';
 import { copyText, exportSVG } from '../src/lib/render';
 test('collection is sourced, unique, broad, and above promised converter minimum', () => {
-  assert.equal(systems.length, 38);
+  assert.equal(systems.length, 40);
   assert.equal(converters.length, systems.length, 'every entry has a documented bounded converter');
-  assert.equal(new Set(systems.map((s) => s.id)).size, 38);
-  assert.equal(new Set(systems.map((s) => s.region)).size, 5);
+  assert.equal(new Set(systems.map((s) => s.id)).size, 40);
+  assert.equal(new Set(systems.map((s) => s.region)).size, 6);
   for (const s of systems) {
     assert.ok(s.sources.length > 0, s.id);
     assert.ok(s.examples.length >= 3, s.id);

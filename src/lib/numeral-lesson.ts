@@ -42,6 +42,8 @@ function localDigitExpression(system: SystemDefinition, digit: number): string {
 }
 
 function digitDescription(system: SystemDefinition, digit: number): string {
+  if (system.id === 'hexadecimal' && digit >= 10)
+    return `The letter ${digit.toString(16).toUpperCase()} is the digit ${digit}.`;
   if (system.id === 'maya') {
     if (digit === 0) return 'The shell sign means zero.';
     const bars = Math.floor(digit / 5);

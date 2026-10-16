@@ -65,7 +65,7 @@ export function initSystemPicker(select: HTMLSelectElement) {
     });
     status.textContent = visible.length
       ? `${visible.length} ${visible.length === 1 ? 'system' : 'systems'} found`
-      : 'No systems found. Try another name or region.';
+      : 'No systems found. Try another name or group.';
     setActive(
       Math.max(
         0,

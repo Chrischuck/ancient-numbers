@@ -1,0 +1,163 @@
+.arithmetic-workspace {
+  margin: 16px 0;
+  padding: clamp(10px, 2vw, 18px);
+  max-width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.arithmetic-workspace .arithmetic-workspace-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--green);
+}
+.arithmetic-workspace .arithmetic-workspace-scope,
+.arithmetic-workspace .arithmetic-workspace-note,
+.arithmetic-workspace .arithmetic-workspace-legend {
+  margin: 6px 0 12px;
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+.arithmetic-workspace-states {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.arithmetic-workspace-states.is-paired {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+.arithmetic-workspace-state {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+}
+.arithmetic-workspace .arithmetic-workspace-state-label {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 3px 12px;
+  margin: 0 0 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.arithmetic-workspace-state-label strong {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.arithmetic-workspace-svg {
+  display: block;
+  width: 100%;
+  max-width: 390px;
+  height: auto;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.arithmetic-workspace-arrow {
+  color: var(--accent);
+  font-size: 22px;
+  line-height: 1;
+}
+.workspace-frame {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 3;
+}
+.workspace-beam {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 5;
+}
+.workspace-rod {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.5;
+}
+.workspace-column-outline {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 1.5;
+}
+.workspace-column.is-changed .workspace-column-outline {
+  stroke: var(--accent);
+  stroke-dasharray: 4 3;
+}
+.workspace-change-marker {
+  fill: var(--accent);
+}
+.workspace-piece {
+  stroke-width: 1.5;
+}
+.workspace-piece.is-active {
+  fill: var(--green);
+  stroke: var(--green);
+}
+.workspace-piece.is-inactive {
+  fill: var(--white);
+  stroke: var(--muted);
+  stroke-dasharray: 2 2;
+}
+.workspace-place-label,
+.workspace-digit-label,
+.workspace-written-digit,
+.workspace-piece-value {
+  font-family: var(--sans);
+  font-variant-numeric: tabular-nums;
+  text-anchor: middle;
+  fill: var(--ink);
+}
+.workspace-place-label {
+  font-size: 11px;
+  fill: var(--muted);
+}
+.workspace-digit-label {
+  font-size: 15px;
+  font-weight: 600;
+}
+.workspace-piece-value {
+  font-size: 9px;
+  fill: var(--muted);
+}
+.workspace-digit-box {
+  fill: var(--white);
+  stroke: var(--line);
+  stroke-width: 1.5;
+}
+.workspace-written-digit {
+  font-size: 28px;
+  font-weight: 500;
+}
+.arithmetic-workspace figcaption {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.arithmetic-workspace-unavailable p {
+  margin: 0;
+  font-size: 12px;
+}
+@media (max-width: 640px) {
+  .arithmetic-workspace-states.is-paired {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .arithmetic-workspace-arrow {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+  .arithmetic-workspace-state {
+    padding: 6px;
+  }
+}

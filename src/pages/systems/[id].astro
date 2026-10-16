@@ -2,7 +2,7 @@
 import Layout from '../../components/Layout.astro';
 import Specimen from '../../components/Specimen.astro';
 import SystemCard from '../../components/SystemCard.astro';
-import { systems } from '../../data/systems';
+import { systems, regionLabel } from '../../data/systems';
 import { loadGlyphs } from '../../lib/glyphs';
 import { renderLearningGuide } from '../../lib/learning-guide';
 import { renderMathReasoning } from '../../lib/math-methods';
@@ -22,7 +22,7 @@ const first =
     <div class="breadcrumb">
       <a href={`${base}collection/`}>Collection</a>
       <span aria-hidden="true">/</span>
-      <span>{system.region}</span>
+      <span>{regionLabel(system.region)}</span>
       <span aria-hidden="true">/</span>
       <span>{system.name}</span>
     </div>

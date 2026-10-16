@@ -1,6 +1,6 @@
 # Ancient Numbers
 
-A world of ways to count. A free, static exploration of 38 written, spoken, and physical counting traditions, each with a sourced whole-number converter and explicit supported range.
+A world of ways to count. A free, static exploration of 40 written, spoken, and physical counting systems, each with a sourced whole-number converter and explicit supported range.
 
 ![Ancient Numbers converter preview](docs/preview.png)
 
@@ -16,10 +16,11 @@ A world of ways to count. A free, static exploration of 38 written, spoken, and 
 - Read the source references, notation limits, and selected period on each system page.
 - Learn human hand poses with gesture dictionaries, illustrated rules, and downloadable vector artwork.
 - Explore spoken-number dictionaries and the additive, subtractive, and multiplicative relationships in number names.
-- Follow operation-specific calculation lessons, including Egyptian sign exchange and doubling, Babylonian table multiplication and reciprocal division, and Chinese rod-board arithmetic.
+- Follow numerical walkthroughs for all four operators in every calculator, using the selected numeral signs, words, or gestures. Examples include Egyptian completion and doubling, Babylonian table multiplication and reciprocal division, and Chinese rod-board arithmetic.
+- Follow before-and-after abacus beads, counter boards, and reconstructed kernel workspaces where calculation uses a tool separate from the written numerals.
 - Learn place value, binary, hexadecimal, and base conversion on the Bases page, with an interactive worked converter.
 
-The collection includes modern and living traditions as well as ancient ones. Spoken words use their documented spelling; generated Yoruba compounds separate morphemes and explicitly identify that teaching form. Physical representations, including hands, are labeled as modern teaching diagrams of documented practices.
+The collection includes modern and living traditions as well as ancient ones. Binary and hexadecimal appear in the Modern group, with positional converters, symbol keys, and worked examples. Spoken words use their documented spelling; generated Yoruba compounds separate morphemes and explicitly identify that teaching form. Physical representations, including hands, are labeled as modern teaching diagrams of documented practices.
 
 ## Run locally
 
@@ -67,7 +68,9 @@ Open Graph and Twitter metadata use `public/social-card-v1.png`, a 1200 × 630 i
 
 Conversion follows named variants with explicit ranges. Some systems currently support a narrow interval (for example, Brahmi below 100). Sinhala Illakkam supports 1–9,999 using documented hundred and thousand multipliers. Those are app limits, not historical claims. All formerly specimen-only entries now have bounded converters: Māori 0–9,999; Hawaiian 0–100; Choctaw and Diné/Navajo 1–100; Mangarevan 1–799 counting units; Oksapmin 1–27; Mende Kikakui 1–9,999,999; Sequoyah’s Cherokee numerals 0–100; Ottoman Siyaq 1–9,999. Bede’s hand-only variant covers 1–9,999; the selected La Trappe hour signals illustrate 1–10 without inventing a larger cardinal code.
 
-A modern cell grid fixes the integer scale for Old Babylonian notation and makes empty counting-rod positions visible. Ordinary Maya base-20 notation is kept separate from Long Count calendar notation. The calculator distinguishes number formation from arithmetic procedures, and labels modern worked applications of documented methods. Fractional and negative answers remain exact even when their historical rendering is unavailable. A spoken number’s structure does not establish how every speaker reasons while calculating.
+A modern cell grid fixes the integer scale for Old Babylonian notation and makes empty counting-rod positions visible. Ordinary Maya base-20 notation is kept separate from Long Count calendar notation. Every calculator has a worked lesson for each operator. Visible evidence labels distinguish documented practices, reconstructions, modern examples, and notation used to record separately calculated quantities. Fractional and negative answers remain exact even when their historical rendering is unavailable. A spoken number’s structure does not establish how every speaker reasons while calculating.
+
+The [arithmetic source guide](docs/math-method-sources.md) links the regional research audits. The About page exposes the complete calculator/operator coverage table. Chinese suanpan diagrams use two upper and five lower beads per decimal column; the Iñupiaq abacus uses three upper five-beads and four lower unit beads in base-twenty columns. Roman and Greek counter boards and the Khipu kernel workspace are explicitly reconstructed teaching layouts.
 
 Each system contains formation references and at least three worked examples. Tests compare source examples and important boundaries; they do not substitute for specialist or community review. Corrections with inspectable references are welcome.
 
