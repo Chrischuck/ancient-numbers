@@ -38,7 +38,7 @@ const home = await readFile(new URL('index.html', root), 'utf8');
 const previewURL = home.match(/property="og:image" content="([^"]+)"/)?.[1];
 assert.ok(previewURL, 'Link previews need an Open Graph image.');
 const preview = new URL(previewURL);
-assert.equal(preview.origin, 'https://cumputersluts.github.io');
+assert.equal(preview.origin, 'https://chrischuck.github.io');
 assert.ok(preview.pathname.startsWith('/ancient-numbers/'));
 const png = await readFile(new URL(preview.pathname.replace('/ancient-numbers/', ''), root));
 assert.equal(png.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
