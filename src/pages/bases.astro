@@ -1,0 +1,432 @@
+---
+import Layout from '../components/Layout.astro';
+import { BASE_OPTIONS, binaryHexGroups, convertBase, renderBaseLesson } from '../lib/bases';
+import '../styles/bases.css';
+
+const base = import.meta.env.BASE_URL;
+const defaultLesson = convertBase('42', 10, 2);
+const hexDigits = Array.from({ length: 16 }, (_, value) => ({
+  value,
+  hex: value.toString(16).toUpperCase(),
+  bits: value.toString(2).padStart(4, '0'),
+}));
+const byteExample = binaryHexGroups(173n);
+---
+
+<Layout
+  title="Understanding bases — Ancient Numbers"
+  description="Learn place value, convert between bases with worked steps, and explore decimal, binary, hexadecimal, Maya base 20, and Babylonian base 60."
+  active="bases"
+>
+  <div class="container bases-page">
+    <header class="bases-hero">
+      <div>
+        <span class="eyebrow bases-kicker">A GUIDE TO NUMBER BASES</span>
+        <h1>
+          One number.
+          <br />
+          <em>Many bases.</em>
+        </h1>
+        <p>
+          Forty-two things stay forty-two things. A base changes how we group and write that
+          quantity. Learn the pattern behind place value, then follow a conversion one step at a
+          time.
+        </p>
+        <nav class="bases-jump-links" aria-label="On this page">
+          <a href="#place-value">Place value</a>
+          <a href="#change-base">Change base</a>
+          <a href="#why-bases">Why different bases?</a>
+          <a href="#binary-hex">Binary &amp; hex</a>
+        </nav>
+      </div>
+      <div class="bases-same-number">
+        <span class="eyebrow">FORTY-TWO, IN EVERY ROW</span>
+        <dl>
+          <div>
+            <dt>
+              Decimal <small>BASE 10</small>
+            </dt>
+            <dd>42</dd>
+          </div>
+          <div>
+            <dt>
+              Binary <small>BASE 2</small>
+            </dt>
+            <dd>101010</dd>
+          </div>
+          <div>
+            <dt>
+              Hexadecimal <small>BASE 16</small>
+            </dt>
+            <dd>2A</dd>
+          </div>
+          <div>
+            <dt>
+              Vigesimal <small>BASE 20</small>
+            </dt>
+            <dd>2,2</dd>
+          </div>
+          <div>
+            <dt>
+              Sexagesimal <small>BASE 60</small>
+            </dt>
+            <dd>42</dd>
+          </div>
+        </dl>
+        <p>Commas separate place digits in bases 20 and 60 on this page.</p>
+      </div>
+    </header>
+
+    <section
+      class="bases-section bases-foundations"
+      id="place-value"
+      aria-labelledby="place-heading"
+    >
+      <div class="bases-section-intro">
+        <span class="eyebrow bases-kicker">01 · THE GROUPING RULE</span>
+        <h2 id="place-heading">What does a base do?</h2>
+        <p>
+          In a positional number system, the <strong>base</strong> tells you how many units make one
+          unit of the next place. In base 10, ten ones make a ten, and ten tens make a hundred. In
+          base 2, two ones make a two, and two twos make a four.
+        </p>
+        <p>
+          The rightmost whole-number place is always worth 1. Each step left multiplies that value
+          by the base: 1, base, base², base³, and so on. A digit tells you how many of that place
+          you have. Zero holds an empty place.
+        </p>
+      </div>
+      <div class="base-place-example">
+        <h3>Read 101010 in base 2</h3>
+        <div
+          class="base-table-scroll"
+          tabindex="0"
+          role="region"
+          aria-label="Binary place-value example"
+        >
+          <table class="base-place-table">
+            <caption>Each step left doubles the place value</caption>
+            <tbody>
+              <tr>
+                <th scope="row">Place value</th>
+                {[32, 16, 8, 4, 2, 1].map((n) => (
+                  <td>{n}</td>
+                ))}
+              </tr>
+              <tr>
+                <th scope="row">Digit</th>
+                {[1, 0, 1, 0, 1, 0].map((n) => (
+                  <td class:list={{ 'base-digit-on': n === 1 }}>{n}</td>
+                ))}
+              </tr>
+              <tr>
+                <th scope="row">Contribution</th>
+                {[32, 0, 8, 0, 2, 0].map((n) => (
+                  <td>{n}</td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="base-place-sum">
+          32 + 8 + 2 = <strong>42</strong>
+        </p>
+        <p>
+          Each digit must be smaller than its base. Binary has 0 and 1; after 1 comes 10, meaning
+          one two and zero ones. So <strong>10 does not always mean ten</strong>.
+        </p>
+        <a class="bases-source" href="https://spaceplace.nasa.gov/binary-code2/en/">
+          NASA · Place value in binary ↗
+        </a>
+      </div>
+      <aside class="bases-notation-note">
+        <h3>A base and a set of symbols are different ideas</h3>
+        <p>
+          Egyptian hieroglyphic numerals group by tens, with separate signs for 1, 10, 100, and so
+          on. Their values come from the signs themselves, rather than a digit’s position. Roman
+          numerals also use signs with fixed values, such as I, V, and X, with rules for combining
+          them. Neither works like a row of positional decimal digits.
+        </p>
+        <p>
+          Changing the base explains a number’s grouping. To learn how people actually added,
+          subtracted, multiplied, or divided, choose an operator in the{' '}
+          <a href={`${base}#converter`}>calculator</a>.
+        </p>
+        <div class="bases-note-links">
+          <a href="https://mathshistory.st-andrews.ac.uk/HistTopics/Egyptian_numerals/">
+            MacTutor · Egyptian numerals ↗
+          </a>
+          <a href={`${base}systems/roman/`}>Explore Roman numerals →</a>
+        </div>
+      </aside>
+    </section>
+
+    <section
+      class="bases-section bases-converter"
+      id="change-base"
+      aria-labelledby="change-heading"
+    >
+      <div class="bases-section-intro">
+        <span class="eyebrow bases-kicker">02 · TRY A CONVERSION</span>
+        <h2 id="change-heading">Change the writing, keep the value.</h2>
+        <p>
+          First read the source digits using their place values. Then divide by the target base to
+          find its digits. These are general conversion methods; individual civilizations had their
+          own arithmetic practices.
+        </p>
+      </div>
+      <noscript>
+        <p class="bases-nojs">
+          The worked example below is 42 in decimal converted to binary. Enable JavaScript to try
+          your own number.
+        </p>
+      </noscript>
+      <form id="base-converter-form" class="base-converter-form" data-base-interactive hidden>
+        <div class="base-field base-number-field">
+          <label for="base-number">Number</label>
+          <input
+            id="base-number"
+            name="number"
+            type="text"
+            inputmode="numeric"
+            value="42"
+            maxlength="128"
+            autocomplete="off"
+            spellcheck="false"
+            aria-describedby="base-input-help base-input-error"
+          />
+        </div>
+        <div class="base-field">
+          <label for="base-source">From base</label>
+          <select id="base-source" name="from">
+            {BASE_OPTIONS.map((option) => (
+              <option value={option.value} selected={option.value === 10}>
+                {option.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div class="base-field">
+          <label for="base-target">To base</label>
+          <select id="base-target" name="to">
+            {BASE_OPTIONS.map((option) => (
+              <option value={option.value} selected={option.value === 2}>
+                {option.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button class="base-convert-button" type="submit">
+          Show conversion <span aria-hidden="true">→</span>
+        </button>
+        <p id="base-input-help" class="base-input-help">
+          Use 0–9. Example: 42. Up to 16 place digits; nonnegative whole numbers only.
+        </p>
+        <p id="base-input-error" class="base-input-error" hidden></p>
+      </form>
+      <div class="base-presets" data-base-interactive hidden>
+        <span>Try an example</span>
+        <button type="button" data-base-example="10101101" data-source="2" data-target="16" hidden>
+          Binary → hex
+        </button>
+        <button type="button" data-base-example="2A" data-source="16" data-target="10" hidden>
+          Hex → decimal
+        </button>
+        <button type="button" data-base-example="1,12" data-source="60" data-target="10" hidden>
+          Base 60 → decimal
+        </button>
+      </div>
+      <p class="base-delimiter-note">
+        <strong>For bases 20 and 60:</strong> type each place digit as a decimal number, separated
+        by commas. For example, 1,12 in base 60 means 1 × 60 + 12 = 72. The comma is a place
+        separator, never a thousands separator here. Spaces around commas are allowed. Fractions,
+        signs, prefixes, colons, and semicolons are outside this lesson.
+      </p>
+      <div id="base-lesson" set:html={renderBaseLesson(defaultLesson)} />
+      <p
+        class="sr-only"
+        id="base-announcement"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      ></p>
+    </section>
+
+    <section class="bases-section" id="why-bases" aria-labelledby="why-heading">
+      <div class="bases-section-intro">
+        <span class="eyebrow bases-kicker">03 · PEOPLE, TOOLS &amp; TRADITION</span>
+        <h2 id="why-heading">Why use different bases?</h2>
+        <p>
+          Number systems grow from counting habits, language, measurement, and the tools people use.
+          A useful convention can be passed down for centuries. We often know how a system worked
+          more confidently than why its earliest users settled on a particular grouping.
+        </p>
+      </div>
+      <div class="bases-culture-grid">
+        <article>
+          <span class="bases-culture-number" aria-hidden="true">
+            10
+          </span>
+          <h3>Decimal · hands and habit</h3>
+          <p>
+            Ten fingers provide a convenient counting aid, a plausible reason for the widespread use
+            of tens. That is not proof of one shared origin for every decimal tradition. Egypt’s
+            grouping by tens and modern decimal place value use different writing rules.
+          </p>
+          <a
+            class="bases-source"
+            href="https://mathshistory.st-andrews.ac.uk/HistTopics/Babylonian_numerals/"
+          >
+            MacTutor · The question of number bases ↗
+          </a>
+        </article>
+        <article>
+          <span class="bases-culture-number" aria-hidden="true">
+            20
+          </span>
+          <h3>Vigesimal · larger body groupings</h3>
+          <p>
+            Counting fingers and toes gives twenty, a common explanation for vigesimal grouping.
+            Treat it as an explanation, rather than a proven origin story for the Maya. Maya
+            numerals use dots, bars, and zero signs and supported trade, astronomy, and calendar
+            work.
+          </p>
+          <p>
+            Here base 20 means pure powers of twenty. The{' '}
+            <a href={`${base}systems/maya/`}>Maya page</a> explains the distinction from calendar
+            place values.
+          </p>
+          <a class="bases-source" href="https://maya.nmai.si.edu/maya-sun/maya-math-game">
+            Smithsonian · Maya mathematics ↗
+          </a>
+        </article>
+        <article>
+          <span class="bases-culture-number" aria-hidden="true">
+            60
+          </span>
+          <h3>Sexagesimal · convenient shares</h3>
+          <p>
+            Babylonian scribes inherited sexagesimal traditions from the Sumerians. The original
+            reason for sixty remains uncertain. Its many divisors do make sharing convenient: a
+            half, a third, and a quarter are 30, 20, and 15 sixtieths. Usefulness is not proof of
+            origin.
+          </p>
+          <p>
+            Familiar traces remain in sixty minutes to an hour and sixty seconds to a minute.
+            Historical cuneiform readings also depended on context to establish scale.
+          </p>
+          <a
+            class="bases-source"
+            href="https://mathshistory.st-andrews.ac.uk/HistTopics/Babylonian_numerals/"
+          >
+            MacTutor · Babylonian numerals ↗
+          </a>
+        </article>
+      </div>
+    </section>
+
+    <section class="bases-section" id="binary-hex" aria-labelledby="computer-heading">
+      <div class="bases-section-intro">
+        <span class="eyebrow bases-kicker">04 · FROM CIRCUITS TO READABLE DIGITS</span>
+        <h2 id="computer-heading">Why computers use binary, and people use hex.</h2>
+      </div>
+      <div class="bases-computer-grid">
+        <div class="bases-computer-copy">
+          <h3>Binary · two states</h3>
+          <p>
+            Digital circuits can represent two distinguishable states, such as low and high voltage,
+            as 0 and 1. Designing around two separated states makes reliable switching practical.
+            Each binary digit is a <strong>bit</strong>. Several bits together can represent
+            numbers, letters, colors, instructions, and other information.
+          </p>
+          <a class="bases-source" href="https://www.ibm.com/think/topics/qubit">
+            IBM · Bits and their physical representation ↗
+          </a>
+          <h3>Hexadecimal · four bits in one digit</h3>
+          <p>
+            Long binary strings are hard to read. Since 16 = 2⁴, exactly four bits fit into one
+            hexadecimal digit. Hex uses 0–9, then{' '}
+            <strong>A = 10, B = 11, C = 12, D = 13, E = 14, F = 15</strong>. After F comes 10,
+            meaning one sixteen and zero ones.
+          </p>
+          <p>
+            Hex is a compact way for people to read binary data, used in places such as color codes
+            and memory addresses. It does not require a different kind of sixteen-state computer
+            hardware.
+          </p>
+          <a class="bases-source" href="https://spaceplace.nasa.gov/binary-code3/en/">
+            NASA · Why hexadecimal fits binary ↗
+          </a>
+        </div>
+        <div class="bases-hex-reference">
+          <h3>The sixteen possible four-bit groups</h3>
+          <div
+            class="base-table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="Hexadecimal digit reference"
+          >
+            <table class="base-hex-table">
+              <caption>One hex digit is exactly four binary bits</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Decimal</th>
+                  <th scope="col">Hex</th>
+                  <th scope="col">Binary</th>
+                </tr>
+              </thead>
+              <tbody>
+                {hexDigits.map((digit) => (
+                  <tr>
+                    <td>{digit.value}</td>
+                    <th scope="row">{digit.hex}</th>
+                    <td>{digit.bits}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="base-byte-example">
+        <div>
+          <span class="eyebrow">A SHORTCUT BETWEEN BINARY AND HEX</span>
+          <h3>10101101₂ = AD₁₆ = 173₁₀</h3>
+          <p>
+            Group binary digits in fours from the right. Add leading zeros to the leftmost group if
+            needed; they do not change the value. Match each group to one hex digit. To go back,
+            replace each hex digit with its four bits. Eight bits make one byte.
+          </p>
+        </div>
+        <div
+          class="base-byte-groups"
+          role="img"
+          aria-label="Binary 1010 is hexadecimal A; binary 1101 is hexadecimal D"
+        >
+          {byteExample.map((group) => (
+            <div>
+              <span>{group.binary}</span>
+              <span aria-hidden="true">↓</span>
+              <strong>{group.hex}</strong>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <aside class="bases-next">
+      <div>
+        <span class="eyebrow bases-kicker">TAKE THE NEXT STEP</span>
+        <h2>How did people calculate?</h2>
+        <p>Explore a civilization, select an operator, and follow its arithmetic method.</p>
+      </div>
+      <a href={`${base}#converter`}>
+        Open the calculator <span aria-hidden="true">→</span>
+      </a>
+    </aside>
+  </div>
+</Layout>
+
+<script>
+  import '../lib/bases-client';
+</script>

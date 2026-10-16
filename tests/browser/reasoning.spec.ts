@@ -128,6 +128,96 @@ test('calculator teaches Egyptian doubling using the entered operands', async ({
   await expect(page.locator('#conversion-guide')).toBeHidden();
 });
 
+test('changing the operator replaces the historical method without a base-conversion lesson', async ({
+  page,
+}) => {
+  await page.goto('?system=egyptian&number=13&mode=calculate&operation=multiply&second=24');
+  const lesson = page.locator('#math-reasoning');
+  await expect(page.locator('#exact-value')).toHaveText('312');
+  await expect(lesson).toContainText(/doubl/i);
+  await expect(lesson.locator('.formation-steps')).toHaveCount(0);
+  await expect(lesson.locator('.math-table table')).toBeVisible();
+  await expect(lesson.locator('.math-table svg').first()).toBeVisible();
+  await expect(page.locator('#notation-reference')).not.toHaveAttribute('open');
+  await page.locator('#notation-reference > summary').click();
+  await expect(page.locator('#learning-guide')).toBeVisible();
+
+  await page.locator('#operation').selectOption('add');
+  await expect(page.locator('#exact-value')).toHaveText('37');
+  await expect(lesson).toContainText(/combin|collect/i);
+  await expect(lesson.locator('[data-operation]')).toHaveAttribute('data-operation', 'add');
+  await expect(lesson).not.toContainText('doubling and selecting');
+  await expect(lesson.locator('.math-table')).toHaveCount(0);
+  await expect(lesson.locator('.formation-steps')).toHaveCount(0);
+
+  await page.locator('#number-input').fill('100');
+  await page.locator('#second-input').fill('1');
+  await page.locator('#operation').selectOption('subtract');
+  await expect(page.locator('#exact-value')).toHaveText('99');
+  await expect(lesson).toContainText(/exchange/i);
+  await expect(lesson).toContainText(/remove|cancel/i);
+  await expect(lesson.locator('[data-operation]')).toHaveAttribute('data-operation', 'subtract');
+  await expect(lesson).not.toContainText('doubling and selecting');
+
+  await page.locator('#number-input').fill('312');
+  await page.locator('#second-input').fill('24');
+  await page.locator('#operation').selectOption('divide');
+  await expect(page.locator('#exact-value')).toHaveText('13');
+  await expect(lesson).toContainText('finding the missing multiplier');
+  await expect(lesson.locator('.formation-steps')).toHaveCount(0);
+  await expect(page.locator('#translated-equation')).not.toHaveAttribute('open');
+});
+
+test('Babylonian multiplication and division use their own table methods', async ({ page }) => {
+  await page.goto('?system=babylonian&number=47&mode=calculate&operation=multiply&second=7');
+  const lesson = page.locator('#math-reasoning');
+  await expect(page.locator('#exact-value')).toHaveText('329');
+  await expect(lesson).toContainText(/multiplication table/i);
+  await expect(lesson).not.toContainText('multiplying by a reciprocal');
+  await expect(lesson.locator('.formation-steps')).toHaveCount(0);
+  await page.locator('#number-input').fill('54');
+  await page.locator('#second-input').fill('6');
+  await page.locator('#operation').selectOption('divide');
+  await expect(page.locator('#exact-value')).toHaveText('9');
+  await expect(lesson).toContainText('multiplying by a reciprocal');
+  await expect(lesson).toContainText('1/6 = 0; 10');
+});
+
+test('historical operation lessons fit narrow screens and expose accessible tables', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  for (const path of [
+    '?system=egyptian&number=13&mode=calculate&operation=multiply&second=24',
+    '?system=egyptian&number=100&mode=calculate&operation=subtract&second=1',
+    '?system=babylonian&number=47&mode=calculate&operation=multiply&second=7',
+    '?system=rods&number=27&mode=calculate&operation=multiply&second=15',
+    '?system=oksapmin&number=16&mode=calculate&operation=subtract&second=7',
+  ]) {
+    await page.goto(path);
+    await expect(page.locator('#conversion-guide')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+    const result = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+      .analyze();
+    expect(result.violations.map((violation) => violation.id)).toEqual([]);
+  }
+});
+
+test('Oksapmin subtraction tracks removed body positions separately from the result', async ({
+  page,
+}) => {
+  await page.goto('?system=oksapmin&number=16&mode=calculate&operation=subtract&second=7');
+  await expect(page.locator('#exact-value')).toHaveText('9');
+  const lesson = page.locator('#math-reasoning');
+  await expect(lesson).toContainText('upper arm');
+  await expect(lesson.locator('.math-evidence')).toContainText(/schooling/);
+  await expect(lesson.locator('.formation-body svg').first()).toBeVisible();
+  await expect(lesson.locator('.formation-steps')).toHaveCount(0);
+});
+
 test('illustrated lessons, spoken guides and gesture guides fit accessible small screens', async ({
   page,
 }) => {

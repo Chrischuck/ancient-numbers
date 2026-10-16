@@ -265,6 +265,18 @@ h1 em {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 17px;
+  gap: 18px;
+}
+.bases-guide-link {
+  color: var(--green);
+  font-size: 12px;
+  line-height: 1.6;
+  padding-block: 8px;
+  text-align: right;
+}
+.bases-guide-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 .tabs {
   display: flex;
@@ -991,7 +1003,8 @@ h2 {
 }
 .cistercian-diagram {
   position: relative;
-  width: 270px;
+  width: 100%;
+  max-width: 270px;
   height: 205px;
   display: grid;
   place-items: center;
@@ -1560,7 +1573,8 @@ h2 {
     position: absolute;
     left: 0;
     bottom: 4px;
-    gap: 24px;
+    margin-left: 0;
+    gap: clamp(12px, 4vw, 24px);
   }
   .site-header nav a {
     font-size: 10px;
@@ -1815,7 +1829,7 @@ h2 {
   }
   .editorial-feature {
     margin-top: 42px;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 28px;
     padding: 28px 0;
   }
@@ -2334,11 +2348,90 @@ h2 {
   font-size: 12px;
 }
 .math-reasoning .math-context,
-.math-reasoning .math-sources {
+.math-reasoning .math-sources,
+.math-reasoning .math-method-sources {
   font-size: 12px;
   color: var(--muted);
 }
-.math-sources a {
+.math-reasoning .math-evidence {
+  margin: 14px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.math-table {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.math-table table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+.math-table caption {
+  text-align: left;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  color: var(--muted);
+}
+.math-table th,
+.math-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  line-height: 1.6;
+}
+.math-table th {
+  font-weight: 500;
+}
+.math-table tr.selected {
+  background: var(--green-light);
+}
+.math-table tr.selected td:first-child {
+  font-weight: 500;
+  color: var(--green);
+}
+.math-table .formation-sign {
+  margin-top: 8px;
+}
+.math-table .formation-sign .specimen > .glyph-cell {
+  width: 28px;
+  height: 36px;
+  flex-basis: 28px;
+}
+.math-step-signs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 16px 0;
+}
+.math-step-signs > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.translated-equation summary {
+  cursor: pointer;
+  color: var(--green);
+  font-size: 13px;
+  padding-block: 8px;
+}
+.notation-reference > summary {
+  display: none;
+}
+.calculation-reference > summary {
+  display: list-item;
+  cursor: pointer;
+  color: var(--green);
+  font-size: 13px;
+  padding-block: 20px;
+}
+.calculation-reference:not([open]) {
+  border-bottom: 1px solid var(--line);
+}
+.math-sources a,
+.math-method-sources a {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -2348,6 +2441,13 @@ h2 {
 @media (max-width: 600px) {
   .math-reasoning {
     padding: 20px 16px;
+  }
+  .bases-guide-link {
+    font-size: 11px;
+  }
+  .math-table th,
+  .math-table td {
+    padding: 10px 6px;
   }
 }
 .gesture-grid {

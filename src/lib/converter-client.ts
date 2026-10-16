@@ -40,6 +40,11 @@ if (input) {
     });
     el('arithmetic-fields').hidden = mode !== 'calculate';
     el('input-panel').setAttribute('aria-labelledby', `${mode}-tab`);
+    el('conversion-guide-title').textContent =
+      mode === 'calculate' ? 'How the calculation works' : 'How to read this number';
+    const reference = el<HTMLDetailsElement>('notation-reference');
+    reference.open = mode === 'translate';
+    reference.classList.toggle('calculation-reference', mode === 'calculate');
   }
   function stateURL() {
     const u = new URL(location.href);
@@ -176,7 +181,7 @@ if (input) {
           const r = represent(v, system);
           return `<div class="equation-term">${r.tokens.length ? renderRepresentation(r, glyphs) : '<span>Not available in this notation</span>'}<small>${escapeHTML(formatNumber(v))}</small></div>`;
         };
-        equation.innerHTML = `<h3>The equation in ${escapeHTML(system.name)}</h3><div class="equation-numerals">${operand(firstValue)}<span class="equation-operator">${symbol}</span>${operand(secondValue!)}<span class="equation-operator">=</span>${operand(value)}</div><p>The numerals use the selected notation; +, −, ×, ÷ and = are modern operators. This shows the equation’s translation, not a historical calculation method.</p>`;
+        equation.innerHTML = `<summary>See the equation in ${escapeHTML(system.name)}</summary><div class="equation-numerals">${operand(firstValue)}<span class="equation-operator">${symbol}</span>${operand(secondValue!)}<span class="equation-operator">=</span>${operand(value)}</div><p>The numerals use the selected notation; +, −, ×, ÷ and = are modern operators. The worked method is explained above.</p>`;
       }
       lastGlyphs = glyphs;
       lastResult = result;

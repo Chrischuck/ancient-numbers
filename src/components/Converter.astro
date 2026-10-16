@@ -31,6 +31,9 @@ const base = import.meta.env.BASE_URL;
         Calculate
       </button>
     </div>
+    <a class="bases-guide-link" href={`${base}bases/`}>
+      Understanding bases <span aria-hidden="true">↗</span>
+    </a>
   </div>
   <div class="converter-grid">
     <div id="input-panel" class="input-panel" role="tabpanel" aria-labelledby="translate-tab">
@@ -166,7 +169,13 @@ const base = import.meta.env.BASE_URL;
           {initial.baseLabel}
         </span>
       </div>
-      <div id="output-value" class="output-value">
+      <div
+        id="output-value"
+        class="output-value"
+        role="region"
+        aria-label="Numeral result"
+        tabindex="0"
+      >
         <Specimen system={initial} value={42} />
       </div>
       <div id="output-message" class="output-message" hidden></div>
@@ -211,13 +220,16 @@ const base = import.meta.env.BASE_URL;
     aria-labelledby="conversion-guide-title"
     hidden
   >
-    <h2 id="conversion-guide-title">Step by step</h2>
+    <h2 id="conversion-guide-title">How to read this number</h2>
     <div id="math-reasoning"></div>
-    <div id="translated-equation" class="translated-equation" hidden></div>
+    <details id="translated-equation" class="translated-equation" hidden></details>
   </section>
-  <section id="learning-guide" class="learning-guide" aria-labelledby="symbol-key-title">
-    <Fragment set:html={renderLearningGuide(initial, await loadGlyphs(initial.region))} />
-  </section>
+  <details id="notation-reference" class="notation-reference" open>
+    <summary>Symbol dictionary and reading rules</summary>
+    <section id="learning-guide" class="learning-guide" aria-labelledby="symbol-key-title">
+      <Fragment set:html={renderLearningGuide(initial, await loadGlyphs(initial.region))} />
+    </section>
+  </details>
   <div class="converter-context">
     <div>
       <span class="eyebrow">NOTATION</span>

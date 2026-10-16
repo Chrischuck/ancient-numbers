@@ -165,7 +165,7 @@ test('tool tabs follow keyboard focus and Home/End semantics', async ({ page }) 
   await expect(calculate).toBeFocused();
 });
 
-test('one formation lesson and translated arithmetic explain the current inputs', async ({
+test('translate explains formation while calculate focuses on the selected operation', async ({
   page,
 }) => {
   await page.goto('?system=kaktovik&number=42');
@@ -175,16 +175,16 @@ test('one formation lesson and translated arithmetic explain the current inputs'
   await expect(page.locator('#translated-equation')).toBeHidden();
   await page.getByRole('tab', { name: 'Calculate' }).click();
   await expect(page.locator('#math-reasoning')).toContainText('42 + 8 = 50');
-  await expect(page.locator('#math-reasoning')).toContainText('2 × 20 + 10 = 50');
+  await expect(page.locator('#math-reasoning .formation-steps')).toHaveCount(0);
+  await expect(page.locator('#conversion-guide-title')).toHaveText('How the calculation works');
+  await page.locator('#translated-equation summary').click();
   await expect(page.locator('#translated-equation .equation-term')).toHaveCount(3);
   await expect(page.locator('#translated-equation')).toContainText('modern operators');
   await page.locator('#operation').selectOption('subtract');
   await expect(page.locator('#math-reasoning')).toContainText('42 − 8 = 34');
   await page.locator('#second-input').fill('100');
   await expect(page.locator('#math-reasoning')).toContainText('42 − 100 = -58');
-  await expect(page.locator('#math-reasoning')).toContainText(
-    'does not supply historical negative-number notation',
-  );
+  await expect(page.locator('#output-message')).toBeVisible();
   await page.locator('#second-input').fill('invalid');
   await expect(page.locator('#conversion-guide')).toBeHidden();
 });

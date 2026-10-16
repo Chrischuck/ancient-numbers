@@ -8,6 +8,7 @@ import { numeralLesson } from './numeral-lesson';
 import { renderRepresentation } from './render';
 import { spokenNumberLesson } from './spoken-lesson';
 import { spokenLesson } from './worked-spoken-lesson';
+import { operationLesson } from './operation-lessons';
 
 export interface ReasoningCalculation {
   first: Rational;
@@ -26,6 +27,12 @@ interface Explanation {
 interface Method extends Explanation {
   title: string;
   steps?: string[];
+  evidence?: string;
+  table?: {
+    caption: string;
+    headings: string[];
+    rows: { selected?: boolean; cells: { text: string; tokens?: RenderToken[] }[] }[];
+  };
 }
 
 // These limits bound the *teaching explanation*, not the calculator's exact arithmetic.
@@ -34,30 +41,6 @@ const WORKED_LIMIT = 999_999_999n;
 const MAX_STEPS = 14;
 const SIGNS: Record<string, string> = { add: '+', subtract: '−', multiply: '×', divide: '÷' };
 
-const egyptianSource: Source = {
-  title: 'Rhind Mathematical Papyrus · Chace translation, Egyptian arithmetic',
-  url: 'https://en.wikisource.org/wiki/Page:The_Rhind_Mathematical_Papyrus,_Volume_I.pdf/20',
-};
-const egyptianContext: Source = {
-  title: 'Open University · Egyptian calculation',
-  url: 'https://www.open.edu/openlearn/science-maths-technology/mathematics-statistics/egyptian-mathematics/content-section-1.1.2',
-};
-const rodSource: Source = {
-  title: 'University of St Andrews · Chinese numerals and counting-board arithmetic',
-  url: 'https://mathshistory.st-andrews.ac.uk/HistTopics/Chinese_numerals/',
-};
-const babylonianSource: Source = {
-  title: 'Open University · Babylonian mathematics and reciprocal tables',
-  url: 'https://www.open.edu/openlearn/mod/oucontent/view.php?id=1976&printable=1',
-};
-const romanSource: Source = {
-  title: 'Oxford Classical Dictionary · Abacus',
-  url: 'https://doi.org/10.1093/acrefore/9780199381135.013.1',
-};
-const mayaSource: Source = {
-  title: 'Rojo-Garibaldi et al. · Mesoamerican positional number representation (2021)',
-  url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC8022160/',
-};
 const yorubaSource: Source = {
   title: 'Ajibade · A construction morphology approach to Yoruba numerals (2023)',
   url: 'https://constructions.journals.hhu.de/article/download/549/585/2271',
@@ -407,88 +390,6 @@ function formation(system: SystemDefinition, value: Rational): Explanation {
   return { text: specimen.explanation || system.howItWorks };
 }
 
-function positionalSteps(a: bigint, b: bigint, base: number, subtract = false): string[] {
-  const steps: string[] = [];
-  const radix = BigInt(base);
-  let left = a;
-  let right = b;
-  let carry = 0n;
-  let place = 1n;
-  do {
-    const x = left % radix;
-    const y = right % radix;
-    if (subtract) {
-      const raw = x - carry - y;
-      const borrowed = raw < 0n;
-      steps.push(
-        `Place worth ${place}: ${x}${carry ? ' − 1 already borrowed' : ''} − ${y}${borrowed ? ` is negative; exchange one group from the next place for ${base} here` : ''}. Leave ${borrowed ? raw + radix : raw} in this place.`,
-      );
-      carry = borrowed ? 1n : 0n;
-    } else {
-      const sum = x + y + carry;
-      steps.push(
-        `Place worth ${place}: ${x} + ${y}${carry ? ` + ${carry} carried` : ''} = ${sum}. Leave ${sum % radix}${sum >= radix ? ` and carry ${sum / radix} to the next place (${base} of this place make one next-place group)` : '; no carry'}.`,
-      );
-      carry = sum / radix;
-    }
-    left /= radix;
-    right /= radix;
-    place *= radix;
-  } while ((left || right || (!subtract && carry)) && steps.length < MAX_STEPS - 1);
-  return steps;
-}
-
-function groupedSteps(calculation: ReasoningCalculation, base: number): string[] {
-  const a = calculation.first.numerator;
-  const b = calculation.second.numerator;
-  const result = calculate(calculation.first, calculation.second, calculation.operation);
-  if (calculation.operation === 'add') return positionalSteps(a, b, base);
-  if (calculation.operation === 'subtract' && a >= b) return positionalSteps(a, b, base, true);
-  if (calculation.operation === 'multiply') {
-    const steps = [
-      `Split the second factor into place-value groups: ${b} = ${placeTerms(b, base).join(' + ')}.`,
-    ];
-    let rest = b;
-    let place = 1n;
-    while (rest && steps.length < MAX_STEPS - 2) {
-      const digit = rest % BigInt(base);
-      if (digit) steps.push(`${a} × (${digit} × ${place}) = ${a * digit * place}.`);
-      rest /= BigInt(base);
-      place *= BigInt(base);
-    }
-    steps.push(
-      `Add the partial products to get ${valueText(result)}${b === 0n ? ' (there are no groups to add)' : ''}.`,
-    );
-    return steps;
-  }
-  if (calculation.operation === 'divide' && b > 0n) {
-    const q = a / b;
-    const remainder = a % b;
-    return [
-      `Find how many whole groups of ${b} fit in ${a}: ${q} groups, since ${q} × ${b} = ${q * b}.`,
-      `The amount left is ${a} − ${q * b} = ${remainder}.`,
-      remainder
-        ? `The exact modern result is ${q} + ${remainder}/${b} = ${valueText(result)}. This entry’s sign renderer covers whole numbers.`
-        : `No remainder: ${a} ÷ ${b} = ${q}.`,
-    ];
-  }
-  return [
-    `${valueText(calculation.first)} ${SIGNS[calculation.operation]} ${valueText(calculation.second)} = ${valueText(result)} in familiar signed arithmetic.`,
-  ];
-}
-
-function sexagesimalFraction(numerator: bigint, denominator: bigint): string {
-  const parts: string[] = [];
-  let remainder = numerator % denominator;
-  for (let i = 0; remainder && i < 6; i++) {
-    remainder *= 60n;
-    parts.push(String(remainder / denominator));
-    remainder %= denominator;
-  }
-  const integer = baseDigits(numerator / denominator, 60).join(', ');
-  return `${integer}${parts.length ? `; ${parts.join(', ')}` : ''}${remainder ? ', …' : ''}`;
-}
-
 function canWork(calculation: ReasoningCalculation): boolean {
   return (
     whole(calculation.first) &&
@@ -502,123 +403,54 @@ function method(system: SystemDefinition, calculation: ReasoningCalculation): Me
   const { first, second, operation } = calculation;
   const result = calculate(first, second, operation);
   const equation = `${valueText(first)} ${SIGNS[operation]} ${valueText(second)} = ${valueText(result)}`;
-  const general: Method = {
-    title: 'Calculate the result',
-    text: `Perform the operation, then express the result in ${system.name}.`,
-    equation,
-    notes: [
-      'This calculation uses exact modern arithmetic. The notation sources do not specify a historical method for this operation.',
-    ],
+  const operationNames: Record<string, string> = {
+    add: 'Addition',
+    subtract: 'Subtraction',
+    multiply: 'Multiplication',
+    divide: 'Division',
   };
-  const boundedNote =
-    'Worked steps use nonnegative whole-number operands of at most nine digits. Larger, signed, or fractional calculations keep their exact modern result without extending this historical demonstration.';
-  if (!canWork(calculation)) return { ...general, notes: [boundedNote] };
+  const name = operationNames[operation];
+  const general: Method = {
+    title: `${name} in ${system.name}`,
+    text: `The cited sources for this entry describe the notation but do not establish a specific ${name.toLowerCase()} procedure using these signs. The equation below is the calculator’s exact modern result.`,
+    evidence:
+      'Evidence limit: a way of writing or naming numbers does not by itself tell us how its users performed an operation. This does not imply that the community could not calculate.',
+    equation,
+  };
+  if (!canWork(calculation))
+    return {
+      ...general,
+      text: `The worked ${name.toLowerCase()} examples here cover nonnegative whole-number operands of at most nine digits. Your exact modern result is retained below; these inputs do not extend the historical demonstration.`,
+    };
+  const historical = operationLesson(system, calculation);
+  if (historical) return historical;
   const a = first.numerator;
   const b = second.numerator;
 
-  if (system.id === 'egyptian' && (operation === 'multiply' || operation === 'divide')) {
-    const multiplication = operation === 'multiply';
-    const count = multiplication ? (a < b ? a : b) : b ? a / b : 0n;
-    const amount = multiplication ? (a < b ? b : a) : b;
-    if (!multiplication && (b === 0n || a % b !== 0n)) {
-      return {
-        title: 'Division through multiplication',
-        text: 'Egyptian division looked for the multiplier that produces the dividend. Nonintegral answers could involve unit fractions, as documented in the Rhind papyrus. This panel does not reconstruct its fraction procedures.',
-        equation,
-        sources: [egyptianSource, egyptianContext],
-      };
-    }
-    if (count > 1023n) {
-      return {
-        title: multiplication ? 'Doubling and selecting' : 'Division through multiplication',
-        text: 'Double an amount repeatedly, then select and add the rows needed for the target. The doubling table here is limited to ten rows; the modern result remains exact.',
-        equation,
-        sources: [egyptianSource, egyptianContext],
-      };
-    }
-    const rows: string[] = [
-      multiplication
-        ? `Build ${count} copies of ${amount} by doubling. Select rows whose copy counts add to ${count}.`
-        : `Double the divisor ${b}; find rows whose amounts add to the dividend ${a}. Their copy counts give the quotient.`,
-    ];
-    const keptCounts: bigint[] = [];
-    const keptAmounts: bigint[] = [];
-    for (let copies = 1n; copies <= count; copies *= 2n) {
-      const keep = Boolean(count & copies);
-      rows.push(
-        `${keep ? 'Keep' : 'Pass'}: ${copies} ${copies === 1n ? 'copy' : 'copies'} → ${copies * amount}.`,
-      );
-      if (keep) {
-        keptCounts.push(copies);
-        keptAmounts.push(copies * amount);
-      }
-    }
-    rows.push(
-      `Selected copy counts: ${keptCounts.join(' + ') || '0'} = ${count}. Selected amounts: ${keptAmounts.join(' + ') || '0'} = ${count * amount}.`,
-    );
-    return {
-      title: multiplication ? 'Doubling and selecting' : 'Division through multiplication',
-      text: 'Double both columns. Select the rows that make the required count, then add their amounts.',
-      equation,
-      steps: rows,
-      notes: [
-        'The Rhind papyrus uses hieratic writing. This example applies its doubling method; the hieroglyphs above use a different Egyptian numeral repertoire.',
-      ],
-      sources: [egyptianSource, egyptianContext],
-    };
-  }
-
-  if (system.id === 'babylonian' && operation === 'divide' && b > 0n) {
-    let regular = b;
-    for (const factor of [2n, 3n, 5n]) while (regular % factor === 0n) regular /= factor;
-    const reciprocal = sexagesimalFraction(1n, b);
-    return {
-      title: 'Multiply by a reciprocal',
-      text: 'Babylonian mathematical tablets document reciprocal tables used for division. Here is a modern worked application with explicit place separators and scale.',
-      equation,
-      steps: [
-        `Find the reciprocal of ${b}: 1/${b} = ${reciprocal} in modern sexagesimal transcription. The semicolon separates whole and fractional places.`,
-        `Replace division by multiplication: ${a} ÷ ${b} = ${a} × (1/${b}) = ${valueText(result)}.`,
-        regular === 1n
-          ? 'The divisor has no prime factors other than 2, 3, and 5, so its reciprocal has a terminating base-60 expansion.'
-          : 'This divisor’s reciprocal does not terminate in base 60. Historical computations could use approximations; the fraction result here stays exact.',
-      ],
-      notes: [
-        'At most six fractional places are shown. An ellipsis marks omitted places, not an exact finite reciprocal. The punctuation is a modern reading aid; historical scale depended on context.',
-      ],
-      sources: [babylonianSource],
-    };
-  }
-
   if (system.id === 'yoruba') {
-    const steps = [
-      `First operand’s name construction: ${yorubaConstruction(a) ?? 'outside the verified 1–100 examples'}.`,
-      `Second operand’s name construction: ${yorubaConstruction(b) ?? 'outside the verified 1–100 examples'}.`,
-    ];
     const anchor = ((a + 19n) / 20n) * 20n;
     const gap = anchor - a;
-    if (a > 0n && gap && operation === 'add' && b >= gap) {
+    const steps: string[] = [];
+    if (a > 0n && gap && operation === 'add') {
       steps.push(
-        `Choose a convenient multiple of twenty for this calculation: ${a} = ${anchor} − ${gap}. Then ${a} + ${b} = (${anchor} − ${gap}) + ${b} = ${anchor} + ${b - gap} = ${valueText(result)}.`,
+        `Use a nearby multiple of twenty: ${a} = ${anchor} − ${gap}. Then ${a} + ${b} = ${anchor} + ${b} − ${gap} = ${valueText(result)}.`,
+      );
+    } else if (a > 0n && gap && operation === 'subtract') {
+      steps.push(
+        `Use a nearby multiple of twenty: ${a} = ${anchor} − ${gap}. Then ${a} − ${b} = ${anchor} − (${gap} + ${b}) = ${valueText(result)}.`,
       );
     } else if (a > 0n && gap && operation === 'multiply') {
       steps.push(
-        `A complement can simplify this multiplication: (${anchor} − ${gap}) × ${b} = ${anchor * b} − ${gap * b} = ${valueText(result)}.`,
+        `A complement simplifies this multiplication: (${anchor} − ${gap}) × ${b} = ${anchor * b} − ${gap * b} = ${valueText(result)}.`,
       );
-    } else {
-      steps.push(`Work the operation: ${equation}.`);
-    }
-    const construction = whole(result) ? yorubaConstruction(result.numerator) : undefined;
-    if (construction)
-      steps.push(`Express the result using its number-name construction: ${construction}.`);
+    } else return { ...general, sources: [yorubaSource] };
     return {
-      title: 'Number names and useful regrouping',
-      text: 'Use a nearby multiple of twenty to regroup the calculation.',
+      title: `${name} · using a complement of twenty`,
+      text: 'Yorùbá number names often use a nearby multiple of twenty. That structure can suggest a convenient complement for this calculation.',
+      evidence:
+        'Modern mathematical illustration: the name constructions are documented linguistic patterns. They do not establish this as a historical arithmetic procedure or every speaker’s mental method.',
       equation,
       steps,
-      notes: [
-        'The name constructions are documented linguistic patterns. The complement calculation is a modern mathematical illustration, not a claim about every speaker’s mental method.',
-      ],
       sources: [yorubaSource],
     };
   }
@@ -627,7 +459,7 @@ function method(system: SystemDefinition, calculation: ReasoningCalculation): Me
     if (a > 799n || b > 799n)
       return {
         ...general,
-        title: 'Regrouping through binary steps',
+        title: `${name} · regrouping through binary steps`,
         text: 'The verified mixed-system illustration covers counts through 799 counting units. Its special groups double through 10, 20, 40, and 80; this input is beyond the illustrated vocabulary range.',
         sources: [mangarevanSource],
       };
@@ -653,87 +485,16 @@ function method(system: SystemDefinition, calculation: ReasoningCalculation): Me
       `The modern exact result is ${valueText(result)}${whole(result) && result.numerator <= 799n ? ` counting units = ${additiveTerms(result.numerator, [80, 40, 20, 10, 1]).join(' + ') || '0'}` : ''}.`,
     );
     return {
-      title: 'Regrouping through binary steps',
+      title: `${name} · regrouping through binary steps`,
       text: 'Work with the groups of 10, 20, 40, and 80, keeping the counting unit fixed.',
       equation,
       steps,
-      notes: [
-        'These operations follow Bender and Beller’s analytical reconstruction from the recorded vocabulary. Historical performance of these calculations was not observed.',
-      ],
+      evidence:
+        'Analytical reconstruction: these operations follow Bender and Beller’s analysis of the recorded vocabulary. Historical performance of these calculations was not observed.',
       sources: [mangarevanSource],
     };
   }
 
-  if (
-    system.id === 'cistercian' ||
-    system.id === 'cistercian-gestures' ||
-    system.id === 'medieval-finger-counting'
-  ) {
-    return {
-      title: 'A quantity to record or communicate',
-      text: 'Calculate the quantity first, then express it with the signs or hand positions.',
-      equation,
-      notes: [
-        'The cited description does not supply a general arithmetic algorithm for these signs or hand positions.',
-      ],
-      steps: [
-        `Perform the operation in the calculator: ${equation}.`,
-        whole(result) && inRange(result.numerator, system)
-          ? `Read the result ${result.numerator} using the quantity’s documented place or gesture rules above.`
-          : 'The result has no supported sign or gesture in this entry; keep the exact result in familiar digits.',
-      ],
-    };
-  }
-
-  if (
-    system.id === 'rods' ||
-    system.id === 'suzhou' ||
-    system.id === 'roman' ||
-    system.id === 'maya' ||
-    system.id === 'kaktovik' ||
-    system.id === 'babylonian' ||
-    system.id === 'egyptian'
-  ) {
-    const base = system.radix ?? 10;
-    const isRods = system.id === 'rods';
-    const isRoman = system.id === 'roman';
-    const context = isRods
-      ? 'Chinese texts document decimal rod-board arithmetic. These steps are a modern teaching application, rather than a transcription of a historical problem.'
-      : isRoman
-        ? 'Roman-style abaci used counters in numerical columns. This is a modern illustration of that regrouping, followed by writing the result.'
-        : `This modern regrouping exercise uses the ${base}-based number structure. It does not reconstruct a historical arithmetic procedure.`;
-    return {
-      title: isRods
-        ? 'Regrouping on a counting board'
-        : isRoman
-          ? 'Regrouping counters'
-          : `Working with groups of ${base}`,
-      text: isRods
-        ? 'Work in decimal columns. Ten in one column can be exchanged for one in the next.'
-        : isRoman
-          ? 'Exchange five unit counters for one five-counter, and two fives for one ten.'
-          : `Work with groups of ${base}. ${base} in one place makes one in the next place.`,
-      equation,
-      steps: groupedSteps(calculation, base),
-      notes: [
-        context,
-        ...(system.id === 'maya'
-          ? [
-              'The base-20 exercise uses the app’s ordinary vigesimal layout. It does not use the Long Count’s 360-day third position.',
-            ]
-          : []),
-      ],
-      sources: isRods
-        ? [rodSource]
-        : isRoman
-          ? [romanSource]
-          : system.id === 'maya'
-            ? [mayaSource]
-            : system.id === 'babylonian'
-              ? [babylonianSource]
-              : undefined,
-    };
-  }
   return general;
 }
 
@@ -752,6 +513,28 @@ function renderExplanation(explanation: Explanation, glyphs?: GlyphSet): string 
   return `<p>${escapeHTML(explanation.text)}</p>${parts}${explanation.equation ? `<p class="math-check-label">Check</p><p class="math-equation">${escapeHTML(explanation.equation)}</p>` : ''}`;
 }
 
+function renderOperation(worked: Method, glyphs?: GlyphSet): string {
+  const illustration = (tokens: RenderToken[] | undefined, text: string): string =>
+    glyphs && tokens?.length
+      ? `<div class="math-step-signs formation-sign${tokens.some((token) => token.glyph?.startsWith('oksapmin-')) ? ' formation-body' : ''}">${renderRepresentation({ status: 'ok', layout: tokens[0].text !== undefined ? 'words' : 'row', tokens, explanation: text }, glyphs)}</div>`
+      : '';
+  const parts: Explanation['parts'] = worked.parts ?? worked.steps?.map((text) => ({ text }));
+  const steps = parts?.length
+    ? `<ol class="math-steps">${parts
+        .slice(0, MAX_STEPS)
+        .map(
+          (part) =>
+            `<li>${illustration(part.tokens, part.text)}<p>${escapeHTML(part.text)}</p></li>`,
+        )
+        .join('')}</ol>`
+    : '';
+  const table = worked.table
+    ? `<div class="math-table" role="region" aria-label="${escapeHTML(worked.table.caption)}" tabindex="0"><table><caption>${escapeHTML(worked.table.caption)}</caption><thead><tr>${worked.table.headings.map((heading) => `<th scope="col">${escapeHTML(heading)}</th>`).join('')}</tr></thead><tbody>${worked.table.rows.map((row) => `<tr${row.selected ? ' class="selected"' : ''}>${row.cells.map((cell) => `<td>${illustration(cell.tokens, cell.text)}<span>${escapeHTML(cell.text)}</span></td>`).join('')}</tr>`).join('')}</tbody></table></div>`
+    : '';
+  const methodSources = (worked.sources ?? []).filter((source) => /^https?:\/\//.test(source.url));
+  return `<h3>${escapeHTML(worked.title)}</h3><p>${escapeHTML(worked.text)}</p>${worked.evidence ? `<p class="math-evidence">${escapeHTML(worked.evidence)}</p>` : ''}${table}${steps}${worked.equation ? `<p class="math-equation">${escapeHTML(worked.equation)}</p>` : ''}${methodSources.length ? `<p class="math-method-sources">${methodSources.map((source) => `<a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.title)}</a>`).join(' · ')}</p>` : ''}`;
+}
+
 /** Render a bounded, source-linked worked example without changing calculator arithmetic. */
 export function renderMathReasoning(
   system: SystemDefinition,
@@ -763,7 +546,6 @@ export function renderMathReasoning(
   if (!normalized) {
     return '<div class="math-reasoning"><p>Division by zero has no defined numerical result.</p></div>';
   }
-  const construction = formation(system, normalized);
   const first = calculation && normalize(calculation.first);
   const second = calculation && normalize(calculation.second);
   let worked: Method | undefined;
@@ -772,36 +554,30 @@ export function renderMathReasoning(
       worked = method(system, { first, second, operation: calculation.operation });
     } catch {
       worked = {
-        title: 'Undefined operation',
+        title: `${({ add: 'Addition', subtract: 'Subtraction', multiply: 'Multiplication', divide: 'Division' } as Record<string, string>)[calculation.operation]} · undefined result`,
         text: 'Division by zero has no defined numerical result.',
       };
     }
   }
+  const construction = worked ? undefined : formation(system, normalized);
   const sources = [
     ...new Map(
       [
-        ...(construction.sources ?? []),
+        ...(construction?.sources ?? []),
         ...(worked?.sources ?? []),
         ...system.sources.slice(0, 2),
       ].map((source) => [source.url, source]),
     ).values(),
   ].filter((source) => /^https?:\/\//.test(source.url));
-  const context = [...new Set([...(construction.notes ?? []), ...(worked?.notes ?? [])])];
+  const context = [...new Set([...(construction?.notes ?? []), ...(worked?.notes ?? [])])];
   const verb =
     system.structure === 'Spoken' || system.id === 'mangarevan'
       ? 'Read'
       : system.structure === 'Physical'
         ? 'Show'
         : 'Write';
-  const operation = worked
-    ? `<h3>${escapeHTML(worked.title)}</h3><p>${escapeHTML(worked.text)}</p>${
-        worked.steps?.length
-          ? `<ol class="math-steps">${worked.steps
-              .slice(0, MAX_STEPS)
-              .map((step) => `<li>${escapeHTML(step)}</li>`)
-              .join('')}</ol>`
-          : ''
-      }${worked.equation ? `<p class="math-equation">${escapeHTML(worked.equation)}</p>` : ''}`
-    : '';
-  return `<div class="math-reasoning">${operation}<h3>${verb} ${escapeHTML(valueText(normalized))} in ${escapeHTML(system.name)}</h3>${renderExplanation(construction, glyphs)}<details class="math-references"><summary>Sources and notation notes</summary>${context.map((note) => `<p class="math-context">${escapeHTML(note)}</p>`).join('')}${sources.length ? `<p class="math-sources">${sources.map((source) => `<a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.title)}</a>`).join(' · ')}</p>` : ''}</details></div>`;
+  const lesson = worked
+    ? renderOperation(worked, glyphs)
+    : `<h3>${verb} ${escapeHTML(valueText(normalized))} in ${escapeHTML(system.name)}</h3>${renderExplanation(construction!, glyphs)}`;
+  return `<div class="math-reasoning"${worked && calculation ? ` data-operation="${escapeHTML(calculation.operation)}"` : ''}>${lesson}<details class="math-references"><summary>Sources and notation notes</summary>${context.map((note) => `<p class="math-context">${escapeHTML(note)}</p>`).join('')}${sources.length ? `<p class="math-sources">${sources.map((source) => `<a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.title)}</a>`).join(' · ')}</p>` : ''}</details></div>`;
 }

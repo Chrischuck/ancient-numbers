@@ -58,8 +58,8 @@ test('Yorùbá explains the words in its subtractive number name', () => {
   assert.match(fiftyFour, /\(3 × 20 − 10\) \+ 4 = 54/);
   const addition = worked('yoruba', 54n, 6n, 'add');
   assert.match(addition, /54 = 60 − 6/);
-  assert.match(addition, /modern mathematical illustration/);
-  assert.match(addition, /60 \+ 0 = 60/);
+  assert.match(addition, /Modern mathematical illustration/);
+  assert.match(addition, /60 \+ 6 − 6 = 60/);
 });
 
 test('Babylonian lessons count the two wedge types and preserve an empty internal place', async () => {
@@ -246,18 +246,246 @@ test('productive Pacific counts explain arbitrary supported values without examp
 
 test('Egyptian multiplication selects doubling rows and division reverses the task', () => {
   const multiplication = worked('egyptian', 13n, 12n, 'multiply');
-  assert.match(multiplication, /Doubling and selecting/);
-  assert.match(multiplication, /Keep: 4 copies → 52/);
-  assert.match(multiplication, /Keep: 8 copies → 104/);
-  assert.match(multiplication, /Selected amounts: 52 \+ 104 = 156/);
-  assert.match(multiplication, /hieratic writing/);
+  assert.match(multiplication, /Multiplication · doubling and selecting/);
+  assert.match(multiplication, /class="math-table"/);
+  assert.match(multiplication, /Selected copy counts: 1 \+ 4 \+ 8 = 13/);
+  assert.match(multiplication, /Selected amounts: 12 \+ 48 \+ 96 = 156/);
+  assert.match(multiplication, /papyrus itself uses hieratic/);
   const division = worked('egyptian', 156n, 12n, 'divide');
-  assert.match(division, /Division through multiplication/);
+  assert.match(division, /Division · finding the missing multiplier/);
   assert.match(division, /Selected copy counts: 1 \+ 4 \+ 8 = 13/);
   assert.match(division, /Selected amounts: 12 \+ 48 \+ 96 = 156/);
   const fractional = worked('egyptian', 5n, 3n, 'divide');
   assert.match(fractional, /unit fractions/);
   assert.match(fractional, /5 ÷ 3 = 5\/3/);
+});
+
+test('each operator renders only its operation lesson and translate retains numeral formation', () => {
+  const names = {
+    add: 'Addition',
+    subtract: 'Subtraction',
+    multiply: 'Multiplication',
+    divide: 'Division',
+  };
+  for (const entry of systems) {
+    for (const [operation, name] of Object.entries(names)) {
+      const html = worked(entry.id, 58n, 7n, operation);
+      assert.match(html, new RegExp(`<h3>${name}`), `${entry.id}: ${operation}`);
+      assert.match(html, new RegExp(`data-operation="${operation}"`), `${entry.id}: ${operation}`);
+      assert.match(html, /class="math-evidence"/, `${entry.id}: ${operation}`);
+      assert.doesNotMatch(
+        html,
+        /formation-steps|<h3>(Write|Read|Show) |Perform the operation, then express|Split the second factor into place-value groups/,
+        `${entry.id}: ${operation}`,
+      );
+      assert.doesNotMatch(html, /undefined|NaN|Infinity/, `${entry.id}: ${operation}`);
+      assert.ok(stepCount(html, 'math-steps') <= 14, `${entry.id}: ${operation}`);
+    }
+  }
+  assert.match(renderMathReasoning(system('egyptian'), rational(58n)), /formation-steps/);
+});
+
+test('Egyptian addition combines actual signs and subtraction exchanges across empty magnitudes', async () => {
+  const entry = system('egyptian');
+  const glyphs = await loadGlyphs(entry.region);
+  const addition = renderMathReasoning(
+    entry,
+    rational(125n),
+    {
+      first: rational(58n),
+      second: rational(67n),
+      operation: 'add',
+    },
+    glyphs,
+  );
+  assert.match(addition, /8 \+ 7 = 15/);
+  assert.match(addition, /Exchange ten for one ten sign \(hobble\); leave 5/);
+  assert.match(addition, /5 \+ 6 \+ 1 exchanged from below = 12/);
+  assert.match(addition, /math-step-signs/);
+  assert.match(addition, /<svg/);
+  assert.match(addition, /Teaching reconstruction:.*hieratic writing/);
+  assert.doesNotMatch(addition, /doubling|reciprocal|class="math-table"/);
+  const subtraction = worked('egyptian', 100n, 1n, 'subtract');
+  assert.match(subtraction, /Exchange one hundred sign \(rope coil\) for ten ten sign \(hobble\)s/);
+  assert.match(subtraction, /Exchange one ten sign \(hobble\) for ten unit strokes/);
+  assert.match(subtraction, /10 − 1 = 9 remain/);
+  assert.match(subtraction, /100 − 1 = 99/);
+  assert.doesNotMatch(subtraction, /doubling|reciprocal/);
+  // A carry beyond the repertoire is explained without referring to missing artwork.
+  const overflow = renderMathReasoning(
+    entry,
+    rational(19_999_998n),
+    {
+      first: rational(9_999_999n),
+      second: rational(9_999_999n),
+      operation: 'add',
+    },
+    glyphs,
+  );
+  assert.match(overflow, /19999998/);
+  assert.doesNotMatch(overflow, /undefined|NaN/);
+});
+
+test('doubling table renders Egyptian signs and selected amounts for the user example', async () => {
+  const entry = system('egyptian');
+  const html = renderMathReasoning(
+    entry,
+    rational(312n),
+    {
+      first: rational(13n),
+      second: rational(24n),
+      operation: 'multiply',
+    },
+    await loadGlyphs(entry.region),
+  );
+  assert.match(html, /<table>/);
+  assert.match(html, /<th scope="col">Copies<\/th>/);
+  assert.match(html, /<th scope="col">Amount<\/th>/);
+  assert.equal((html.match(/<tr class="selected">/g) ?? []).length, 3);
+  assert.match(html, /Selected amounts: 24 \+ 96 \+ 192 = 312/);
+  assert.match(html, /<svg/);
+  assert.doesNotMatch(html, /Subtraction|Division ·|formation-steps/);
+});
+
+test('Babylonian add and subtract operate on wedges and sixty-place exchanges', async () => {
+  const entry = system('babylonian');
+  const html = renderMathReasoning(
+    entry,
+    rational(71n),
+    {
+      first: rational(23n),
+      second: rational(48n),
+      operation: 'add',
+    },
+    await loadGlyphs(entry.region),
+  );
+  assert.match(html, /23 \+ 48 = 71/);
+  assert.match(html, /Pool 6 ten-wedges and 11 one-wedges/);
+  assert.match(html, /Exchange ten one-wedges for a ten-wedge/);
+  assert.match(html, /Exchange six ten-wedges for one one-wedge in the next place/);
+  assert.match(html, /result is 1, 11 in sexagesimal/);
+  assert.match(html, /<svg/);
+  assert.doesNotMatch(html, /reciprocal|Multiplication tables/);
+  const subtraction = worked('babylonian', 3600n, 1n, 'subtract');
+  assert.match(subtraction, /Exchange one group worth 3600 for sixty groups worth 60/);
+  assert.match(subtraction, /Exchange one group worth 60 for sixty groups worth 1/);
+  assert.match(subtraction, /result is 59, 59 in sexagesimal/);
+});
+
+test('Babylonian multiplication builds a missing product from table multiples, without division instructions', () => {
+  const html = worked('babylonian', 47n, 7n, 'multiply');
+  assert.match(html, /Multiplication tables supplied/);
+  assert.match(html, /47 = 40 \+ 7/);
+  assert.match(html, /40 × 7 = 4, 40/);
+  assert.match(html, /7 × 7 = 49/);
+  assert.match(html, /47 × 7 = 5, 29/);
+  assert.match(html, /47 × 7 = 329/);
+  assert.match(html, /Documented tools, reconstructed working/);
+  assert.doesNotMatch(html, /reciprocal|Division ·|formation-steps/);
+});
+
+test('rod multiplication follows Sunzi’s rows, while division shifts a divisor and retains its remainder', async () => {
+  const entry = system('rods');
+  const multiplication = renderMathReasoning(
+    entry,
+    rational(312n),
+    {
+      first: rational(13n),
+      second: rational(24n),
+      operation: 'multiply',
+    },
+    await loadGlyphs(entry.region),
+  );
+  assert.match(multiplication, /upper row.*lower row.*middle row/);
+  assert.match(multiplication, /left to right/);
+  assert.match(multiplication, /1 × 24 × 10 = 240/);
+  assert.match(multiplication, /3 × 24 × 1 = 72/);
+  assert.match(
+    multiplication,
+    /Remove the finished upper digit and shift the lower row one place right/,
+  );
+  assert.match(multiplication, /middle row, carrying tens immediately: 312/);
+  assert.match(multiplication, /<svg/);
+  assert.match(multiplication, /sun-tzu\/i\/8/);
+  const division = worked('rods', 100n, 6n, 'divide');
+  assert.match(division, /At quotient place 10, 1 copies of the shifted divisor 60 fit/);
+  assert.match(division, /At quotient place 1, 6 copies of the shifted divisor 6 fit/);
+  assert.match(division, /16 \+ 4\/6 = 50\/3/);
+  assert.match(division, /sun-tzu\/i\/9/);
+});
+
+test('Kaktovik lessons use documented classroom strokes and graphical quotient chunks', () => {
+  const addition = worked('kaktovik', 19n, 2n, 'add');
+  assert.match(
+    addition,
+    /five unit strokes make one five-stroke, and four five-strokes make one in the next place/,
+  );
+  assert.match(addition, /Documented classroom practice/);
+  const subtraction = worked('kaktovik', 20n, 1n, 'subtract');
+  assert.match(subtraction, /Open one group worth 20 into twenty at place 1/);
+  assert.match(subtraction, /20 − 1 = 19/);
+  const division = worked('kaktovik', 30561n, 61n, 'divide');
+  assert.match(division, /Division · graphical chunking/);
+  assert.match(division, /At place 400, trace 1 copies/);
+  assert.match(division, /At place 20, trace 5 copies/);
+  assert.match(division, /501 whole copies fit/);
+  const multiplication = worked('kaktovik', 13n, 24n, 'multiply');
+  assert.match(
+    multiplication,
+    /cited sources.*do not establish a specific multiplication procedure/,
+  );
+});
+
+test('Oksapmin addition and subtraction track the actual body path as a modern ethnographic adaptation', async () => {
+  const entry = system('oksapmin');
+  const glyphs = await loadGlyphs(entry.region);
+  const addition = renderMathReasoning(
+    entry,
+    rational(16n),
+    {
+      first: rational(9n),
+      second: rational(7n),
+      operation: 'add',
+    },
+    glyphs,
+  );
+  assert.match(addition, /Addition · tracking forward on the body path/);
+  assert.match(
+    addition,
+    /Count added step 1: move forward from upper arm · first side \(9\) to shoulder · first side \(10\)/,
+  );
+  assert.match(addition, /finish at ear · other side, position 16: 9 \+ 7 = 16/);
+  assert.match(addition, /Observed modern adaptation:.*schooling and economic exchange/);
+  assert.match(addition, /<svg/);
+  assert.doesNotMatch(addition, /formation-steps|The subtraction example/);
+  assert.match(addition, /not positional base-27 digits/);
+  const subtraction = worked('oksapmin', 16n, 7n, 'subtract');
+  assert.match(subtraction, /Subtraction · tracking backward on the body path/);
+  assert.match(
+    subtraction,
+    /Count removal 1 at ear · other side \(16\), then move back to eye · other side \(15\)/,
+  );
+  assert.match(
+    subtraction,
+    /Count removal 7 at shoulder · first side \(10\), then move back to upper arm · first side \(9\)/,
+  );
+  assert.match(subtraction, /finish at upper arm · first side, position 9: 16 − 7 = 9/);
+  assert.match(subtraction, /2015.*Oksapmin body arithmetic/);
+  assert.ok(stepCount(worked('oksapmin', 26n, 25n, 'subtract'), 'math-steps') <= 13);
+  for (const [a, b, operation] of [
+    [27n, 1n, 'add'],
+    [1n, 1n, 'subtract'],
+    [2n, 3n, 'subtract'],
+    [28n, 1n, 'subtract'],
+  ] as const) {
+    const html = worked('oksapmin', a, b, operation);
+    assert.match(html, /first-traversal exhibit boundary/);
+    assert.doesNotMatch(html, /Count added step|Count removal|undefined|NaN/);
+  }
+  assert.match(
+    worked('oksapmin', 9n, 7n, 'multiply'),
+    /do not establish a specific multiplication procedure/,
+  );
 });
 
 test('rod-board examples explain carries and borrowing in actual operands', () => {
@@ -266,7 +494,10 @@ test('rod-board examples explain carries and borrowing in actual operands', () =
   assert.match(addition, /5 \+ 6 \+ 1 carried = 12/);
   assert.match(addition, /58 \+ 67 = 125/);
   const subtraction = worked('rods', 100n, 1n, 'subtract');
-  assert.match(subtraction, /exchange one group from the next place for 10 here/);
+  assert.match(
+    subtraction,
+    /Replace one group worth 100 with ten worth 10\. Replace one group worth 10 with ten worth 1/,
+  );
   assert.match(subtraction, /100 − 1 = 99/);
   assert.ok(stepCount(subtraction, 'math-steps') <= 14);
 });
@@ -286,9 +517,9 @@ test('Babylonian division uses exact reciprocals and labels truncated sexagesima
 test('Maya exercises carry twenty while Roman writing exposes subtractive groups', () => {
   const maya = worked('maya', 58n, 7n, 'add');
   assert.match(maya, /18 \+ 7 = 25/);
-  assert.match(maya, /20 of this place make one next-place group/);
-  assert.match(maya, /3 × 20 \+ 5 = 65/);
-  assert.match(maya, /modern regrouping exercise/i);
+  assert.match(maya, /five dots make one bar, and four bars make one in the next place/);
+  assert.match(maya, /At place 20: 2 \+ 0 \+ 1 carried = 3/);
+  assert.match(maya, /Teaching reconstruction/);
   assert.match(maya, /Long Count’s 360-day third position/);
   const roman = renderMathReasoning(system('roman'), rational(54n));
   assert.match(roman, /50 \+ \(5 − 1\) = 54/);
@@ -299,7 +530,7 @@ test('Mangarevan reasoning preserves counting units and marks reconstructed algo
   const html = worked('mangarevan', 273n, 219n, 'add');
   assert.match(html, /6 × 80 \+ 10 \+ 2/);
   assert.match(html, /object-dependent counting unit/);
-  assert.match(html, /analytical reconstruction/);
+  assert.match(html, /Analytical reconstruction/);
   assert.match(html, /two takau form one paua/);
   assert.match(
     worked('mangarevan', 1000n, 2n, 'multiply'),
@@ -317,7 +548,7 @@ test('gesture reasoning distinguishes decimal communication, hours, and written 
   assert.match(renderMathReasoning(trappist, rational(3n, 2n)), /1 hour \+ 1\/2 hour = 3\/2 hours/);
   assert.match(
     worked('cistercian', 27n, 15n, 'add'),
-    /does not supply a general arithmetic algorithm/,
+    /cited sources.*do not establish a specific addition procedure/,
   );
 });
 

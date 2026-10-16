@@ -16,7 +16,8 @@ A world of ways to count. A free, static exploration of 38 written, spoken, and 
 - Read the source references, notation limits, and selected period on each system page.
 - Learn human hand poses with gesture dictionaries, illustrated rules, and downloadable vector artwork.
 - Explore spoken-number dictionaries and the additive, subtractive, and multiplicative relationships in number names.
-- Follow worked applications of documented calculation methods in the calculator, alongside explanations of number formation.
+- Follow operation-specific calculation lessons, including Egyptian sign exchange and doubling, Babylonian table multiplication and reciprocal division, and Chinese rod-board arithmetic.
+- Learn place value, binary, hexadecimal, and base conversion on the Bases page, with an interactive worked converter.
 
 The collection includes modern and living traditions as well as ancient ones. Spoken words use their documented spelling; generated Yoruba compounds separate morphemes and explicitly identify that teaching form. Physical representations, including hands, are labeled as modern teaching diagrams of documented practices.
 
