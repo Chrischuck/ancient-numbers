@@ -4,7 +4,7 @@ A world of ways to count. A free, static exploration of 38 written, spoken, and 
 
 ![Ancient Numbers converter preview](docs/preview.png)
 
-**Deployment target:** https://cumputersluts.github.io/ancient-numbers/
+**Deployment target:** https://chrischuck.github.io/ancient-numbers/
 
 ## Explore
 
@@ -45,7 +45,7 @@ The repository contains `.github/workflows/pages.yml`. Pull requests run verific
 
 A repository owner or maintainer must select **Settings → Pages → Build and deployment → Source → GitHub Actions** once. The connected development account has push access, but cannot change that administration setting. After enabling Pages, rerun the workflow or use its **Run workflow** button. No custom domain, secrets, runtime functions, or paid services are required.
 
-Astro is configured with `site: 'https://cumputersluts.github.io'`, `base: '/ancient-numbers'`, and static output. Every internal link, asset, and share URL respects this base.
+Astro is configured with `site: 'https://chrischuck.github.io'`, `base: '/ancient-numbers'`, and static output. Every internal link, asset, and share URL respects this base.
 
 ## Architecture
 
