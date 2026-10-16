@@ -53,7 +53,7 @@ Astro is configured with `site: 'https://cumputersluts.github.io'`, `base: '/anc
 - `src/glyphs/`: vector paths, Unicode metadata, provenance, and artwork references.
 - `src/lib/numbers.ts`: exact `BigInt` rational arithmetic and input parsing.
 - `src/lib/format.ts`: notation adapters, independent of SVG drawing.
-- `src/lib/render.ts`: accessible rendering, logical-order text copying, and path-only SVG exports.
+- `src/lib/render.ts`: accessible rendering, logical-order text copying, and self-contained SVG exports (including original scan imagery for the La Trappe finger-total illustrations).
 - `src/pages/`: prerendered collection, system, and editorial pages.
 
 There is no framework runtime in the browser. Content is generated as HTML; small TypeScript modules handle interactions. Regional glyph chunks load only when needed. Fonts are hosted locally. Inputs allow at most 100 digits, and representations at most 256 elements.

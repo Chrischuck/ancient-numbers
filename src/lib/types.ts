@@ -9,12 +9,16 @@ export interface GlyphPath {
   fill?: boolean;
   color?: string;
   weight?: number;
+  opacity?: number;
 }
 export interface GlyphDefinition {
   label: string;
   paths: GlyphPath[];
+  images?: { href: string; width: number; height: number; print?: boolean }[];
   unicode?: string;
   viewBox?: string;
+  clip?: boolean;
+  caption?: string;
   source: string;
   provenance?: 'original' | 'adapted';
   license?: 'public-domain';

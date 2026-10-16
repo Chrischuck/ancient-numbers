@@ -117,7 +117,7 @@ export const gestureSystems: SystemDefinition[] = [
     history:
       'Louis Du Bois printed a vocabulary of La Trappe signs in 1824, attributing its renewal to the Trappist reform of de Rancé. Its entry Heure describes numerical replies about time. This dated Cistercian Strict Observance witness is used here, without assigning its exact gestures to the medieval order as a whole. Earlier Loccum lists, printed by Leibniz in 1717, independently document COUNT and HALF.',
     howItWorks:
-      'In the La Trappe time signal, show as many fingers as the number of hours. The converter illustrates 1–10 using an index-first sequence, with a second hand after five. Du Bois does not prescribe which fingers or hand to choose. His entry also specifies half of a finger for a half-hour and one joint for a quarter-hour. These fractional time signals are described in the dictionary.',
+      'In the La Trappe time signal, show as many fingers as the number of hours. The converter illustrates 1–10 using the thumb-first sequence in the sourced engraving, with a second hand after five. Du Bois does not prescribe which fingers or hand to choose. His entry also specifies half of a finger for a half-hour and one joint for a quarter-hour. These fractional time signals are described in the dictionary.',
     readingSteps: [
       'Count the extended fingers across the displayed hands: one finger represents one hour.',
       'For 6–10, combine an open hand with the remaining fingers on the other hand. The choice and order of fingers here are illustrative.',
@@ -125,7 +125,7 @@ export const gestureSystems: SystemDefinition[] = [
       'Distinguish this 1824 La Trappe witness, the earlier Loccum glossary, Bede’s code, and the written Cistercian stave numerals.',
     ],
     caveat:
-      'This converter implements the documented hour-counting rule only for 1–10. It does not claim a universal medieval Cistercian cardinal-number code or invent a rule for 11 and 12. Finger selection and palm orientation are original diagram choices, because the source specifies the total but not a fixed pose. Loccum COUNT and HALF are separately dated vocabulary items, not arbitrary cardinal numerals.',
+      'This converter implements the documented hour-counting rule only for 1–10. It does not claim a universal medieval Cistercian cardinal-number code or invent a rule for 11 and 12. Existing public-domain engravings illustrate the finger totals. They come from a 1911 number-sign plate and a separate counting illustration, not Cistercian sources; finger selection and palm orientation remain illustrative. Loccum COUNT and HALF are separately dated vocabulary items, not arbitrary cardinal numerals.',
     engine: 'gestures',
     min: '1',
     max: '10',
@@ -135,12 +135,12 @@ export const gestureSystems: SystemDefinition[] = [
       {
         value: '1',
         explanation:
-          'One extended finger answers one hour. The index finger shown is an illustrative choice.',
+          'One extended finger answers one hour. The thumb shown is an illustrative choice.',
       },
       {
         value: '4',
         explanation:
-          'Four extended fingers answer four hours; the thumb is folded in this diagram.',
+          'Four extended fingers answer four hours; finger selection follows the illustrative engraving.',
       },
       {
         value: '7',
@@ -152,6 +152,18 @@ export const gestureSystems: SystemDefinition[] = [
       },
     ],
     sources: [
+      {
+        title: 'Illustration source — Encyclopaedia Britannica (1911), number-sign engraving',
+        url: 'https://archive.org/details/encyclopaediabrit07chisrich/page/n917',
+        detail:
+          'Volume 7, printed p. 885, figure 1. Only the one-to-five figures illustrate finger totals here; this is not evidence for Cistercian poses. Public-domain source scans are retained, with a monochrome display filter.',
+      },
+      {
+        title: 'Illustration source — Counting Fingers on Hand, j4p4n',
+        url: 'https://openclipart.org/detail/322626/counting-fingers-on-hand',
+        detail:
+          'Existing CC0/public-domain vector illustration of indicating another hand’s fingers, used for the COUNT action. Original path retained without redrawing. Not a historical Cistercian image.',
+      },
       {
         title: 'Louis Du Bois — Histoire de l’abbaye de La Trappe (1824)',
         url: trappistSource,

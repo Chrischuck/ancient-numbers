@@ -87,7 +87,7 @@ export function representGesture(n: bigint, system: SystemDefinition): Represent
             ]
           : []),
       ],
-      explanation: `${n} ${n === 1n ? 'hour' : 'hours'}: show ${n} ${n === 1n ? 'finger' : 'fingers'}${second ? ` (${first} + ${second})` : ''}. Du Bois’s 1824 La Trappe vocabulary gives the total, without specifying which fingers. The index-first poses and hand order in these diagrams are illustrative. This is a time signal from a dated Trappist witness.`,
+      explanation: `${n} ${n === 1n ? 'hour' : 'hours'}: show ${n} ${n === 1n ? 'finger' : 'fingers'}${second ? ` (${first} + ${second})` : ''}. Du Bois’s 1824 La Trappe vocabulary gives the total, without specifying which fingers. The thumb-first engraved poses and hand order in these diagrams are illustrative. This is a time signal from a dated Trappist witness.`,
     };
   }
   return unsupported('No gesture converter is supplied for this system.');
@@ -143,11 +143,6 @@ export function gestureDictionary(system: SystemDefinition): { glyph: string; me
         glyph: 'hand-cistercian-count',
         meaning:
           'COUNT · indicate fingertips as if enumerating them. Loccum Latin list, entry 88, printed 1717; an action sign, not a cardinal numeral.',
-      },
-      {
-        glyph: 'hand-cistercian-half',
-        meaning:
-          'HALF · pass an edgewise hand along the other hand’s length. Loccum Low German list, entry 139, recalling 1577–1578 practice; distinct from La Trappe’s half-finger time signal.',
       },
     ];
   return [];

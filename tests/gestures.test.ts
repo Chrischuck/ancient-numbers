@@ -1,7 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { gestureSystems } from '../src/data/gestures';
-import { handGlyphs, bedeHandGlyph } from '../src/glyphs/hands';
+import {
+  handGlyphs,
+  bedeHandGlyph,
+  hourArtworkSource,
+  countArtworkSource,
+} from '../src/glyphs/hands';
 import { gestureDictionary, representGesture } from '../src/lib/gestures';
 import { exportSVG } from '../src/lib/render';
 import { woodcutCells } from '../src/glyphs/bede-woodcut';
@@ -100,6 +105,30 @@ test('La Trappe hour signals remain in their bounded documented context', () => 
     assert.equal(representGesture(n, trappist).status, 'unsupported');
 });
 
+test('Cistercian illustrations reuse original scan bytes and the published counting path', () => {
+  for (let n = 1; n <= 5; n++) {
+    const source = readFileSync(
+      new URL(`../public/reference/hands/hour-count-${n}.jpg`, import.meta.url),
+    );
+    const glyph = handGlyphs[`hand-trappist-left-${n}`];
+    assert.equal(glyph.license, 'public-domain');
+    assert.equal(glyph.source, hourArtworkSource);
+    assert.deepEqual(Buffer.from(glyph.images![0].href.split(',')[1], 'base64'), source);
+    assert.deepEqual(handGlyphs[`hand-trappist-right-${n}`].images, glyph.images);
+  }
+  const original = readFileSync(
+    new URL('../public/reference/hands/counting-fingers-on-hand.svg', import.meta.url),
+    'utf8',
+  );
+  const path = original.match(/<path\b[^>]*\bd="([^"]+)"/)![1];
+  assert.equal(handGlyphs['hand-cistercian-count'].paths[0].d, path);
+  assert.equal(handGlyphs['hand-cistercian-count'].source, countArtworkSource);
+  const svg = exportSVG(representGesture(7n, trappist), handGlyphs, trappist.name)!;
+  assert.match(svg, /<image href="data:image\/jpeg;base64,/);
+  assert.match(svg, /grayscale\(1\)/);
+  assert.doesNotMatch(svg, /<image href="https?:/);
+});
+
 test('dictionaries preserve documented distinctions and export their hands', () => {
   assert.equal(gestureDictionary(bede).length, 36);
   assert.ok(gestureDictionary(trappist).some((e) => e.meaning.includes('½ hour')));
@@ -112,13 +141,17 @@ test('dictionaries preserve documented distinctions and export their hands', () 
       handGlyphs,
       system.name,
     )!;
-    assert.match(svg, /<path/);
-    assert.doesNotMatch(svg, /<text|<image|font-family/);
+    assert.doesNotMatch(svg, /<text|font-family/);
     if (system.id === bede.id) {
+      assert.match(svg, /<path/);
+      assert.doesNotMatch(svg, /<image/);
       assert.match(svg, /public-domain/);
       assert.match(svg, /fill="#ffffff"/);
       assert.doesNotMatch(svg, /SIL OPEN FONT LICENSE/);
-    } else assert.match(svg, /original/);
+    } else {
+      assert.match(svg, /<image href="data:image\/jpeg;base64,/);
+      assert.match(svg, /public-domain/);
+    }
   }
   assert.deepEqual(gestureDictionary({ ...bede, id: 'roman', engine: 'roman' }), []);
 });

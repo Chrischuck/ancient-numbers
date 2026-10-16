@@ -4,7 +4,7 @@ Bede's hand illustrations are exact extractions from the public-domain vector ch
 
 The chart provides a separate drawing for each nonzero decimal-place group. The converter therefore shows 54 using the original 50 and 4 figures, and 1,254 using 50, 4, 200, and 1,000. These are separate views of the groups to combine on two hands. Printed numbers remain part of the original artwork. The signer’s left and right are taken from the chart’s labeled rows, rather than inferred from palm direction. The full original chart is also available on the system page.
 
-The separate La Trappe and Loccum illustrations remain modern teaching diagrams with their own source labels; they are not attributed to the 1520 chart.
+La Trappe and Loccum use separately sourced public-domain artwork as illustrative teaching aids. Their artwork is not attributed to the 1520 chart or claimed as a depiction of historical monastic practice.
 
 ## Bede, 725
 
@@ -20,7 +20,7 @@ The converter stops at 9,999 because Bede’s higher values use positions at the
 
 Louis Du Bois, _Histoire civile, religieuse et littéraire de l’abbaye de La Trappe_ (1824), pp. 248–258, includes the sign-vocabulary entry _Heure_. The [original book](https://books.google.com/books?id=rS1MAAAAYAAJ) is the cited witness; the French entry is also reproduced on PDF page 4 of [Rebecca Lucas’s bilingual transcription](https://www.medieval-baltic.us/trappe.pdf).
 
-The primary French instructs the respondent to show as many fingers as hours, half of a finger for a half-hour, and a joint for a quarter-hour. The implemented numerical examples are bounded to 1–10 hours. The text does not prescribe which fingers, hand order, or palm direction; the site explicitly labels its index-first diagram choices as illustrative. It does not invent sequences for 11 or 12. Small brackets on the fractional diagrams explain the indicated portion and are not claimed as components of the historical gestures.
+The primary French instructs the respondent to show as many fingers as hours, half of a finger for a half-hour, and a joint for a quarter-hour. The implemented numerical examples are bounded to 1–10 hours. The text does not prescribe which fingers, hand order, or palm direction; the site explicitly labels its thumb-first illustration choices as illustrative. It does not invent sequences for 11 or 12. Small brackets on the fractional diagrams explain the indicated portion and are not claimed as components of the historical gestures.
 
 The vocabulary is a witness of the Cistercian Strict Observance/Trappist tradition, printed in 1824. The site does not project those exact forms onto all medieval Cistercians, claim they are the written Cistercian ciphers, or treat time replies as a complete cardinal arithmetic notation.
 
@@ -32,4 +32,14 @@ Leibniz’s _Collectanea etymologica_, part II (1717), preserves a Latin list an
 - [Scan 660](https://digitale-sammlungen.gwlb.de/content/730901130/pdf/00000660.pdf): Low German entry 139, _halff_, passing an edgewise hand along the other hand’s length, printed p. 402.
 - Scan 651: the Low German introduction recalls the author’s novitiate in 1577 and 1578.
 
-These two glossary illustrations are dated and labelled separately. COUNT is an action, not a cardinal-number conversion; HALF is a fractional concept and is distinct from La Trappe’s half-finger time reply. Printed list entry numbers are catalogue numbers, not values conveyed by the gestures.
+These two glossary entries are dated and labelled separately. COUNT uses an existing public-domain counting illustration; HALF is described in text with its original source link because a matching historical image was not established. COUNT is an action, not a cardinal-number conversion; HALF is a fractional concept and is distinct from La Trappe’s half-finger time reply. Printed list entry numbers are catalogue numbers, not values conveyed by the gestures.
+
+## Cistercian illustration assets
+
+The one-to-five figures come from the public-domain _Encyclopaedia Britannica_ (1911), vol. 7, printed p. 885, figure 1. [Original scan, leaf 917](https://archive.org/details/encyclopaediabrit07chisrich/page/n917). The plate depicts a separate system of number signs. Only its ordinary extended-finger totals 1–5 are used here as illustrations of Du Bois’s rule; its 6–100 poses and its place-value rules are not used. This is not evidence that Cistercians used these exact poses. The choice of fingers is illustrative, as Du Bois supplies no prescribed sequence.
+
+The six retained JPEGs are unchanged server-side crops of that original scan, obtained from `https://iiif.archive.org/iiif/encyclopaediabrit07chisrich%24917/REGION/full/0/default.jpg`. Region coordinates (x, y, width, height) are: 1 `(43,931,98,172)`; 2 `(149,931,113,172)`; 3 `(261,931,111,172)`; 4 `(365,931,123,172)`; 5 `(492,931,117,172)`; finger detail `(43,970,98,133)`. A CSS display filter removes paper coloration and matches the site's monochrome print treatment; source image bytes are retained and embedded unchanged in standalone SVG downloads. The half-hour and quarter-hour brackets are modern explanatory annotations on a sourced digit, not historical gesture components.
+
+COUNT uses j4p4n’s [Counting Fingers on Hand](https://openclipart.org/detail/322626/counting-fingers-on-hand), uploaded 18 August 2020 and dedicated to the public domain under CC0 in the SVG metadata. The original downloaded SVG is retained at `public/reference/hands/counting-fingers-on-hand.svg`; its path data is used unchanged. Its vector hatching matches the site's print style. It illustrates indicating fingertips and is not claimed as a historical Cistercian image.
+
+`scripts/extract-cistercian-illustrations.py` packages these original scans and paths for the shared renderer. Regression checks compare embedded image bytes and the counting path against the retained sources. No generated hand drawings remain in the Cistercian entry.

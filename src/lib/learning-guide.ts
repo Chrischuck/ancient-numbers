@@ -4,7 +4,7 @@ import { represent } from './format';
 import { renderRepresentation } from './render';
 import { gestureDictionary } from './gestures';
 import { spokenDictionary, spokenLanguage } from './spoken';
-import { pacificSymbolDictionary } from './pacific-counts';
+import { pacificSymbolDictionary, oksapminPositions } from './pacific-counts';
 
 type SymbolEntry = { glyph: string; meaning: string };
 const decimalValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90];
@@ -78,12 +78,18 @@ export function renderLearningGuide(system: SystemDefinition, glyphs: GlyphSet):
   const symbols = symbolEntries(system);
   const words = spokenDictionary(system);
   const gestures = gestureDictionary(system).length > 0;
+  const bodyCount = system.id === 'oksapmin';
   const illustrated = (value: string) =>
     renderRepresentation(represent({ numerator: BigInt(value), denominator: 1n }, system), glyphs);
   const chart = symbols
     .map(({ glyph, meaning }) => {
       const sign = findGlyph(glyph, glyphs);
       if (!sign) throw new Error(`Missing learning-guide artwork: ${glyph}`);
+      if (bodyCount) {
+        const position = oksapminPositions[Number(glyph.split('-')[1]) - 1];
+        const [part, side] = position.part.split(' · ');
+        return `<li class="symbol-tile body-count-tile"><span class="body-count-number">${position.value}</span>${glyphSVG(sign, true)}<span class="body-count-part">${escapeHTML(part)}</span><span class="body-count-side">${escapeHTML(side)}</span></li>`;
+      }
       return `<li class="symbol-tile">${glyphSVG(sign, true)}<span>${escapeHTML(meaning)}</span></li>`;
     })
     .join('');
@@ -106,24 +112,37 @@ export function renderLearningGuide(system: SystemDefinition, glyphs: GlyphSet):
     note =
       system.id === 'medieval-finger-counting'
         ? 'These are the original illustrations and printed numbers from a public-domain chart based on a 1520 woodcut. Each pose shows one place-value group. Combine the groups on each hand; left and right refer to the signer.'
-        : 'These hand glyphs are modern teaching drawings of documented gestures. Left and right refer to the person making the signs. Read each pose using its labeled value and the rules below.';
+        : 'Existing public-domain engravings illustrate the documented finger totals and counting action. The artwork is illustrative and comes from separate sources; it is not a historical depiction of Cistercian practice. Brackets on the fractional examples are modern teaching annotations.';
   if (words.length)
     note =
       'Number words are the signs in this tradition. This dictionary shows the documented words and their meanings, preserving the spelling used by the sources. Some words name whole groups or connect parts of a number.';
+  if (bodyCount)
+    note =
+      'Follow positions 1–27 in order. Each close-up highlights the body part to touch; the ring marks the counting point. Begin on either side, pass through the nose at 14, then continue down the other side.';
   const dictionary = words.length
     ? `<dl class="word-dictionary" aria-label="${escapeHTML(system.name)} number-word dictionary">${words.map(({ word, meaning }) => `<div class="word-entry"><dt${spokenLanguage(system) ? ` lang="${spokenLanguage(system)}"` : ''}>${escapeHTML(word)}</dt><dd>${escapeHTML(meaning)}</dd></div>`).join('')}</dl>`
     : '';
   const title = words.length
     ? 'Number-word dictionary'
-    : gestures
-      ? 'Hand gesture dictionary'
-      : system.engine === 'explainer'
-        ? 'Signs in the documented examples'
-        : 'Meet the symbols';
-  const symbolSection = `<h2 id="symbol-key-title">${title}</h2><p>${escapeHTML(note)}</p>${chart ? `<ul class="symbol-grid${gestures ? ' gesture-grid' : ''}" aria-label="${escapeHTML(system.name)} symbol key">${chart}</ul>` : ''}${dictionary}`;
+    : bodyCount
+      ? 'The 27 body positions'
+      : gestures
+        ? 'Hand gesture dictionary'
+        : system.engine === 'explainer'
+          ? 'Signs in the documented examples'
+          : 'Meet the symbols';
+  const bodyReference = bodyCount
+    ? '<p class="body-count-reference"><a class="inline-link" href="https://culturecognition.com/new-page-3" target="_blank" rel="noopener noreferrer">Watch the count and see the full-body chart ↗</a><span>Geoffrey Saxe · field research</span></p>'
+    : '';
+  const symbolSection = `<h2 id="symbol-key-title">${title}</h2><p>${escapeHTML(note)}</p>${bodyReference}${chart ? `<ul class="symbol-grid${gestures ? ' gesture-grid' : ''}${system.id === 'cistercian-gestures' ? ' cistercian-gesture-grid' : ''}${bodyCount ? ' body-count-grid' : ''}" aria-label="${escapeHTML(system.name)} symbol key">${chart}</ul>` : ''}${dictionary}`;
   const woodcutReference =
     system.id === 'medieval-finger-counting'
       ? `<details class="woodcut-reference"><summary>View the complete original woodcut chart</summary><figure><img src="${import.meta.env?.BASE_URL ?? '/ancient-numbers/'}reference/hands/finger-numerals-1520.svg" width="1347" height="743" loading="lazy" alt="Original 1520 finger-counting woodcut chart, with illustrated poses for 1–9, 10–90, 100–900 and 1,000–9,000"><figcaption><a href="https://commons.wikimedia.org/wiki/File:Finger_numerals_1520-Bedan_system.svg" target="_blank" rel="noopener noreferrer">1520 woodcut chart · public domain · Wikimedia Commons</a></figcaption></figure></details>`
+      : '';
+
+  const loccumHalfNote =
+    system.id === 'cistercian-gestures'
+      ? '<aside class="gesture-source-note"><h3>Loccum HALF</h3><p>Pass an edgewise hand along the length of the other hand. The Low German list recalls Loccum practice in 1577–1578 (entry 139, printed in 1717). This is distinct from La Trappe’s half-finger time signal.</p><a class="inline-link" href="https://digitale-sammlungen.gwlb.de/content/730901130/pdf/00000660.pdf" target="_blank" rel="noopener noreferrer">Read the original HALF entry ↗</a></aside>'
       : '';
 
   const romanRules = [
@@ -157,5 +176,5 @@ export function renderLearningGuide(system: SystemDefinition, glyphs: GlyphSet):
     system.engine === 'roman'
       ? `<div class="rule-grid">${romanRules.map((rule) => `<article class="rule-card"><h3>${escapeHTML(rule.title)}</h3>${illustrated(rule.value)}<p>${escapeHTML(rule.text)}</p></article>`).join('')}</div>`
       : `<p>${escapeHTML(system.howItWorks)}</p><ol class="reading-steps">${system.readingSteps.map((step) => `<li>${escapeHTML(step)}</li>`).join('')}</ol><div class="rule-grid">${system.examples.map((example) => `<article class="rule-card"><h3>${escapeHTML(example.value)} in ${escapeHTML(system.name)}</h3>${illustrated(example.value)}<p>${escapeHTML(example.explanation)}</p></article>`).join('')}</div>`;
-  return `${symbolSection}${woodcutReference}<h2 class="rules-title">${words.length ? 'How the words fit together' : gestures ? 'How the gestures fit together' : 'How the symbols fit together'}</h2>${rules}<p class="learning-note">${escapeHTML(system.caveat)}</p>`;
+  return `${symbolSection}${woodcutReference}${loccumHalfNote}<h2 class="rules-title">${words.length ? 'How the words fit together' : gestures ? 'How the gestures fit together' : 'How the symbols fit together'}</h2>${rules}<p class="learning-note">${escapeHTML(system.caveat)}</p>`;
 }

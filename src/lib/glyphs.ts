@@ -49,9 +49,26 @@ export const escapeHTML = (s: string) =>
     /[&<>"']/g,
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
   );
+export function glyphPathsSVG(glyph: GlyphDefinition, fillColor = 'currentColor'): string {
+  const images = (glyph.images ?? [])
+    .map(
+      (image) =>
+        `<image href="${escapeHTML(image.href)}" width="${image.width}" height="${image.height}"${image.print ? ' style="filter:grayscale(1) brightness(1.15) contrast(3);mix-blend-mode:multiply"' : ''}/>`,
+    )
+    .join('');
+  return (
+    images +
+    glyph.paths
+      .map(
+        (p) =>
+          `<path d="${p.d}"${p.fill ? ` fill="${escapeHTML(p.color ?? fillColor)}" stroke="none"` : p.color ? ` stroke="${escapeHTML(p.color)}"` : ''}${p.weight ? ` stroke-width="${p.weight}"` : ''}${p.opacity !== undefined ? ` opacity="${p.opacity}"` : ''}/>`,
+      )
+      .join('')
+  );
+}
 export function glyphSVG(glyph: GlyphDefinition, accessible = false): string {
   const attrs = accessible
     ? `role="img" aria-label="${escapeHTML(glyph.label)}"`
     : 'aria-hidden="true"';
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${glyph.viewBox ?? '0 0 100 100'}" ${attrs} class="numeral-glyph" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">${glyph.paths.map((p) => `<path d="${p.d}"${p.fill ? ` fill="${escapeHTML(p.color ?? 'currentColor')}" stroke="none"` : ''}${p.weight ? ` stroke-width="${p.weight}"` : ''}/>`).join('')}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${glyph.viewBox ?? '0 0 100 100'}" ${attrs} class="numeral-glyph"${glyph.clip ? ' style="overflow:hidden"' : ''} fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">${glyphPathsSVG(glyph)}</svg>`;
 }

@@ -1,7 +1,8 @@
 ---
 import type { SystemDefinition } from '../lib/types';
 import { represent } from '../lib/format';
-import { loadGlyphs, findGlyph, glyphSVG } from '../lib/glyphs';
+import { loadGlyphs } from '../lib/glyphs';
+import { renderGlyphCell } from '../lib/render';
 interface Props {
   system: SystemDefinition;
   value?: number;
@@ -20,11 +21,7 @@ const glyphs = await loadGlyphs(system.region);
 >
   {result.tokens.map((token) =>
     token.glyph ? (
-      <span class:list={['glyph-cell', { 'hand-glyph': token.glyph.startsWith('hand-') }]}>
-        {findGlyph(token.glyph, glyphs) && (
-          <Fragment set:html={glyphSVG(findGlyph(token.glyph, glyphs)!)} />
-        )}
-      </span>
+      <Fragment set:html={renderGlyphCell({ glyph: token.glyph }, glyphs)} />
     ) : (
       <span class="word-specimen" lang={token.lang}>
         {token.text}

@@ -1,15 +1,20 @@
 import { ORIGINAL_ARTWORK_LICENSE, ADAPTED_ARTWORK_LICENSE } from './artwork-license';
-import type { GlyphSet, Representation, SystemDefinition } from './types';
-import { findGlyph, glyphSVG, escapeHTML } from './glyphs';
+import type { GlyphSet, RenderToken, Representation, SystemDefinition } from './types';
+import { findGlyph, glyphSVG, glyphPathsSVG, escapeHTML } from './glyphs';
+
+export function renderGlyphCell(token: RenderToken, set: GlyphSet): string {
+  const id = token.glyph!;
+  const glyph = findGlyph(id, set);
+  if (!glyph) throw new Error(`Missing artwork: ${id}`);
+  return `<span class="glyph-cell${id.startsWith('hand-') ? ' hand-glyph' : ''}${id.startsWith('oksapmin-') ? ' body-glyph' : ''}">${glyphSVG(glyph)}${glyph.caption ? `<span class="glyph-caption">${escapeHTML(glyph.caption)}</span>` : ''}${token.place ? `<span class="place-label">× ${escapeHTML(token.place)}</span>` : ''}</span>`;
+}
 export function renderRepresentation(result: Representation, set: GlyphSet): string {
   if (!result.tokens.length) return '';
   const language = result.layout === 'words' ? result.tokens[0]?.lang : undefined;
   return `<div class="specimen layout-${result.layout}"${language ? ` lang="${escapeHTML(language)}"` : ''} role="img" aria-label="${escapeHTML(result.tokens.map((t) => t.label ?? (t.glyph ? findGlyph(t.glyph, set)?.label : t.text) ?? '').join(', '))}">${result.tokens
     .map((t) => {
       if (t.glyph) {
-        const g = findGlyph(t.glyph, set);
-        if (!g) throw new Error(`Missing artwork: ${t.glyph}`);
-        return `<span class="glyph-cell${t.glyph.startsWith('hand-') ? ' hand-glyph' : ''}">${glyphSVG(g)}${t.place ? `<span class="place-label">× ${escapeHTML(t.place)}</span>` : ''}</span>`;
+        return renderGlyphCell(t, set);
       }
       return `<span class="word-specimen">${escapeHTML(t.text ?? '')}</span>`;
     })
@@ -65,7 +70,7 @@ export function exportSVG(
     .map((t, i) => {
       const g = findGlyph(t.glyph!, set)!;
       // Each glyph's own viewBox is retained in a nested SVG, requiring no font.
-      return `<svg x="${column ? 50 : i * 100 + 40}" y="${column ? i * 100 + 40 : 50}" width="100" height="100" viewBox="${g.viewBox ?? '0 0 100 100'}">${g.paths.map((p) => `<path d="${p.d}"${p.fill ? ` fill="${escapeHTML(p.color ?? '#263d34')}" stroke="none"` : ''}${p.weight ? ` stroke-width="${p.weight}"` : ''}/>`).join('')}</svg>`;
+      return `<svg x="${column ? 50 : i * 100 + 40}" y="${column ? i * 100 + 40 : 50}" width="100" height="100" viewBox="${g.viewBox ?? '0 0 100 100'}">${glyphPathsSVG(g, '#263d34')}</svg>`;
     })
     .join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" fill="none" stroke="#263d34" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" role="img"><title>${escapeHTML(label)}</title><desc>Ancient Numbers. Educational representation; see the system page for notation variant, sources, and limitations.</desc>${paths}<metadata>${metadata}</metadata></svg>`;

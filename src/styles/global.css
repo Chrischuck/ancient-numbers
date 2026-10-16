@@ -2408,3 +2408,135 @@ h2 {
   margin-top: 12px;
   font-size: 12px;
 }
+
+.body-count-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 130px), 1fr));
+  gap: 12px;
+}
+.body-count-tile {
+  gap: 6px;
+  padding: 12px;
+  background: var(--white);
+}
+.body-count-number {
+  align-self: flex-start;
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 5px;
+  border-radius: 50%;
+  color: var(--green);
+  background: var(--green-light);
+  font-size: 13px;
+  font-weight: 600;
+}
+.body-count-tile .numeral-glyph {
+  width: 100px;
+  height: 100px;
+  max-width: 100%;
+}
+.body-count-part {
+  font-size: 13px;
+  font-weight: 600;
+}
+.body-count-side {
+  color: var(--muted);
+  font-size: 11px;
+}
+.body-count-reference {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+.body-count-reference span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.specimen > .body-glyph,
+.rule-card .specimen > .body-glyph,
+.formation-body .specimen > .body-glyph {
+  width: 140px;
+  height: auto;
+  flex: 0 1 140px;
+  gap: 8px;
+}
+.body-glyph .numeral-glyph {
+  height: 120px;
+  flex: none;
+}
+.glyph-caption {
+  font: 12px/1.5 var(--sans);
+  text-align: center;
+  color: inherit;
+}
+.output-value .body-glyph {
+  --body-count-accent: #f2b79f;
+}
+.output-value .specimen > .body-glyph,
+.system-showcase .specimen > .body-glyph {
+  width: 190px;
+  height: auto;
+  flex-basis: 190px;
+}
+.output-value .body-glyph .numeral-glyph,
+.system-showcase .body-glyph .numeral-glyph {
+  height: 160px;
+}
+.compact > .body-glyph {
+  width: 90px;
+  height: 100px;
+  flex-basis: 90px;
+}
+.compact > .body-glyph .numeral-glyph {
+  height: 100px;
+}
+.compact > .body-glyph .glyph-caption {
+  display: none;
+}
+
+.gesture-source-note {
+  margin: 24px 0;
+  padding: 20px;
+  border-left: 2px solid var(--green);
+  background: var(--green-light);
+}
+.gesture-source-note h3 {
+  margin: 0 0 10px;
+  font-family: var(--serif);
+  font-size: 23px;
+}
+.gesture-source-note p {
+  margin: 0 0 12px;
+}
+
+.cistercian-gesture-grid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+.cistercian-gesture-grid .symbol-tile:nth-child(n + 7) {
+  grid-column: span 2;
+}
+.cistercian-gesture-grid .symbol-tile:nth-child(n + 7) .numeral-glyph {
+  height: 150px;
+  width: 120px;
+}
+.cistercian-gesture-grid .symbol-tile:last-child .numeral-glyph {
+  width: 170px;
+}
+@media (max-width: 900px) {
+  .cistercian-gesture-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cistercian-gesture-grid .symbol-tile:nth-child(n + 7) {
+    grid-column: auto;
+  }
+}
+@media (max-width: 600px) {
+  .cistercian-gesture-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cistercian-gesture-grid .symbol-tile:last-child {
+    grid-column: span 2;
+  }
+}
