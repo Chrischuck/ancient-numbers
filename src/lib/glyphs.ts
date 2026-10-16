@@ -1,6 +1,7 @@
 import { coreGlyphs, cistercianGlyph } from '../glyphs/core';
 import type { GlyphDefinition, GlyphSet, Region } from './types';
 const cache = new Map<string, Promise<GlyphSet>>();
+let nextPrintFilterId = 0;
 export async function loadGlyphs(region: Region): Promise<GlyphSet> {
   if (!cache.has(region))
     cache.set(
@@ -52,13 +53,22 @@ export const escapeHTML = (s: string) =>
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
   );
 export function glyphPathsSVG(glyph: GlyphDefinition, fillColor = 'currentColor'): string {
+  const printFilterId = glyph.images?.some((image) => image.print)
+    ? `print-ink-${typeof window === 'undefined' ? 'static' : 'live'}-${nextPrintFilterId++}`
+    : undefined;
+  // Convert the scan's luminance to black ink with transparent paper. Native SVG
+  // filters also work in Safari and standalone downloads without CSS blending.
+  const printFilter = printFilterId
+    ? `<defs><filter id="${printFilterId}" color-interpolation-filters="sRGB" x="0" y="0" width="100%" height="100%"><feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.73335 -2.46744 -0.24921 0 2"/></filter></defs>`
+    : '';
   const images = (glyph.images ?? [])
     .map(
       (image) =>
-        `<image href="${escapeHTML(image.href)}" width="${image.width}" height="${image.height}"${image.print ? ' style="filter:grayscale(1) brightness(1.15) contrast(3);mix-blend-mode:multiply"' : ''}/>`,
+        `<image href="${escapeHTML(image.href)}" width="${image.width}" height="${image.height}"${image.print ? ` filter="url(#${printFilterId})"` : ''}/>`,
     )
     .join('');
   return (
+    printFilter +
     images +
     glyph.paths
       .map(

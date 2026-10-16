@@ -22,6 +22,12 @@
 body {
   margin: 0;
 }
+body.system-picker-open {
+  position: fixed;
+  top: var(--system-picker-scroll-y);
+  width: 100%;
+  overflow: hidden;
+}
 button,
 input,
 select {
@@ -394,12 +400,21 @@ h1 em {
   top: calc(100% + 6px);
   left: 0;
   right: 0;
+  bottom: auto;
   z-index: 10;
+  width: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 3px;
   background: var(--white);
+  color: inherit;
   box-shadow: 0 10px 28px #282e2926;
+}
+.system-picker-header {
+  display: none;
 }
 .system-search {
   width: 100%;
@@ -1662,6 +1677,63 @@ h2 {
   .select-wrap > select,
   .system-picker-button {
     height: 46px;
+  }
+  .system-picker {
+    position: fixed;
+    top: var(--system-picker-top, 0px);
+    height: var(--system-picker-height, 100dvh);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: max(16px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: hidden;
+  }
+  .system-picker::backdrop {
+    background: var(--white);
+  }
+  .system-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-shrink: 0;
+    margin-bottom: 12px;
+  }
+  .system-picker-header h2 {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 400;
+    letter-spacing: -0.5px;
+  }
+  .system-picker-close {
+    min-height: 44px;
+    padding: 8px 4px;
+    color: var(--green);
+    font-size: 14px;
+  }
+  .system-search {
+    min-height: 48px;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+  .system-options {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    margin-top: 12px;
+  }
+  .system-option {
+    min-height: 48px;
+    font-size: 16px;
+  }
+  .system-search-status {
+    flex-shrink: 0;
+    font-size: 12px;
   }
   .input-note {
     padding-top: 15px;

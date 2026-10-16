@@ -2,11 +2,14 @@
 export function initSystemPicker(select: HTMLSelectElement) {
   const button = document.getElementById('system-picker-button') as HTMLButtonElement;
   const value = document.getElementById('system-picker-value')!;
-  const popup = document.getElementById('system-picker')!;
+  const popup = document.getElementById('system-picker') as HTMLDialogElement;
+  const closeButton = document.getElementById('system-picker-close') as HTMLButtonElement;
   const search = document.getElementById('system-search') as HTMLInputElement;
   const list = document.getElementById('system-options')!;
   const status = document.getElementById('system-search-status')!;
   const wrapper = select.parentElement!;
+  const mobile = window.matchMedia('(max-width: 760px)');
+  const viewport = window.visualViewport;
   const normalize = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
   const entries = Array.from(select.options, (option) => ({
     id: option.value,
@@ -15,6 +18,17 @@ export function initSystemPicker(select: HTMLSelectElement) {
   }));
   let visible = entries;
   let activeIndex = -1;
+  let scrollPosition: { x: number; y: number } | undefined;
+
+  function updateViewport() {
+    if (!scrollPosition) return;
+    // iOS keyboards resize the visual viewport without resizing the page.
+    popup.style.setProperty(
+      '--system-picker-height',
+      `${viewport?.height ?? window.innerHeight}px`,
+    );
+    popup.style.setProperty('--system-picker-top', `${viewport?.offsetTop ?? 0}px`);
+  }
 
   function syncSelection() {
     value.textContent = entries.find((entry) => entry.id === select.value)!.name;
@@ -27,7 +41,12 @@ export function initSystemPicker(select: HTMLSelectElement) {
     const active = options[index];
     if (active) {
       search.setAttribute('aria-activedescendant', active.id);
-      active.scrollIntoView({ block: 'nearest' });
+      // Scroll only the results, keeping the page and search field in place.
+      const optionBounds = active.getBoundingClientRect();
+      const listBounds = list.getBoundingClientRect();
+      if (optionBounds.top < listBounds.top) list.scrollTop -= listBounds.top - optionBounds.top;
+      else if (optionBounds.bottom > listBounds.bottom)
+        list.scrollTop += optionBounds.bottom - listBounds.bottom;
     } else search.removeAttribute('aria-activedescendant');
   }
 
@@ -75,16 +94,34 @@ export function initSystemPicker(select: HTMLSelectElement) {
   }
 
   function close(restoreFocus = false) {
+    if (!popup.open) return;
+    popup.close();
     popup.hidden = true;
     button.setAttribute('aria-expanded', 'false');
     search.setAttribute('aria-expanded', 'false');
     search.removeAttribute('aria-activedescendant');
-    if (restoreFocus) button.focus();
+    if (scrollPosition) {
+      document.body.classList.remove('system-picker-open');
+      document.body.style.removeProperty('--system-picker-scroll-y');
+      window.scrollTo({ left: scrollPosition.x, top: scrollPosition.y, behavior: 'instant' });
+      scrollPosition = undefined;
+    }
+    popup.style.removeProperty('--system-picker-height');
+    popup.style.removeProperty('--system-picker-top');
+    if (restoreFocus) button.focus({ preventScroll: true });
   }
 
   function open() {
+    if (popup.open) return;
     search.value = '';
     popup.hidden = false;
+    if (mobile.matches) {
+      scrollPosition = { x: window.scrollX, y: window.scrollY };
+      document.body.style.setProperty('--system-picker-scroll-y', `${-scrollPosition.y}px`);
+      document.body.classList.add('system-picker-open');
+      updateViewport();
+      popup.showModal();
+    } else popup.show();
     button.setAttribute('aria-expanded', 'true');
     search.setAttribute('aria-expanded', 'true');
     search.focus({ preventScroll: true });
@@ -124,8 +161,24 @@ export function initSystemPicker(select: HTMLSelectElement) {
       event.preventDefault();
       event.stopPropagation();
       close(true);
+    } else if (event.key === 'Tab' && popup.matches(':modal')) {
+      const wrapToSearch = event.shiftKey && document.activeElement === closeButton;
+      const wrapToCancel = !event.shiftKey && document.activeElement === search;
+      if (wrapToSearch || wrapToCancel) {
+        event.preventDefault();
+        (wrapToSearch ? search : closeButton).focus({ preventScroll: true });
+      }
     }
   });
+  popup.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    close(true);
+  });
+  closeButton.addEventListener('click', () => close(true));
+  viewport?.addEventListener('resize', updateViewport);
+  viewport?.addEventListener('scroll', updateViewport);
+  window.addEventListener('resize', updateViewport);
+  mobile.addEventListener('change', () => close(true));
   // Keep focus in the combobox while clicking an option.
   list.addEventListener('mousedown', (event) => event.preventDefault());
   list.addEventListener('click', (event) => {
@@ -136,7 +189,7 @@ export function initSystemPicker(select: HTMLSelectElement) {
     if (!wrapper.contains(event.target as Node)) close();
   });
   wrapper.addEventListener('focusout', (event) => {
-    if (!wrapper.contains(event.relatedTarget as Node | null)) close();
+    if (!popup.matches(':modal') && !wrapper.contains(event.relatedTarget as Node | null)) close();
   });
   select.addEventListener('change', syncSelection);
   syncSelection();

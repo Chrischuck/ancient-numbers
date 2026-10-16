@@ -125,7 +125,7 @@ test('Cistercian illustrations reuse original scan bytes and the published count
   assert.equal(handGlyphs['hand-cistercian-count'].source, countArtworkSource);
   const svg = exportSVG(representGesture(7n, trappist), handGlyphs, trappist.name)!;
   assert.match(svg, /<image href="data:image\/jpeg;base64,/);
-  assert.match(svg, /grayscale\(1\)/);
+  assert.match(svg, /<feColorMatrix/);
   assert.doesNotMatch(svg, /<image href="https?:/);
 });
 
