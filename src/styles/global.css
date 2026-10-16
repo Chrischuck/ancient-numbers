@@ -2375,6 +2375,13 @@ h2 {
   height: 150px;
   flex-basis: 136px;
 }
+.output-value .hand-glyph .numeral-glyph {
+  /* Original woodcuts and engravings retain black ink on a light paper backing. */
+  background: var(--paper);
+  color: var(--ink);
+  padding: 8px;
+  border-radius: 2px;
+}
 .gesture-grid .numeral-glyph {
   width: 100px;
   height: 116px;
