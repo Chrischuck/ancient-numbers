@@ -86,12 +86,13 @@ for (const id of ['binary', 'hexadecimal']) {
     }
   });
 
-  test(`${id} calculator lessons explain conversion without historical evidence warnings`, async () => {
+  test(`${id} calculator lessons work directly in their own radix with decimal hints`, async () => {
     const calculation = { first: rational(40n), second: rational(2n), operation: 'add' };
     const glyphs = await loadGlyphs(system.region);
     const result = calculate(calculation.first, calculation.second, calculation.operation);
     const lesson = renderMathReasoning(system, result, calculation, glyphs);
-    assert.match(lesson, /40 \+ 2 = 42/);
+    assert.match(lesson, id === 'binary' ? /101000 \+ 10 = 101010/ : /28 \+ 2 = 2A/);
+    assert.match(lesson, /class="math-decimal-hint"/);
     assert.match(lesson, new RegExp(`base ${system.radix}`));
     assert.match(lesson, /class="math-steps"/);
     assert.doesNotMatch(lesson, /Evidence limit|historical demonstration/);

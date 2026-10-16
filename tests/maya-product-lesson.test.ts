@@ -20,14 +20,17 @@ function readTokens(tokens: RenderToken[] | undefined): bigint | undefined {
 
 test('Maya bar times bar visibly exchanges twenty and preserves the remaining bar', () => {
   const lesson = mayaProductLesson(maya, 5n, 5n);
-  assert.equal(lesson.equation, '5 × 5 = 25');
+  assert.equal(lesson.equation, '[5] × [5] = [1, 5]');
   assert.match(lesson.evidence, /Teaching reconstruction/);
   assert.match(lesson.evidence, /does not establish.*ancient/);
   const row = lesson.table!.rows[0];
   assert.equal(readTokens(row.cells[0].tokens), 5n);
   assert.equal(readTokens(row.cells[1].tokens), 5n);
-  assert.match(row.cells[2].text, /\(1 × 1\) × 25 \+ 0 × 5 \+ \(0 × 0\) × 1 = 25/);
-  assert.match(lesson.parts![1].text, /25 at weight 1 becomes 1 in the next row and 5 here/);
+  assert.match(
+    row.cells[2].text,
+    /\[1\] bar-by-bar pairs give an upper-row dot and a current-row bar each/,
+  );
+  assert.match(lesson.parts![1].text, /keep \[5\] here and carry \[1\] to the next row/);
   assert.equal(readTokens(row.cells[2].tokens), 25n);
   assert.equal(readTokens(lesson.parts!.at(-1)!.tokens), 25n);
   assert.deepEqual(
@@ -39,15 +42,18 @@ test('Maya bar times bar visibly exchanges twenty and preserves the remaining ba
 test('Maya mixed dot and bar products combine the correct component types', () => {
   const lesson = mayaProductLesson(maya, 7n, 13n);
   const cell = lesson.table!.rows[0].cells[2];
-  assert.match(cell.text, /7 has 1 bar and 2 dots; 13 has 2 bars and 3 dots/);
-  assert.match(cell.text, /\(1 × 2\) × 25 \+ 7 × 5 \+ \(2 × 3\) × 1 = 91/);
+  assert.match(cell.text, /\[7\] has 1 bar and 2 dots; \[13\] has 2 bars and 3 dots/);
+  assert.match(
+    cell.text,
+    /\[2\] bar-by-bar pairs[\s\S]*\[7\] dot-by-bar pairs[\s\S]*\[6\] dot-by-dot pairs/,
+  );
   assert.equal(readTokens(cell.tokens), 91n);
   assert.equal(readTokens(lesson.parts!.at(-1)!.tokens), 91n);
 });
 
 test('the published 925 by 407 grid includes all weighted cells and yields 376475', () => {
   const lesson = mayaProductLesson(maya, 925n, 407n);
-  assert.equal(lesson.equation, '925 × 407 = 376475');
+  assert.equal(lesson.equation, '[2, 6, 5] × [1, 0, 7] = [2, 7, 1, 3, 15]');
   const weighted = lesson.table!.rows.reduce(
     (sum, row) => sum + readTokens(row.cells[3].tokens)!,
     0n,
@@ -111,7 +117,7 @@ test('zero uses a shell and invalid or huge inputs never manufacture glyphs', ()
     assert.ok(lesson.parts!.every((part) => !part.tokens));
     assert.ok(JSON.stringify(lesson).length < 3000);
   }
-  assert.match(mayaProductLesson(maya, enormous, 7n).equation, /2001 digits/);
+  assert.match(mayaProductLesson(maya, enormous, 7n).equation, /abbreviated/);
   const restricted: SystemDefinition = { ...maya, max: '24' };
   const restrictedLesson = mayaProductLesson(restricted, 5n, 5n);
   assert.equal(restrictedLesson.parts!.at(-1)!.tokens, undefined);

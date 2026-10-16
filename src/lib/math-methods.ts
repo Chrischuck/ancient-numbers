@@ -9,7 +9,7 @@ import { renderRepresentation } from './render';
 import { spokenNumberLesson } from './spoken-lesson';
 import { spokenLesson } from './worked-spoken-lesson';
 import { operationLesson } from './operation-lessons';
-import type { OperationPart } from './operation-lessons';
+import type { OperationPart, OperationLesson } from './operation-lessons';
 import { completeOperationLesson } from './complete-operation-lessons';
 import { arithmeticProfiles } from '../data/arithmetic-profiles';
 import type { ArithmeticOperation, EvidenceKind } from './arithmetic-evidence';
@@ -17,6 +17,8 @@ import { renderArithmeticWorkspace } from './arithmetic-workspace';
 import { mayaProductLesson } from './maya-product-lesson';
 import { mangarevanOperationLesson } from './mangarevan-operation-lesson';
 import { oksapminOperationLesson } from './oksapmin-operation-lesson';
+import { nativePositionalLesson, nativeRationalLesson } from './native-arithmetic';
+import { babylonianNativeLesson } from './babylonian-arithmetic';
 
 export interface ReasoningCalculation {
   first: Rational;
@@ -37,11 +39,7 @@ interface Method extends Explanation {
   steps?: string[];
   evidence?: string;
   evidenceKind?: EvidenceKind;
-  table?: {
-    caption: string;
-    headings: string[];
-    rows: { selected?: boolean; cells: { text: string; tokens?: RenderToken[] }[] }[];
-  };
+  table?: OperationLesson['table'];
 }
 
 // These limits bound the *teaching explanation*, not the calculator's exact arithmetic.
@@ -418,6 +416,30 @@ function method(system: SystemDefinition, calculation: ReasoningCalculation): Me
     calculation.second.numerator <= WORKED_LIMIT &&
     calculate(calculation.first, calculation.second, operation).numerator >= 0n;
   if (withinWorkedRange) {
+    if (system.id === 'babylonian')
+      return operation === 'multiply' || operation === 'divide'
+        ? babylonianNativeLesson(
+            system,
+            calculation.first.numerator,
+            calculation.second.numerator,
+            operation,
+          )
+        : nativePositionalLesson(
+            system,
+            calculation.first.numerator,
+            calculation.second.numerator,
+            operation,
+          );
+    if (
+      ['binary', 'hexadecimal', 'medefaidrin', 'kaktovik'].includes(system.id) ||
+      (system.id === 'maya' && operation !== 'multiply')
+    )
+      return nativePositionalLesson(
+        system,
+        calculation.first.numerator,
+        calculation.second.numerator,
+        operation,
+      );
     if (system.id === 'oksapmin' && (operation === 'multiply' || operation === 'divide'))
       return {
         ...oksapminOperationLesson(
@@ -462,6 +484,12 @@ function method(system: SystemDefinition, calculation: ReasoningCalculation): Me
       }
     }
   }
+  if (
+    !withinWorkedRange &&
+    ((system.radix && system.radix !== 10) ||
+      ['mexica', 'yoruba', 'mangarevan', 'ethiopic'].includes(system.id))
+  )
+    return nativeRationalLesson(system, calculation.first, calculation.second, operation);
   return completeOperationLesson(system, { ...calculation, operation }, profile);
 }
 
@@ -494,7 +522,9 @@ function renderOperation(worked: Method, glyphs?: GlyphSet): string {
             `<li>${part.workspace ? renderArithmeticWorkspace(part.workspace) : ''}${illustration(part.tokens, part.text)}${part.text
               .split('\n')
               .map((line) => `<p>${escapeHTML(line)}</p>`)
-              .join('')}</li>`,
+              .join(
+                '',
+              )}${part.hint ? `<small class="math-decimal-hint">Decimal hint: ${escapeHTML(part.hint)}</small>` : ''}</li>`,
         )
         .join('')}</ol>`
     : '';
@@ -508,7 +538,9 @@ function renderOperation(worked: Method, glyphs?: GlyphSet): string {
                   `<td role="cell"><span class="math-cell-label" aria-hidden="true">${escapeHTML(worked.table!.headings[index] ?? '')}</span><div class="math-cell-content">${illustration(cell.tokens, cell.text)}${cell.text
                     .split('\n')
                     .map((line) => `<span class="math-cell-line">${escapeHTML(line)}</span>`)
-                    .join('')}</div></td>`,
+                    .join(
+                      '',
+                    )}${cell.hint ? `<small class="math-decimal-hint">Decimal hint: ${escapeHTML(cell.hint)}</small>` : ''}</div></td>`,
               )
               .join('')}</tr>`,
         )

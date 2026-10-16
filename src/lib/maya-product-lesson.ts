@@ -2,6 +2,7 @@ import type { OperationLesson, OperationPart } from './operation-lessons';
 import type { RenderToken, Source, SystemDefinition } from './types';
 import { baseDigits, rational } from './numbers';
 import { represent } from './format';
+import { nativeQuantity } from './native-arithmetic';
 
 const MAX_OPERAND = 999_999_999n;
 const MAX_TABLE_ROWS = 10;
@@ -43,16 +44,17 @@ function components(n: number): string {
 /** A transparent pure-vigesimal teaching reconstruction, with exact bounded working. */
 export function mayaProductLesson(system: SystemDefinition, a: bigint, b: bigint): OperationLesson {
   const product = a * b;
+  const q = (value: bigint | number) => nativeQuantity(system, BigInt(value));
   const lesson: OperationLesson = {
     title: 'Multiplication · a dot-and-bar product grid',
     text: 'Place one factor’s dot-and-bar rows down the side of a grid and the other’s across the top. Multiply the components in each cell, then collect the diagonals that have the same place value.',
     evidence:
       'Teaching reconstruction: the grid demonstrates multiplication with Maya signs. The consulted evidence does not establish these steps as surviving ancient general multiplication instructions.',
-    equation: `${short(a)} × ${short(b)} = ${short(product)}`,
+    equation: `${q(a)} × ${q(b)} = ${q(product)}`,
     sources,
     notes: [
       'This lesson uses ordinary powers of twenty: 1, 20, 400 and so on. The Long Count calendar’s 360-day third position requires different exchanges.',
-      'The dots, bars and shell use the selected Maya repertoire. Decimal captions identify quantities for comparison; they are not a conversion-first calculation.',
+      'The dots, bars and shell use the selected Maya repertoire. Small decimal hints identify quantities for comparison. Bracketed working values and the dot-and-bar grid remain vigesimal throughout.',
     ],
   };
 
@@ -80,7 +82,7 @@ export function mayaProductLesson(system: SystemDefinition, a: bigint, b: bigint
 
   const parts: OperationPart[] = [
     {
-      text: 'Use three component rules: dot × dot = one dot; dot × bar = one bar; bar × bar = 25, or one dot in the row above and one bar in this row. A shell contributes no product.',
+      text: 'Use three component rules: dot × dot = one dot; dot × bar = one bar; bar × bar = one dot in the row above and one bar in this row. A shell contributes no product.',
     },
   ];
   if (a === 0n || b === 0n) {
@@ -119,25 +121,34 @@ export function mayaProductLesson(system: SystemDefinition, a: bigint, b: bigint
       cellCount++;
       if (!firstExchange && digitProduct >= 20n) firstExchange = { x, y, digitProduct, weight };
       if (rows.length >= MAX_TABLE_ROWS) continue;
-      const primitive =
-        `${x} has ${components(x)}; ${y} has ${components(y)}. ` +
-        `(${barsA} × ${barsB}) × 25 + ${crossProducts} × 5 + (${dotsA} × ${dotsB}) × 1 = ${digitProduct}.` +
-        (digitProduct >= 20n
-          ? ` Exchange ${digitProduct / 20n} groups of twenty upward; leave ${digitProduct % 20n} here.`
-          : ' Keep this cell’s signs in its current row.');
+      const primitive = [
+        `${q(x)} has ${components(x)}; ${q(y)} has ${components(y)}.`,
+        `${q(barsA * barsB)} bar-by-bar pairs give an upper-row dot and a current-row bar each.`,
+        `${q(crossProducts)} dot-by-bar pairs give one bar each.`,
+        `${q(dotsA * dotsB)} dot-by-dot pairs give one dot each.`,
+        digitProduct >= 20n
+          ? `Exchange four bars for one dot in the next row, and five dots for a bar. Keep ${q(digitProduct % 20n)} here and carry ${q(digitProduct / 20n)} upward.`
+          : 'Keep these signs in their current row.',
+        `The cell product is ${q(digitProduct)}.`,
+      ].join('\n');
       rows.push({
         cells: [
           {
-            text: `${x} in ${rowName(i).toLowerCase()} (weight ${20n ** BigInt(i)})`,
+            text: `${q(x)} in ${rowName(i).toLowerCase()}`,
             tokens: numeralTokens(system, BigInt(x)),
           },
           {
-            text: `${y} in ${rowName(j).toLowerCase()} (weight ${20n ** BigInt(j)})`,
+            text: `${q(y)} in ${rowName(j).toLowerCase()}`,
             tokens: numeralTokens(system, BigInt(y)),
           },
-          { text: primitive, tokens: numeralTokens(system, digitProduct) },
           {
-            text: `Weight ${weight}: ${digitProduct} × ${weight} = ${digitProduct * weight}`,
+            text: primitive,
+            hint: `${x} × ${y} = ${digitProduct}`,
+            tokens: numeralTokens(system, digitProduct),
+          },
+          {
+            text: `Move this cell ${i + j} rows upward: ${q(digitProduct * weight)}.`,
+            hint: String(digitProduct * weight),
             tokens: numeralTokens(system, digitProduct * weight),
           },
         ],
@@ -158,7 +169,7 @@ export function mayaProductLesson(system: SystemDefinition, a: bigint, b: bigint
   if (firstExchange) {
     const { x, y, digitProduct, weight } = firstExchange;
     parts.push({
-      text: `For the ${x} × ${y} cell, ${digitProduct} at weight ${weight} becomes ${digitProduct / 20n} in the next row and ${digitProduct % 20n} here. Each group of four bars is exchanged for one upper-row dot; five dots become one bar.`,
+      text: `For the ${q(x)} × ${q(y)} cell, keep ${q(digitProduct % 20n)} here and carry ${q(digitProduct / 20n)} to the next row. Each group of four bars is exchanged for one upper-row dot; five dots become one bar.`,
       tokens: numeralTokens(system, digitProduct * weight),
     });
   }
@@ -181,12 +192,13 @@ export function mayaProductLesson(system: SystemDefinition, a: bigint, b: bigint
     }));
     accumulation.push({
       text:
-        `${rowName(exponent)} (weight ${weight}): collect ${coefficient} from its product diagonal${incoming ? ` + ${incoming} carried from below` : ''} = ${raw}. ` +
+        `${rowName(exponent)}: collect ${q(coefficient)} from its product diagonal${incoming ? ` + ${q(incoming)} carried from below` : ''} = ${q(raw)}.\n` +
         (carry
-          ? `Exchange ${carry} groups of twenty for ${carry} in the row above; leave ${digit} here`
-          : `Leave ${digit} here`) +
+          ? `Exchange complete groups for ${q(carry)} in the row above; leave ${q(digit)} here`
+          : `Leave ${q(digit)} here`) +
         `, shown as ${digit ? components(Number(digit)) : 'the shell for an empty row'}.`,
       tokens: digitTokens,
+      hint: String(raw),
     });
   }
   // Seven-place inputs can yield fourteen output rows. Preserve both ends of the
@@ -202,8 +214,9 @@ export function mayaProductLesson(system: SystemDefinition, a: bigint, b: bigint
   }
   const resultTokens = numeralTokens(system, normalizedTotal);
   parts.push({
-    text: `The regrouped rows give ${normalizedTotal}.${resultTokens ? '' : ' The result exceeds this selected renderer’s range, so its quantity is retained without inventing further signs.'}`,
+    text: `The regrouped rows give ${q(normalizedTotal)}.${resultTokens ? '' : ' The result exceeds this selected renderer’s range, so its quantity is retained without inventing further signs.'}`,
     tokens: resultTokens,
+    hint: String(normalizedTotal),
   });
   lesson.parts = parts;
   return lesson;

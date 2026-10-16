@@ -70,7 +70,9 @@ for (const [system, numeral] of [
     await page.locator('#number-input').fill('40');
     await page.locator('#second-input').fill('2');
     await expect(page.locator('#exact-value')).toHaveText('42');
-    await expect(page.locator('#math-reasoning')).toContainText('40 + 2 = 42');
+    await expect(page.locator('#math-reasoning .math-equation')).toHaveText(
+      system === 'binary' ? '101000 + 10 = 101010' : '28 + 2 = 2A',
+    );
     await expect(page.locator('#math-reasoning')).not.toContainText('Evidence limit');
     await page.locator('#copy-button').click();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(numeral);

@@ -2400,6 +2400,20 @@ h2 {
 .math-cell-line + .math-cell-line {
   margin-top: 12px;
 }
+.math-decimal-hint {
+  display: block;
+  margin: 8px 0 12px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.result-caption.is-decimal-hint {
+  font-size: 11px;
+  color: var(--paper);
+}
+.result-caption.is-decimal-hint::before {
+  content: 'Decimal hint: ';
+}
 .math-table tr.selected {
   background: var(--green-light);
 }

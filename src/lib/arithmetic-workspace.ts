@@ -30,7 +30,7 @@ const metadata: Record<WorkspaceKind, { name: string; scope: string; legend: str
   'inupiaq-abacus': {
     name: 'Iñupiaq base-20 abacus',
     scope:
-      'A teaching diagram of the documented three-upper, four-lower bead arrangement. An upper bead counts five and a lower bead one within its column; columns are worth 1, 20, 400, and so on. Active beads touch the middle beam. The state totals are labeled in decimal.',
+      'A teaching diagram of the documented three-upper, four-lower bead arrangement. An upper bead counts five and a lower bead one within its column; columns are worth 1, 20, 400, and so on. Active beads touch the middle beam. Native place digits lead; the small decimal hint labels the same state total.',
     legend:
       'Filled beads = active · outlined beads = inactive · outline and triangle = changed place',
   },
@@ -234,7 +234,7 @@ function renderState(
   }
   const svgLabel = `${label}: ${metadata[kind].name} showing ${formatted(value)}. ${descriptions.join('; ')}. Larger places are on the left${rows > 1 ? '; rows continue from the highest places at the top to the lowest at the bottom' : ''}.`;
   return `<div class="arithmetic-workspace-state" data-state="${label.toLowerCase()}">
-    <p class="arithmetic-workspace-state-label">${label}<strong>${formatted(value)}</strong></p>
+    <p class="arithmetic-workspace-state-label">${label}<strong>${kind === 'inupiaq-abacus' ? `[${positionDigits(value, 20).join(', ')}]` : formatted(value)}</strong>${kind === 'inupiaq-abacus' ? `<small>Decimal hint: ${formatted(value)}</small>` : ''}</p>
     <svg class="arithmetic-workspace-svg" role="img" aria-label="${escape(svgLabel)}" data-radix="${radix}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg"><g aria-hidden="true">${drawings.join('')}</g></svg>
   </div>`;
 }

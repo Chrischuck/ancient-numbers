@@ -23,7 +23,7 @@ test('Yoruba explains the words in its subtractive name and updates after calcul
   await page.locator('#operation').selectOption('subtract');
   await page.locator('#second-input').fill('4');
   await expect(page.locator('#exact-value')).toHaveText('56');
-  await expect(page.locator('#math-reasoning')).toContainText('60 − 4');
+  await expect(page.locator('#math-reasoning .math-equation')).toContainText('Ọgọ́ta − Ẹ̀rin');
   await selectSystem(page, 'roman');
   await expect(page.locator('#learning-guide .word-dictionary')).toHaveCount(0);
   await expect(page.locator('#learning-guide .symbol-tile')).toHaveCount(7);
@@ -181,7 +181,7 @@ test('Babylonian multiplication and division use their own table methods', async
   await page.locator('#operation').selectOption('divide');
   await expect(page.locator('#exact-value')).toHaveText('9');
   await expect(lesson).toContainText('multiplying by a reciprocal');
-  await expect(lesson).toContainText('1/6 = 0; 10');
+  await expect(lesson).toContainText('[6] ↔ [0; 10]');
 });
 
 test('historical operation lessons fit narrow screens and expose accessible tables', async ({
@@ -246,55 +246,37 @@ test('illustrated lessons, spoken guides and gesture guides fit accessible small
 });
 
 for (const width of [320, 390, 1440]) {
-  test(`Babylonian 42 times 8 has readable labeled products at ${width}px`, async ({ page }) => {
+  test(`Babylonian native table steps stay readable at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('?system=babylonian&number=42&mode=calculate&operation=multiply&second=8');
     await expect(page.locator('#exact-value')).toHaveText('336');
-    const table = page.locator('#math-reasoning .math-table');
-    await expect(table).not.toContainText('40 × 8 = 5, 20');
-    const cells = table.locator('tbody tr').first().locator('td');
-    const lines = cells.first().locator('.math-cell-line');
-    await expect(lines).toHaveText([
-      'Split 42: 42 = 40 + 2.',
-      '40 × 8 = 320',
-      'Base 60: [5, 20] = 5 × 60 + 20',
-      '2 × 8 = 16',
-      'Add: 320 + 16 = 336.',
-      'Therefore 42 × 8 = 336',
-      'Base 60: [5, 36] = 5 × 60 + 36.',
-    ]);
-    const lineBoxes = await lines.evaluateAll((elements) =>
+    const lesson = page.locator('#math-reasoning');
+    const paragraphs = lesson.locator('.math-steps li > p');
+    await expect(paragraphs.filter({ hasText: 'Look up [40] × [8] = [5, 20].' })).toBeVisible();
+    await expect(paragraphs.filter({ hasText: 'Look up [2] × [8] = [16].' })).toBeVisible();
+    await expect(paragraphs.filter({ hasText: 'The product is [5, 36].' })).toBeVisible();
+    await expect(
+      lesson.locator('.math-decimal-hint').filter({ hasText: /^Decimal hint: 320$/ }),
+    ).toBeVisible();
+    const text = await paragraphs.allTextContents();
+    expect(text.join(' ')).not.toMatch(/320|336|convert|decimal/);
+    const boxes = await paragraphs.evaluateAll((elements) =>
       elements.map((element) => {
         const { y, height } = element.getBoundingClientRect();
         return { y, height };
       }),
     );
-    for (let i = 1; i < lineBoxes.length; i++)
-      expect(lineBoxes[i].y).toBeGreaterThanOrEqual(
-        lineBoxes[i - 1].y + lineBoxes[i - 1].height + 10,
-      );
-    const boxes = await cells.evaluateAll((elements) =>
-      elements.map((element) => {
-        const { x, y, width, height } = element.getBoundingClientRect();
-        return { x, y, width, height };
-      }),
+    for (let i = 1; i < boxes.length; i++)
+      expect(boxes[i].y).toBeGreaterThanOrEqual(boxes[i - 1].y + boxes[i - 1].height - 1);
+    const hint = lesson.locator('.math-decimal-hint').first();
+    expect(
+      await hint.evaluate((element) => parseFloat(getComputedStyle(element).fontSize)),
+    ).toBeLessThan(
+      await paragraphs
+        .first()
+        .evaluate((element) => parseFloat(getComputedStyle(element).fontSize)),
     );
-    if (width < 600) {
-      await expect(cells.nth(0).locator('.math-cell-label')).toHaveText('Table product');
-      await expect(cells.nth(1).locator('.math-cell-label')).toHaveText('Place weight');
-      await expect(cells.nth(2).locator('.math-cell-label')).toHaveText('Partial product');
-      await expect(cells.first().locator('.math-cell-label')).toBeVisible();
-      expect(boxes[0].width).toBeGreaterThan(200);
-      expect(boxes[1].y).toBeGreaterThanOrEqual(boxes[0].y + boxes[0].height - 1);
-      expect(boxes[2].y).toBeGreaterThanOrEqual(boxes[1].y + boxes[1].height - 1);
-      expect(await table.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
-        true,
-      );
-    } else {
-      await expect(cells.first().locator('.math-cell-label')).toBeHidden();
-      expect(boxes[0].y).toBeCloseTo(boxes[1].y, 0);
-      expect(boxes[1].x).toBeGreaterThan(boxes[0].x);
-    }
+    await expect(page.locator('#output-equation')).toBeHidden();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
@@ -304,3 +286,38 @@ for (const width of [320, 390, 1440]) {
     expect(accessibility.violations.map((violation) => violation.id)).toEqual([]);
   });
 }
+
+test('non-decimal calculators lead with native working and keep decimal readings in small hints', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  const fixtures = [
+    ['binary', 'multiply', '101010 × 1000 = 101010000'],
+    ['hexadecimal', 'multiply', '2A × 8 = 150'],
+    ['medefaidrin', 'multiply', '[2, 2] × [8] = [16, 16]'],
+    ['kaktovik', 'multiply', '[2, 2] × [8] = [16, 16]'],
+    ['maya', 'multiply', '[2, 2] × [8] = [16, 16]'],
+    ['mexica', 'multiply', '(2 flags + 2 dots) × 8 dots = 16 flags + 16 dots'],
+    ['ethiopic', 'multiply', '፵፪ × ፰ = ፫፻፴፮'],
+    ['yoruba', 'multiply', null],
+    ['mangarevan', 'multiply', null],
+  ] as const;
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const [system, operation, equation] of fixtures) {
+      await page.goto(`?system=${system}&number=42&mode=calculate&operation=${operation}&second=8`);
+      await expect(page.locator('#exact-value')).toHaveText('336');
+      const lesson = page.locator('#math-reasoning');
+      await expect(lesson.locator('.math-steps li').first()).toBeVisible();
+      await expect(lesson.locator('.math-decimal-hint').first()).toBeVisible();
+      if (equation) await expect(lesson.locator('.math-equation')).toHaveText(equation);
+      expect((await lesson.locator('.math-steps li > p').allTextContents()).join(' ')).not.toMatch(
+        /42 × 8 = 336|320 \+ 16 = 336/,
+      );
+      await expect(page.locator('#output-equation')).toBeHidden();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+        true,
+      );
+    }
+  }
+});

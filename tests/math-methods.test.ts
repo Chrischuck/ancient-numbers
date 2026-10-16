@@ -347,59 +347,39 @@ test('doubling table renders Egyptian signs and selected amounts for the user ex
   assert.doesNotMatch(html, /Subtraction|Division ·|formation-steps/);
 });
 
-test('Babylonian add and subtract operate on wedges and sixty-place exchanges', async () => {
+test('Babylonian add and subtract keep wedge exchanges in sexagesimal places', async () => {
   const entry = system('babylonian');
   const html = renderMathReasoning(
     entry,
     rational(71n),
-    {
-      first: rational(23n),
-      second: rational(48n),
-      operation: 'add',
-    },
+    { first: rational(58n), second: rational(13n), operation: 'add' },
     await loadGlyphs(entry.region),
   );
-  assert.match(html, /23 \+ 48 = 71/);
-  assert.match(html, /Pool 6 ten-wedges and 11 one-wedges/);
-  assert.match(html, /Exchange ten one-wedges for a ten-wedge/);
-  assert.match(html, /Exchange six ten-wedges for one one-wedge in the next place/);
-  assert.match(html, /result is 1, 11 in sexagesimal/);
+  assert.match(html, /\[58\] \+ \[13\] = \[1, 11\]/);
+  assert.match(html, /Carry \[1\] to the next place/);
   assert.match(html, /<svg/);
-  assert.doesNotMatch(html, /reciprocal|Multiplication tables/);
   const subtraction = worked('babylonian', 3600n, 1n, 'subtract');
-  assert.match(subtraction, /Exchange one group worth 3600 for sixty groups worth 60/);
-  assert.match(subtraction, /Exchange one group worth 60 for sixty groups worth 1/);
-  assert.match(subtraction, /result is 59, 59 in sexagesimal/);
+  assert.match(subtraction, /Exchange one unit in the \[1, 0, 0\] place/);
+  assert.match(subtraction, /The answer is \[59, 59\]/);
 });
 
-test('Babylonian multiplication builds a missing product from table multiples, without division instructions', () => {
+test('Babylonian multiplication combines native table entries without decimal working', () => {
   const html = worked('babylonian', 47n, 7n, 'multiply');
-  assert.match(html, /Multiplication tables supplied/);
-  assert.match(html, /47 = 40 \+ 7/);
-  assert.match(html, /40 × 7 = 280/);
-  assert.match(html, /Base 60: \[4, 40\] = 4 × 60 \+ 40/);
-  assert.match(html, /7 × 7 = 49/);
-  assert.match(html, /Base 60: \[5, 29\] = 5 × 60 \+ 29/);
-  assert.match(html, /47 × 7 = 329/);
-  assert.match(html, /Documented tools, reconstructed working/);
+  assert.match(html, /Use \[40\] and \[7\] rows of the \[7\] table/);
+  assert.match(html, /Look up \[40\] × \[7\] = \[4, 40\]/);
+  assert.match(html, /Look up \[7\] × \[7\] = \[49\]/);
+  assert.match(html, /The product is \[5, 29\]/);
+  assert.match(html, /Decimal hint: 329/);
   assert.doesNotMatch(html, /reciprocal|Division ·|formation-steps/);
 });
 
-test('Babylonian products cannot be mistaken for decimal values separated by a comma', () => {
+test('Babylonian 42 times 8 uses separate native steps and small decimal hints', () => {
   const html = worked('babylonian', 42n, 8n, 'multiply');
-  const lines = [...html.matchAll(/<span class="math-cell-line">([^<]+)<\/span>/g)].map(
-    (match) => match[1],
-  );
-  assert.deepEqual(lines.slice(0, 7), [
-    'Split 42: 42 = 40 + 2.',
-    '40 × 8 = 320',
-    'Base 60: [5, 20] = 5 × 60 + 20',
-    '2 × 8 = 16',
-    'Add: 320 + 16 = 336.',
-    'Therefore 42 × 8 = 336',
-    'Base 60: [5, 36] = 5 × 60 + 36.',
-  ]);
-  assert.doesNotMatch(html, /40 × 8 = 5, 20|42 × 8 = 5, 36/);
+  assert.match(html, /Look up \[40\] × \[8\] = \[5, 20\]/);
+  assert.match(html, /\[20\] \+ \[16\] = \[36\]/);
+  assert.match(html, /The product is \[5, 36\]/);
+  assert.match(html, /<small class="math-decimal-hint">Decimal hint: 320<\/small>/);
+  assert.doesNotMatch(html, /<p>[^<]*(?:320|336)/);
 });
 
 test('rod multiplication follows Sunzi’s rows, while division shifts a divisor and retains its remainder', async () => {
@@ -432,25 +412,20 @@ test('rod multiplication follows Sunzi’s rows, while division shifts a divisor
   assert.match(division, /sun-tzu\/i\/9/);
 });
 
-test('Kaktovik lessons use documented classroom strokes and graphical quotient chunks', () => {
+test('Kaktovik lessons use native strokes, bead exchanges and graphical divisor groups', () => {
   const addition = worked('kaktovik', 19n, 2n, 'add');
-  assert.match(
-    addition,
-    /five unit strokes make one five-stroke, and four five-strokes make one in the next place/,
-  );
-  assert.match(addition, /Documented classroom practice/);
+  assert.match(addition, /Five unit strokes make one five-stroke/);
+  assert.match(addition, /data-evidence="documented"/);
+  assert.match(addition, /\[19\] \+ \[2\] = \[1, 1\]/);
   const subtraction = worked('kaktovik', 20n, 1n, 'subtract');
-  assert.match(subtraction, /Open one group worth 20 into twenty at place 1/);
-  assert.match(subtraction, /20 − 1 = 19/);
+  assert.match(subtraction, /Exchange one unit in the \[1, 0\] place/);
+  assert.match(subtraction, /The answer is \[19\]/);
   const division = worked('kaktovik', 30561n, 61n, 'divide');
-  assert.match(division, /Division · graphical chunking/);
-  assert.match(division, /At place 400, trace 1 copies/);
-  assert.match(division, /At place 20, trace 5 copies/);
-  assert.match(division, /501 whole copies fit/);
+  assert.match(division, /Match the divisor’s stroke groups/);
+  assert.match(division, /The whole quotient is \[1, 5, 1\]/);
   const multiplication = worked('kaktovik', 13n, 24n, 'multiply');
-  assert.match(multiplication, /13 × 20 = 260/);
-  assert.match(multiplication, /13 × 4 = 52/);
-  assert.match(multiplication, /13 × 24 = 312/);
+  assert.match(multiplication, /\[13\] × \[4\] = \[2, 12\]/);
+  assert.match(multiplication, /The answer is \[15, 12\]/);
   assert.match(multiplication, /data-evidence="modern"/);
 });
 
@@ -526,13 +501,13 @@ test('rod-board examples explain carries and borrowing in actual operands', () =
   assert.ok(stepCount(subtraction, 'math-steps') <= 14);
 });
 
-test('Babylonian division uses exact reciprocals and labels truncated sexagesimal expansions', () => {
+test('Babylonian division keeps reciprocal multiplication and fractional scale sexagesimal', () => {
   const regular = worked('babylonian', 54n, 6n, 'divide');
-  assert.match(regular, /1\/6 = 0; 10/);
-  assert.match(regular, /54 × \(1\/6\) = 9/);
+  assert.match(regular, /\[6\] ↔ \[0; 10\]/);
+  assert.match(regular, /\[54\] × \[0; 10\]/);
   assert.match(regular, /terminating base-60 expansion/);
   const irregular = worked('babylonian', 1n, 7n, 'divide');
-  assert.match(irregular, /0; 8, 34, 17, 8, 34, 17, …/);
+  assert.match(irregular, /8, 34, 17, 8, 34, 17, …/);
   assert.match(irregular, /does not terminate in base 60/);
   assert.match(irregular, /fraction result here stays exact/);
   assert.match(irregular, /not an exact finite reciprocal/);
@@ -541,8 +516,8 @@ test('Babylonian division uses exact reciprocals and labels truncated sexagesima
 test('Maya exercises carry twenty while Roman writing exposes subtractive groups', () => {
   const maya = worked('maya', 58n, 7n, 'add');
   assert.match(maya, /18 \+ 7 = 25/);
-  assert.match(maya, /five dots make one bar, and four bars make one in the next place/);
-  assert.match(maya, /At place 20: 2 \+ 0 \+ 1 carried = 3/);
+  assert.match(maya, /Five dots make one bar, and four bars make one in the next place/);
+  assert.match(maya, /\[2\] \+ \[0\] \+ \[1\] carried = \[3\]/);
   assert.match(maya, /Teaching reconstruction/);
   assert.match(maya, /Long Count’s 360-day third position/);
   const roman = renderMathReasoning(system('roman'), rational(54n));

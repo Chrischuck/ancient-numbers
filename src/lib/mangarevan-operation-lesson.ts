@@ -46,7 +46,7 @@ function mixed(n: bigint): bigint[] {
 function groupReading(n: bigint): string {
   if (!n) return 'no counting units';
   return mixed(n)
-    .flatMap((count, i) => (count ? [`${count} ${terms[i]}`] : []))
+    .flatMap((count, i) => (count ? [`${small(count)} ${terms[i]}`] : []))
     .reverse()
     .join(' + ');
 }
@@ -58,14 +58,19 @@ function wordTokens(system: SystemDefinition, n: bigint): RenderToken[] | undefi
 }
 
 function part(system: SystemDefinition, text: string, n?: bigint): OperationPart {
-  return { text, tokens: n === undefined ? undefined : wordTokens(system, n) };
+  return {
+    text,
+    hint: n === undefined ? undefined : String(n),
+    tokens: n === undefined ? undefined : wordTokens(system, n),
+  };
 }
 
 function completed(system: SystemDefinition, n: bigint, prefix = 'The answer'): OperationPart {
   const tokens = wordTokens(system, n);
   return {
-    text: `${prefix} is ${n}: ${n >= 0n ? groupReading(n) : 'a negative quantity'}.${n === 0n ? ' No zero word is supplied by this bounded dictionary.' : !tokens ? ' This is beyond the illustrated vocabulary range of 1–799 counting units; the exact quantity is retained without inventing a full Mangarevan number word.' : ' The displayed words name this count in the selected mixed system.'}`,
+    text: `${prefix} is ${n >= 0n ? groupReading(n) : 'a negative quantity'}.${n === 0n ? ' No zero word is supplied by this bounded dictionary.' : !tokens ? ' This is beyond the illustrated vocabulary range of 1–799 counting units; the exact quantity is retained without inventing a full Mangarevan number word.' : ' The displayed words name this count in the selected mixed system.'}`,
     tokens,
+    hint: String(n),
   };
 }
 
@@ -79,7 +84,7 @@ function addition(system: SystemDefinition, a: bigint, b: bigint): OperationPart
   const parts = [
     part(
       system,
-      `Join ${a} (${groupReading(a)}) and ${b} (${groupReading(b)}), keeping the named group levels separate.`,
+      `Join ${groupReading(a)} and ${groupReading(b)}, keeping the named group levels separate.`,
       a,
     ),
   ];
@@ -132,7 +137,7 @@ function subtraction(system: SystemDefinition, a: bigint, b: bigint): OperationP
   const parts = [
     part(
       system,
-      `Set out ${a}: ${groupReading(a)}. Remove the second quantity’s named groups, opening a larger group when a required level is empty.`,
+      `Set out ${groupReading(a)}. Remove the second quantity’s named groups, opening a larger group when a required level is empty.`,
       a,
     ),
   ];
@@ -155,7 +160,7 @@ function subtraction(system: SystemDefinition, a: bigint, b: bigint): OperationP
       parts.push(
         part(
           system,
-          `${exchanges.join(' ')}${exchanges.length ? ' ' : ''}At ${terms[i]}, remove ${removed[i]} from ${before}, leaving ${available[i]}. The remaining quantity is ${remaining}.`,
+          `${exchanges.join(' ')}${exchanges.length ? ' ' : ''}At ${terms[i]}, remove ${removed[i]} from ${before}, leaving ${available[i]}. The remaining groups are ${groupReading(remaining)}.`,
           remaining,
         ),
       );
@@ -220,16 +225,20 @@ function multiplication(
       selected,
       cells: [
         { text: selected ? 'Keep' : 'Skip' },
-        { text: String(copies), tokens: wordTokens(system, copies) },
+        { text: groupReading(copies), hint: String(copies), tokens: wordTokens(system, copies) },
         { text: copies === 1n ? `One copy: ${groupReading(quantity)}.` : doubling(quantity / 2n) },
-        { text: `${quantity} counting units`, tokens: wordTokens(system, quantity) },
+        {
+          text: groupReading(quantity),
+          hint: String(quantity),
+          tokens: wordTokens(system, quantity),
+        },
       ],
     });
   }
   const parts = [
     part(
       system,
-      `Make ${count} copies of ${amount} counting units. Doubling shifts takau → paua → tataua → varu; ordinary unit and varu coefficients are regrouped separately.`,
+      `Make ${groupReading(count)} copies of ${groupReading(amount)}. Doubling shifts takau → paua → tataua → varu; ordinary unit and varu coefficients are regrouped separately.`,
       amount,
     ),
   ];
@@ -246,7 +255,7 @@ function multiplication(
     parts.push(
       part(
         system,
-        `Keep ${entry.copies} copies, contributing ${entry.amount}. ${joinDescription(before, entry.amount)} The collected quantity becomes ${collected}: ${groupReading(collected)}.`,
+        `Keep ${groupReading(entry.copies)} copies, contributing ${groupReading(entry.amount)}.\n${joinDescription(before, entry.amount)}\nThe collected groups become ${groupReading(collected)}.`,
         collected,
       ),
     );
@@ -296,7 +305,7 @@ function division(system: SystemDefinition, a: bigint, b: bigint): OperationPart
   const parts = [
     part(
       system,
-      `Begin with ${a} counting units: ${groupReading(a)}. Keep the object size of one tauga fixed while forming shares.`,
+      `Begin with ${groupReading(a)}. Keep the object size of one tauga fixed while forming shares.`,
       a,
     ),
   ];
@@ -311,7 +320,7 @@ function division(system: SystemDefinition, a: bigint, b: bigint): OperationPart
       parts.push(
         part(
           system,
-          `Halving ${stage + 1} of ${stages}: ${half.details} ${quantity} gives ${half.quotient} per half.${half.remainder ? ` This stage’s leftover counts as ${scale} of the original counting units.` : ''}`,
+          `Halving ${stage + 1} of ${stages}: ${half.details} ${groupReading(quantity)} gives ${groupReading(half.quotient)} per half.${half.remainder ? ` This stage’s leftover counts as ${scale} of the original counting units.` : ''}`,
           half.quotient,
         ),
       );
@@ -320,7 +329,7 @@ function division(system: SystemDefinition, a: bigint, b: bigint): OperationPart
     parts.push(
       part(
         system,
-        `After ${stages} halving${stages === 1 ? '' : 's'}, each of the ${b} shares contains ${quantity} whole counting units; the original-unit remainder is ${remainder}. Check: ${b} × ${quantity} + ${remainder} = ${a}.`,
+        `After ${stages} halving${stages === 1 ? '' : 's'}, each of the ${groupReading(b)} shares contains ${groupReading(quantity)}; the remaining groups are ${groupReading(remainder)}.`,
         quantity,
       ),
     );
@@ -344,7 +353,7 @@ function division(system: SystemDefinition, a: bigint, b: bigint): OperationPart
       parts.push(
         part(
           system,
-          `Form ${chunk} complete groups of ${b}, using ${quantity}: ${before} − ${quantity} = ${remaining}. ${joinDescription(copies - chunk, chunk)} The count is now ${copies} complete groups.`,
+          `Form ${groupReading(chunk)} complete groups of ${groupReading(b)}.\nRemove ${groupReading(quantity)} from ${groupReading(before)}, leaving ${groupReading(remaining)}. ${joinDescription(copies - chunk, chunk)} The count is now ${groupReading(copies)} complete groups.`,
           remaining,
         ),
       );
@@ -352,7 +361,7 @@ function division(system: SystemDefinition, a: bigint, b: bigint): OperationPart
     parts.push(
       part(
         system,
-        `${a / b} complete groups use ${(a / b) * b} counting units, leaving ${a % b}. Check: ${b} × ${a / b} + ${a % b} = ${a}.`,
+        `${groupReading(a / b)} complete groups use ${groupReading((a / b) * b)}, leaving ${groupReading(a % b)}.`,
         a / b,
       ),
     );
@@ -360,12 +369,13 @@ function division(system: SystemDefinition, a: bigint, b: bigint): OperationPart
   const remainder = a % b;
   if (remainder) {
     const exact = rational(a, b);
-    parts.push(
-      part(
+    parts.push({
+      ...part(
         system,
-        `The exact modern result is ${a / b} + ${remainder}/${b} = ${exact.numerator}/${exact.denominator}. The paper does not establish a historical fraction-word procedure; the fraction is a reading annotation, and no fractional Mangarevan word is invented.`,
+        `Keep ${groupReading(a / b)} in each whole share, with ${groupReading(remainder)} still to share. The paper does not establish a historical fraction-word procedure; the exact fraction is confined to its hint, and no fractional Mangarevan word is invented.`,
       ),
-    );
+      hint: `${a / b} + ${remainder}/${b} = ${exact.numerator}/${exact.denominator}`,
+    });
   } else {
     parts.push(completed(system, a / b, 'The quotient'));
   }
@@ -382,12 +392,13 @@ export function mangarevanOperationLesson(
   const title = `${names[operation]} · ${operation === 'add' ? 'joining mixed counting groups' : operation === 'subtract' ? 'opening and removing mixed groups' : operation === 'multiply' ? 'doubling named groups' : 'splitting mixed counting groups'}`;
   const lesson: OperationLesson = {
     title,
-    text: 'Work with ordinary units, takau (10), paua (20), tataua (40), and varu (80). Ten units make takau; pairs of each following group make the next one. A varu coefficient uses ordinary decimal counting.',
+    text: 'Work with ordinary units, takau, paua, tataua, and varu. Ten units make takau; pairs of each following group make the next one.',
     evidence:
       'Analytical reconstruction: Bender and Beller derive arithmetic possibilities from recorded vocabulary. Direct observations of historical performance are unavailable; the division preferences are explicit assumptions.',
     equation: '',
     sources: [source],
     notes: [
+      'A varu coefficient uses ordinary decimal counting; that is part of this mixed system, not an intermediate base conversion.',
       'Keep the object-dependent counting unit tauga fixed: one turtle, two fish, four coconuts or eight octopuses. The input counts these units, not automatically individual objects.',
       'Full words are generated only for 1–799 counting units. Group terms in English working captions are structural annotations, not invented complete number names.',
     ],
@@ -408,7 +419,7 @@ export function mangarevanOperationLesson(
           ? a * b
           : undefined;
   const fraction = result === undefined ? rational(a, b) : rational(result);
-  lesson.equation = `${small(a)} ${signs[operation]} ${small(b)} = ${small(fraction.numerator)}${fraction.denominator === 1n ? '' : `/${small(fraction.denominator)}`}`;
+  lesson.equation = `(${a >= 0n ? groupReading(a) : small(a)}) ${signs[operation]} (${b >= 0n ? groupReading(b) : small(b)}) = ${fraction.numerator >= 0n ? groupReading(fraction.numerator / fraction.denominator) : small(fraction.numerator)}${fraction.denominator === 1n ? '' : ', with a remaining share'}`;
   if (system.id !== 'mangarevan' || system.engine !== 'pacific') {
     lesson.parts = [
       {

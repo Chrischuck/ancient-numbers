@@ -4,9 +4,12 @@ import { represent } from './format';
 import { oksapminPositions } from './pacific-counts';
 import type { CalculationWorkspace } from './arithmetic-workspace';
 import type { EvidenceKind } from './arithmetic-evidence';
+import { babylonianNativeLesson } from './babylonian-arithmetic';
+import { nativePositionalLesson } from './native-arithmetic';
 
 export interface OperationPart {
   text: string;
+  hint?: string;
   tokens?: RenderToken[];
   workspace?: CalculationWorkspace;
 }
@@ -22,7 +25,10 @@ export interface OperationLesson {
   table?: {
     caption: string;
     headings: string[];
-    rows: { selected?: boolean; cells: { text: string; tokens?: RenderToken[] }[] }[];
+    rows: {
+      selected?: boolean;
+      cells: { text: string; hint?: string; tokens?: RenderToken[] }[];
+    }[];
   };
 }
 interface Calculation {
@@ -51,16 +57,6 @@ const egyptianEvidence: Source = {
   title: 'Katz · History of Mathematics, §1.3: Egyptian arithmetic evidence',
   url: 'https://bpb-us-e1.wpmucdn.com/sites.tufts.edu/dist/8/3572/files/2015/11/katz-ancient-arith.pdf',
 };
-const babylonianSources: Source[] = [
-  {
-    title: 'Open University · Babylonian mathematical tables',
-    url: 'https://www.open.edu/openlearn/mod/oucontent/view.php?id=1976&printable=1',
-  },
-  {
-    title: 'Duncan Melville · Babylonian multiplication tables',
-    url: 'https://myslu.stlawu.edu/~dmel/mesomath/multiply.html',
-  },
-];
 const rodSource: Source = {
   title: 'University of St Andrews · Chinese counting-board numerals',
   url: 'https://mathshistory.st-andrews.ac.uk/HistTopics/Chinese_numerals/',
@@ -90,7 +86,6 @@ const mayaSource: Source = {
 
 const textValue = (n: Rational): string =>
   n.denominator === 1n ? String(n.numerator) : `${n.numerator}/${n.denominator}`;
-const sexagesimal = (n: bigint): string => baseDigits(n, 60).join(', ');
 
 // Do not flood the page with repeated glyphs for a large teaching example.
 function tokens(system: SystemDefinition, n: bigint): RenderToken[] | undefined {
@@ -312,188 +307,16 @@ function egyptian(
   };
 }
 
-function reciprocal(n: bigint): string {
-  const parts: string[] = [];
-  let remainder = 1n % n;
-  for (let i = 0; remainder && i < 6; i++) {
-    remainder *= 60n;
-    parts.push(String(remainder / n));
-    remainder %= n;
-  }
-  return `${sexagesimal(1n / n)}${parts.length ? `; ${parts.join(', ')}` : ''}${remainder ? ', …' : ''}`;
-}
-
-function sexagesimalProduct(value: bigint): string {
-  if (value < 60n) return String(value);
-  const digits = baseDigits(value, 60);
-  const expansion = digits
-    .map((digit, index) => {
-      const place = 60n ** BigInt(digits.length - index - 1);
-      return place === 1n ? String(digit) : `${digit} × ${place}`;
-    })
-    .join(' + ');
-  return `${value}\nBase 60: [${sexagesimal(value)}] = ${expansion}`;
-}
-
 function babylonian(
   system: SystemDefinition,
   a: bigint,
   b: bigint,
   operation: string,
-  equation: string,
+  _equation: string,
 ): OperationLesson {
-  if (operation === 'divide') {
-    let regular = b;
-    for (const factor of [2n, 3n, 5n]) while (regular % factor === 0n) regular /= factor;
-    return {
-      title: 'Division · multiplying by a reciprocal',
-      text: 'Scribes used tables of reciprocals to turn division into multiplication. A reciprocal gives the amount that, multiplied by the divisor, makes one.',
-      evidence:
-        'Documented practice: reciprocal tables survive on clay tablets. This worked application supplies explicit scale and punctuation for a modern reader.',
-      equation,
-      sources: babylonianSources,
-      parts: [
-        {
-          text: `Find the reciprocal of ${b}: 1/${b} = ${reciprocal(b)} in modern sexagesimal transcription. The semicolon separates whole and fractional places.`,
-        },
-        {
-          text: `Use ${a} × (1/${b}) = ${textValue(rational(a, b))}. The exact quotient in sexagesimal is ${sexagesimalFraction(a, b)}.`,
-        },
-        {
-          text:
-            regular === 1n
-              ? 'Only factors 2, 3 and 5 occur in this divisor, so the reciprocal has a terminating base-60 expansion.'
-              : 'This reciprocal does not terminate in base 60. An ellipsis is not an exact finite reciprocal; the fraction result here stays exact. Irregular divisors required other work or an approximation.',
-        },
-      ],
-      notes: [
-        'At most six fractional places are displayed. Ancient sexagesimal notation did not fix an absolute scale or use our commas and semicolon; the problem’s context supplied the scale.',
-      ],
-    };
-  }
-  if (operation === 'multiply') {
-    const left = baseDigits(a, 60).reverse();
-    const right = baseDigits(b, 60).reverse();
-    const rows: NonNullable<OperationLesson['table']>['rows'] = [];
-    const partials: bigint[] = [];
-    for (let i = 0; i < left.length; i++)
-      for (let j = 0; j < right.length; j++) {
-        if (!left[i] || !right[j]) continue;
-        const product = BigInt(left[i] * right[j]);
-        const place = 60n ** BigInt(i + j);
-        const xParts = [Math.floor(left[i] / 10) * 10, left[i] % 10].filter(Boolean);
-        const yParts = [Math.floor(right[j] / 10) * 10, right[j] % 10].filter(Boolean);
-        const lookups = xParts.flatMap((x) =>
-          yParts.map((y) => `${x} × ${y} = ${sexagesimalProduct(BigInt(x * y))}`),
-        );
-        const decomposition = [
-          ...(xParts.length > 1 ? [`Split ${left[i]}: ${left[i]} = ${xParts.join(' + ')}.`] : []),
-          ...(yParts.length > 1 ? [`Split ${right[j]}: ${right[j]} = ${yParts.join(' + ')}.`] : []),
-          ...lookups,
-          ...(lookups.length > 1
-            ? [
-                `Add: ${xParts.flatMap((x) => yParts.map((y) => x * y)).join(' + ')} = ${product}.`,
-                `Therefore ${left[i]} × ${right[j]} = ${sexagesimalProduct(product)}.`,
-              ]
-            : []),
-        ].join('\n');
-        partials.push(product * place);
-        if (rows.length < 10)
-          rows.push({
-            cells: [
-              { text: decomposition, tokens: tokens(system, product) },
-              { text: `× ${place}` },
-              {
-                text: sexagesimalProduct(product * place),
-                tokens: tokens(system, product * place),
-              },
-            ],
-          });
-      }
-    return {
-      title: 'Multiplication · table multiples and partial products',
-      text: 'Multiplication tables supplied useful multiples. Split each place group into tens and units when needed, combine those table multiples, then add the properly placed products. A shift of one place multiplies its value by sixty.',
-      evidence:
-        'Documented tools, reconstructed working: multiplication tablets survive. This example assembles place products for your numbers; it does not claim a surviving table for every factor or a fixed ancient written layout.',
-      equation,
-      sources: babylonianSources,
-      table: {
-        caption: `Products are shown in decimal, with base-60 digits in brackets. For example, [5, 20] means 5 × 60 + 20 = 320.${partials.length > 10 ? ` The first 10 of ${partials.length} nonzero partial products are shown.` : ''}`,
-        headings: ['Table product', 'Place weight', 'Partial product'],
-        rows,
-      },
-      parts: [
-        {
-          text: `${partials.length > 10 ? 'All partial products, including those omitted from the table,' : 'Add the partial products in decimal:'} ${partials.length <= 10 ? partials.join(' + ') || '0' : ''}${partials.length <= 10 ? ' =' : ' total'} ${sexagesimalProduct(a * b)}.`,
-          tokens: tokens(system, a * b),
-        },
-      ],
-      notes: [
-        'These educational place separators and integer scale labels are modern. Empty places are blanks in this Old Babylonian repertoire.',
-      ],
-    };
-  }
-  const subtract = operation === 'subtract';
-  const evidence =
-    'Teaching reconstruction: the tablets establish base-sixty places and additive one- and ten-wedges. The combine/remove steps below illustrate that notation; they are not a transcript of a surviving general algorithm.';
-  if (subtract && a < b)
-    return {
-      title: 'Subtraction · removing wedges',
-      text: 'This wedge-removal example covers nonnegative differences. The signed answer below is modern arithmetic.',
-      evidence,
-      equation,
-      sources: babylonianSources,
-    };
-  const parts = columns(a, b, 60, subtract).map((c): OperationPart => {
-    const exchange = c.exchanges
-      .map(
-        ({ from, to }) =>
-          `Exchange one group worth ${from} for sixty groups worth ${to} (six ten-wedges in that position).`,
-      )
-      .join(' ');
-    const ones = (c.x % 10n) + (c.y % 10n) + c.carry;
-    const tens = c.x / 10n + c.y / 10n;
-    const group = subtract ? c.digit : c.raw % 60n;
-    return {
-      text: subtract
-        ? `${exchange}${exchange ? ' ' : ''}In the place worth ${c.place}, remove ${c.y} from ${c.x}: ${c.x} − ${c.y} = ${c.digit}. ${c.x % 10n < c.y % 10n ? 'Split a ten-wedge into ten one-wedges to remove the required units. ' : ''}Leave ${c.digit / 10n} ten-wedges and ${c.digit % 10n} one-wedges.`
-        : `Place worth ${c.place}: ${c.x} + ${c.y}${c.carry ? ` + ${c.carry} carried` : ''} = ${c.raw}. Pool ${tens} ten-wedges and ${ones} one-wedges.${ones >= 10n ? ' Exchange ten one-wedges for a ten-wedge.' : ''}${c.raw >= 60n ? ' Exchange six ten-wedges for one one-wedge in the next place.' : ''} Leave ${group / 10n} ten-wedges and ${group % 10n} one-wedges here.`,
-      tokens: group
-        ? [
-            {
-              glyph: `babylonian-${group}`,
-              place: String(c.place),
-              label: `${group} in the place worth ${c.place}`,
-            },
-          ]
-        : undefined,
-    };
-  });
-  parts.push({
-    text: `The result is ${sexagesimal(a + (subtract ? -b : b))} in sexagesimal (decimal ${a + (subtract ? -b : b)}).`,
-    tokens: tokens(system, a + (subtract ? -b : b)),
-  });
-  return {
-    title: `${names[operation]} · ${subtract ? 'removing' : 'combining'} wedges`,
-    text: subtract
-      ? 'Remove like wedges within matching places. Exchange from a higher place when needed, then remove unit or ten-wedges.'
-      : 'Combine the wedges in matching places. Regroup ten one-wedges as a ten-wedge, and six ten-wedges as one group in the next place.',
-    evidence,
-    equation,
-    parts,
-    sources: babylonianSources,
-  };
-}
-
-function sexagesimalFraction(n: bigint, d: bigint): string {
-  const parts: string[] = [];
-  let remainder = n % d;
-  for (let i = 0; remainder && i < 6; i++) {
-    remainder *= 60n;
-    parts.push(String(remainder / d));
-    remainder %= d;
-  }
-  return `${sexagesimal(n / d)}${parts.length ? `; ${parts.join(', ')}` : ''}${remainder ? ', …' : ''}`;
+  return operation === 'multiply' || operation === 'divide'
+    ? babylonianNativeLesson(system, a, b, operation)
+    : nativePositionalLesson(system, a, b, operation as 'add' | 'subtract');
 }
 
 function rodBoard(

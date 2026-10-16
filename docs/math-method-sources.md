@@ -4,6 +4,8 @@ Translate explains how the selected tradition writes, names, or physically repre
 
 All 40 calculators provide worked numerical lessons for addition, subtraction, multiplication, and division: 160 combinations, including binary and hexadecimal. Each lesson uses the selected operation and entered operands. Native signs, words, or gestures illustrate supported intermediate quantities and results; an evidence notice never substitutes for the numerical walkthrough.
 
+Non-decimal working stays in its own radix or named grouping system. Babylonian lessons combine sexagesimal table facts; binary and hex carry in their own digits; vigesimal lessons exchange twenty-based groups; Maya component products use dots and bars; Mangarevan and Yorùbá captions keep named groups; Ethiopic captions retain their signs. Decimal equivalents appear in separate small hints, including the main calculator result caption. Conversion expansions remain in Translate and on the Bases page. Each calculation step has its own line or paragraph.
+
 The calculation lessons distinguish documented practices, reconstructions, modern examples, and recording notation used after a separate calculation. The evidence label is visible beside the relevant lesson. Number-name morphology is not treated as a universal description of a speaker’s mental arithmetic. When no historical recipe was established, the calculator still supplies an explicitly reconstructed or modern worked example without attributing it to the historical community.
 
 ## Regional research audits

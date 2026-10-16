@@ -150,6 +150,12 @@ if (input) {
     lastExact = formatNumber(value);
     el('exact-value').textContent = lastExact;
     el('output-equation').textContent = result.explanation || 'Exact value';
+    el('output-equation').hidden = mode === 'calculate';
+    document
+      .querySelector('.result-caption')
+      ?.classList.toggle('is-decimal-hint', mode === 'calculate');
+    const separator = document.querySelector<HTMLElement>('.result-separator');
+    if (separator) separator.hidden = mode === 'calculate';
     el('output-message').textContent = result.reason ?? '';
     el('output-message').hidden = !result.reason;
     if (!result.tokens.length) {

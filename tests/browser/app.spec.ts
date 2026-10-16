@@ -174,14 +174,14 @@ test('translate explains formation while calculate focuses on the selected opera
   await expect(page.locator('#conversion-steps')).toHaveCount(0);
   await expect(page.locator('#translated-equation')).toBeHidden();
   await page.getByRole('tab', { name: 'Calculate' }).click();
-  await expect(page.locator('#math-reasoning')).toContainText('42 + 8 = 50');
+  await expect(page.locator('#math-reasoning .math-equation')).toHaveText('[2, 2] + [8] = [2, 10]');
   await expect(page.locator('#math-reasoning .formation-steps')).toHaveCount(0);
   await expect(page.locator('#conversion-guide-title')).toHaveText('How the calculation works');
   await page.locator('#translated-equation summary').click();
   await expect(page.locator('#translated-equation .equation-term')).toHaveCount(3);
   await expect(page.locator('#translated-equation')).toContainText('modern operators');
   await page.locator('#operation').selectOption('subtract');
-  await expect(page.locator('#math-reasoning')).toContainText('42 − 8 = 34');
+  await expect(page.locator('#math-reasoning .math-equation')).toHaveText('[2, 2] − [8] = [1, 14]');
   await page.locator('#second-input').fill('100');
   await expect(page.locator('#math-reasoning')).toContainText('42 − 100 = -58');
   await expect(page.locator('#output-message')).toBeVisible();

@@ -210,11 +210,11 @@ test('Egyptian fractional division still works through doubled whole multiples a
 test('Ethiopic multiplication retains odd halving rows for eleven times fifteen', () => {
   const worked = lesson('ethiopic', 11n, 15n, 'multiply');
   assert.match(worked.evidence, /^Documented practice/);
-  assert.equal(worked.equation, '11 × 15 = 165');
+  assert.equal(worked.equation, '፲፩ × ፲፭ = ፻፷፭');
   assert.deepEqual(
     worked.table?.rows.map((row) => [
-      Number(row.cells[0].text.match(/^\d+/)?.[0]),
-      Number(row.cells[1].text),
+      Number(row.cells[0].hint),
+      Number(row.cells[1].hint),
       Boolean(row.selected),
     ]),
     [
@@ -224,7 +224,7 @@ test('Ethiopic multiplication retains odd halving rows for eleven times fifteen'
       [1, 120, true],
     ],
   );
-  assert.match(narrative(worked), /15 \+ 30 \+ 120 = 165/);
+  assert.match(narrative(worked), /፲፭ \+ ፴ \+ ፻፳ = ፻፷፭/);
   assert.ok(worked.table?.rows.every((row) => row.cells.every((cell) => cell.tokens?.length)));
 });
 

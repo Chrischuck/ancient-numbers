@@ -52,6 +52,10 @@ function part(
   return {
     text,
     tokens: value === undefined ? undefined : picture(system, value),
+    hint:
+      value !== undefined && ['mexica', 'yoruba', 'ethiopic'].includes(system.id)
+        ? String(value)
+        : undefined,
     workspace:
       kind && value !== undefined && value >= 0n
         ? {
@@ -73,11 +77,47 @@ function part(
   };
 }
 function words(system: SystemDefinition, value: bigint): string {
+  if (system.id === 'ethiopic') {
+    if (!value) return 'no signs';
+    const native = picture(system, value);
+    if (!native) return 'a quantity outside the selected sign range';
+    return native
+      .map((token) => {
+        const unit = Number(token.glyph?.replace('ethiopic-', ''));
+        return unit === 10000
+          ? '፼'
+          : unit === 100
+            ? '፻'
+            : unit >= 10
+              ? String.fromCodePoint(0x1372 + unit / 10 - 1)
+              : String.fromCodePoint(0x1369 + unit - 1);
+      })
+      .join('');
+  }
+  if (system.id === 'mexica') {
+    let remaining = value;
+    return (
+      [
+        [8000n, 'bags'],
+        [400n, 'feathers'],
+        [20n, 'flags'],
+        [1n, 'dots'],
+      ]
+        .flatMap(([unit, name]) => {
+          const count = remaining / (unit as bigint);
+          remaining %= unit as bigint;
+          return count ? [`${count} ${name}`] : [];
+        })
+        .join(' + ') || 'no marks'
+    );
+  }
   const result = picture(system, value);
   const text = result
     ?.filter((token) => token.text !== undefined)
     .map((token) => token.text)
     .join(' ');
+  if (system.id === 'yoruba')
+    return text || `${value / 20n} twenty-groups and ${value % 20n} singles`;
   return text ? `${text} (${value})` : String(value);
 }
 function radix(system: SystemDefinition): number {
@@ -116,6 +156,8 @@ function groups(system: SystemDefinition, value: bigint): Group[] {
   });
 }
 function groupName(system: SystemDefinition, group: Group): string {
+  if (system.id === 'mexica') return words(system, group.amount);
+  if (system.id === 'ethiopic') return words(system, group.amount);
   if (system.id === 'mangarevan')
     return `${group.count} ${({ '80': 'varu', '40': 'tataua', '20': 'paua', '10': 'takau', '1': 'single counting unit' } as Record<string, string>)[String(group.unit)] ?? `group worth ${group.unit}`} (${group.amount})`;
   if (system.structure === 'Spoken' || system.id === 'yoruba') return words(system, group.amount);
@@ -135,6 +177,7 @@ function finish(system: SystemDefinition, value: bigint, action = 'The answer'):
   const description = system.id === 'cistercian-gestures' ? ' hours' : '';
   return {
     text: `${action} is ${words(system, value)}${description}.${available ? ' The picture shows this quantity in the selected notation.' : value === 0n && !system.zero ? ' Nothing remains; this notation has no zero sign to draw.' : ' The complete result is outside this entry’s supported artwork or word range; no extra sign or word is invented.'}`,
+    hint: ['mexica', 'yoruba', 'ethiopic'].includes(system.id) ? String(value) : undefined,
     tokens: available,
   };
 }
@@ -169,14 +212,20 @@ function notationAddition(
           ),
         );
       const exchange = change.exchanges
-        .map(({ from, to }) => `Exchange one group worth ${from} for ${base} worth ${to}.`)
+        .map(({ from, to }) =>
+          ['mexica', 'ethiopic'].includes(system.id)
+            ? `Open ${words(system, from)} into ${words(system, from).includes('flags') ? 'twenty dot groups' : `${base} smaller groups of ${words(system, to)}`}.`
+            : `Exchange one group worth ${from} for ${base} worth ${to}.`,
+        )
         .join(' ');
       parts.push(
         part(
           system,
-          subtract
-            ? `${exchange}${exchange ? ' ' : ''}At value ${change.place}, remove ${change.y} from ${change.x}: ${change.x} − ${change.y} = ${change.digit}. The running quantity is ${change.board}.`
-            : `At value ${change.place}, combine ${change.x} and ${change.y}${change.carry ? ` and the ${change.carry} carried group` : ''}: ${change.raw}. ${change.raw >= BigInt(base) ? `Exchange ${base} here for one in the next place; keep ${change.digit} here.` : `Keep ${change.digit} here.`} The running quantity is ${change.board}.`,
+          ['mexica', 'ethiopic'].includes(system.id)
+            ? `${exchange}${exchange ? '\n' : ''}${subtract ? 'Remove' : 'Combine'} the matching groups of ${words(system, change.place)}.\n${change.raw >= BigInt(base) ? 'Exchange each complete group for the next larger sign.\n' : ''}The remaining signs record ${words(system, change.board)}.`
+            : subtract
+              ? `${exchange}${exchange ? ' ' : ''}At value ${change.place}, remove ${change.y} from ${change.x}: ${change.x} − ${change.y} = ${change.digit}. The running quantity is ${change.board}.`
+              : `At value ${change.place}, combine ${change.x} and ${change.y}${change.carry ? ` and the ${change.carry} carried group` : ''}: ${change.raw}. ${change.raw >= BigInt(base) ? `Exchange ${base} here for one in the next place; keep ${change.digit} here.` : `Keep ${change.digit} here.`} The running quantity is ${change.board}.`,
           change.board,
           previous,
         ),
@@ -229,7 +278,14 @@ function tableProducts(
     cells: [
       { text: groupName(system, x), tokens: picture(system, x.amount) },
       { text: groupName(system, y), tokens: picture(system, y.amount) },
-      { text: `${x.amount} × ${y.amount} = ${value}`, tokens: picture(system, value) },
+      {
+        text:
+          system.id === 'mexica'
+            ? `${groupName(system, x)} × ${groupName(system, y)} yields ${words(system, value)}.`
+            : `${x.amount} × ${y.amount} = ${value}`,
+        hint: system.id === 'mexica' ? `${x.amount} × ${y.amount} = ${value}` : undefined,
+        tokens: picture(system, value),
+      },
     ],
   }));
   let accumulator = 0n;
@@ -238,7 +294,7 @@ function tableProducts(
     accumulator += value;
     return part(
       system,
-      `Collect this product in the ${system.id === 'khipu' ? 'kernel' : 'working'} total: ${before} + ${value} = ${accumulator}. ${system.id === 'mexica' ? 'Exchange twenty dots for a flag worth 20, twenty flags for a feather worth 400, and twenty feathers for a bag worth 8,000 when needed.' : ['positional', 'suzhou', 'rods', 'babylonian'].includes(system.engine) ? `Exchange ${radix(system)} of one place for one of the next when needed.` : 'Regroup complete decimal quantity orders in the workspace, then recompose the selected whole-value signs or records; the written signs are not positional working digits.'}`,
+      `Collect this product in the ${system.id === 'khipu' ? 'kernel' : 'working'} total:\n${words(system, before)} + ${words(system, value)} = ${words(system, accumulator)}.\n${system.id === 'mexica' ? 'Exchange twenty dots for a flag, twenty flags for a feather, and twenty feathers for a bag when needed.' : system.id === 'ethiopic' ? 'Regroup complete units, tens, hundreds and myriads, then write their Ethiopic signs.' : ['positional', 'suzhou', 'rods', 'babylonian'].includes(system.engine) ? `Exchange ${radix(system)} of one place for one of the next when needed.` : 'Regroup complete decimal quantity orders in the workspace, then recompose the selected whole-value signs or records; the written signs are not positional working digits.'}`,
       accumulator,
       before,
     );
@@ -257,7 +313,7 @@ function tableProducts(
       ...accumulation,
       part(
         system,
-        `${products.length <= 10 ? `Collect the products: ${products.map(({ value }) => value).join(' + ') || '0'} = ${a * b}.` : `Collect all ${products.length} products, including the abbreviated rows: the total is ${a * b}.`}`,
+        `${products.length <= 10 ? `Collect the products: ${products.map(({ value }) => words(system, value)).join(' + ') || '0'} = ${words(system, a * b)}.` : `Collect all ${products.length} products, including the abbreviated rows: the total is ${words(system, a * b)}.`}`,
         a * b,
       ),
       finish(system, a * b),
@@ -322,7 +378,7 @@ function quotientGroups(system: SystemDefinition, a: bigint, b: bigint): Operati
     parts.push(
       part(
         system,
-        `${group.amount} groups of ${b} contain ${removed}. Remove that quantity: ${before} − ${removed} = ${remaining}; the group count becomes ${words(system, totalGroups)}.${system.id === 'khipu' ? ' Move the kernels on the reconstructed yupana workspace; update the quotient’s knot-record quantity separately.' : system.id === 'mangarevan' && [2n, 4n, 8n].includes(b) ? ' Reverse the doubling groups, splitting varu, tataua, paua, or takau as needed.' : ''}`,
+        `${words(system, group.amount)} groups of ${words(system, b)} contain ${words(system, removed)}. Remove that quantity: ${words(system, before)} − ${words(system, removed)} = ${words(system, remaining)}; the group count becomes ${words(system, totalGroups)}.${system.id === 'khipu' ? ' Move the kernels on the reconstructed yupana workspace; update the quotient’s knot-record quantity separately.' : system.id === 'mangarevan' && [2n, 4n, 8n].includes(b) ? ' Reverse the doubling groups, splitting varu, tataua, paua, or takau as needed.' : ''}`,
         remaining,
         before,
       ),
@@ -339,16 +395,24 @@ function quotientGroups(system: SystemDefinition, a: bigint, b: bigint): Operati
   parts.push(
     part(
       system,
-      `${quotient} complete groups use ${quotient * b}, leaving ${remainder}. Check: ${b} × ${quotient} + ${remainder} = ${a}.`,
+      `${words(system, quotient)} complete groups use ${words(system, quotient * b)}, leaving ${words(system, remainder)}. Check: ${words(system, b)} × ${words(system, quotient)} + ${words(system, remainder)} = ${words(system, a)}.`,
       quotient,
     ),
   );
   parts.push(
     remainder
-      ? part(
-          system,
-          `Share the remaining ${remainder} among ${b}: the exact result is ${quotient} + ${remainder}/${b} = ${exact(rational(a, b))}. Fractional signs are not invented for this exhibit.${base === 20n ? ' The counting groups remain twenties; the fraction is a modern exact annotation.' : ''}`,
-        )
+      ? ['mexica', 'yoruba', 'ethiopic'].includes(system.id)
+        ? {
+            ...part(
+              system,
+              `Keep ${words(system, quotient)} complete groups.\nThe remaining ${words(system, remainder)} still needs sharing among ${words(system, b)}. The exact fractional reading is confined to its hint; no fractional sign or word is invented.`,
+            ),
+            hint: exact(rational(a, b)),
+          }
+        : part(
+            system,
+            `Share the remaining ${remainder} among ${b}: the exact result is ${quotient} + ${remainder}/${b} = ${exact(rational(a, b))}. Fractional signs are not invented for this exhibit.${base === 20n ? ' The counting groups remain twenties; the fraction is a modern exact annotation.' : ''}`,
+          )
       : finish(system, quotient, 'The quotient'),
   );
   return parts;
@@ -418,10 +482,11 @@ function ethiopicDoubling(
       selected: keep,
       cells: [
         {
-          text: `${left}${keep ? ' · odd, keep' : ' · even, pass'}`,
+          text: `${words(system, left)}${keep ? ' · odd, keep' : ' · even, pass'}`,
+          hint: String(left),
           tokens: picture(system, left),
         },
-        { text: String(right), tokens: picture(system, right) },
+        { text: words(system, right), hint: String(right), tokens: picture(system, right) },
       ],
     });
     left /= 2n;
@@ -437,8 +502,8 @@ function ethiopicDoubling(
       part(
         system,
         left
-          ? `Continue halving and doubling until the first column reaches one; all kept quantities total ${a * b}.`
-          : `Combine the kept quantities: ${chosen.join(' + ') || '0'} = ${a * b}.`,
+          ? `Continue halving and doubling until the first column reaches one; all kept quantities total ${words(system, a * b)}.`
+          : `Combine the kept quantities:\n${chosen.map((value) => words(system, value)).join(' + ') || 'no signs'} = ${words(system, a * b)}.`,
         a * b,
       ),
       finish(system, a * b),
@@ -569,7 +634,17 @@ function yoruba(
       start,
       part(
         system,
-        `Track the quantity removed: (${anchor} − ${gap}) − ${b} = ${anchor} − (${gap}+${b}) = ${a - b}. Keep the twenty-group reference fixed while increasing the deficit.`,
+        `The rounded twenty-group reference is ${words(system, anchor)}.\nIts initial deficit is ${words(system, gap)}.`,
+        anchor,
+      ),
+      part(
+        system,
+        `Remove ${words(system, b)} by increasing the deficit to ${words(system, gap + b)}.\nKeep the twenty-group reference fixed.`,
+        gap + b,
+      ),
+      part(
+        system,
+        `Take that deficit from ${words(system, anchor)}.\nThe difference is ${words(system, a - b)}.`,
         a - b,
       ),
       finish(system, a - b),
@@ -579,10 +654,14 @@ function yoruba(
       start,
       part(
         system,
-        `Use ${b} groups of the rounded quantity: ${anchor} × ${b} = ${anchor * b}. Each has ${gap} extra units, so remove ${gap} × ${b} = ${gap * b}.`,
+        `Use ${words(system, b)} groups of ${words(system, anchor)}: the rounded collection is ${words(system, anchor * b)}. Each group has ${words(system, gap)} extra; remove ${words(system, gap * b)} in total.`,
         anchor * b,
       ),
-      part(system, `The corrected total is ${anchor * b} − ${gap * b} = ${a * b}.`, a * b),
+      part(
+        system,
+        `The corrected groups are ${words(system, anchor * b)} − ${words(system, gap * b)} = ${words(system, a * b)}.`,
+        a * b,
+      ),
       finish(system, a * b),
     ];
   return [start, ...quotientGroups(system, a, b)];
@@ -598,7 +677,15 @@ export function completeOperationLesson(
   const result = calculate(first, second, operation);
   const a = first.numerator,
     b = second.numerator;
-  const equation = `${exact(first)} ${signs[operation]} ${exact(second)} = ${exact(result)}`;
+  const equation =
+    ['mexica', 'yoruba', 'ethiopic'].includes(system.id) &&
+    first.denominator === 1n &&
+    second.denominator === 1n &&
+    a >= 0n &&
+    b >= 0n &&
+    result.numerator >= 0n
+      ? `${words(system, a).includes(' + ') ? `(${words(system, a)})` : words(system, a)} ${signs[operation]} ${words(system, b).includes(' + ') ? `(${words(system, b)})` : words(system, b)} = ${words(system, result.numerator / result.denominator)}${result.denominator !== 1n ? `, with a remaining share` : ''}`
+      : `${exact(first)} ${signs[operation]} ${exact(second)} = ${exact(result)}`;
   const title = `${names[operation]} · ${system.id === 'suzhou' ? 'abacus work and Suzhou recording' : system.id === 'ethiopic' && operation === 'multiply' ? 'halving and doubling' : system.id === 'rumi' && operation === 'subtract' ? 'completing the difference' : system.id === 'greek-alphabetic' && operation === 'multiply' ? 'Eutocius’ letter-value products' : system.id === 'coptic-epact' ? 'Coptic table quantities' : system.id === 'bamum' && operation === 'multiply' ? 'Bamum school-table products' : system.id === 'mende-kikakui' ? 'subscripted magnitude groups' : system.id === 'khipu' ? 'kernel workspace and knot recording' : system.id === 'cistercian' ? 'counter quantities and staff quadrants' : system.id === 'medieval-finger-counting' ? 'changing the hand-position total' : system.id === 'cistercian-gestures' ? 'hour intervals and time signals' : `${system.name} quantity groups`}`;
   const evidence = `${evidenceLabels[profile.evidence[operation]]}: ${profile.operationNotes[operation]}`;
   const lesson: OperationLesson = {
