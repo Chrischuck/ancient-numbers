@@ -1,7 +1,10 @@
 ---
 import { systems, regions, getSystem } from '../data/systems';
 import Specimen from './Specimen.astro';
-const initial = getSystem('kaktovik')!;
+import { represent } from '../lib/format';
+import { loadGlyphs } from '../lib/glyphs';
+import { renderLearningGuide } from '../lib/learning-guide';
+const initial = getSystem('babylonian')!;
 const base = import.meta.env.BASE_URL;
 ---
 
@@ -76,7 +79,7 @@ const base = import.meta.env.BASE_URL;
       </p>
       <p id="input-error" class="input-error" role="alert" hidden></p>
       <div class="system-field">
-        <label class="eyebrow" for="system-select">
+        <label id="system-label" class="eyebrow" for="system-select">
           NUMERAL SYSTEM
         </label>
         <div class="select-wrap">
@@ -87,7 +90,7 @@ const base = import.meta.env.BASE_URL;
                   .filter((s) => s.region === region)
                   .sort((a, b) => a.name.localeCompare(b.name))
                   .map((s) => (
-                    <option value={s.id} selected={s.id === 'kaktovik'}>
+                    <option value={s.id} selected={s.id === initial.id}>
                       {s.name}
                       {s.engine === 'explainer' ? ' · examples only' : ''}
                     </option>
@@ -95,6 +98,51 @@ const base = import.meta.env.BASE_URL;
               </optgroup>
             ))}
           </select>
+          <button
+            id="system-picker-button"
+            class="system-picker-button"
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-controls="system-picker"
+            aria-labelledby="system-label system-picker-value"
+            hidden
+          >
+            <span id="system-picker-value">{initial.name}</span>
+            <svg viewBox="0 0 12 8" width="12" height="8" aria-hidden="true">
+              <path d="m1 1 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+          </button>
+          <div
+            id="system-picker"
+            class="system-picker"
+            role="dialog"
+            aria-label="Choose a numeral system"
+            hidden
+          >
+            <label class="sr-only" for="system-search">
+              Search numeral systems
+            </label>
+            <input
+              id="system-search"
+              class="system-search"
+              type="text"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded="false"
+              aria-controls="system-options"
+              placeholder="Search systems or regions…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <div
+              id="system-options"
+              class="system-options"
+              role="listbox"
+              aria-label="Numeral systems"
+            ></div>
+            <p id="system-search-status" class="system-search-status" role="status"></p>
+          </div>
         </div>
       </div>
       <div id="example-chips" class="example-chips" aria-label="Try an example">
@@ -112,10 +160,10 @@ const base = import.meta.env.BASE_URL;
     <div class="output-panel" aria-busy="false">
       <div class="output-heading">
         <span id="output-name" class="eyebrow">
-          KAKTOVIK IÑUPIAQ
+          {initial.name.toLocaleUpperCase()}
         </span>
         <span id="output-base" class="base-badge">
-          BASE 20
+          {initial.baseLabel}
         </span>
       </div>
       <div id="output-value" class="output-value">
@@ -127,7 +175,9 @@ const base = import.meta.env.BASE_URL;
         <span class="result-separator" aria-hidden="true">
           /
         </span>
-        <span id="output-equation">2 × 20 + 2 × 1 = 42</span>
+        <span id="output-equation">
+          {represent({ numerator: 42n, denominator: 1n }, initial).explanation}
+        </span>
       </div>
       <div class="output-actions">
         <button id="copy-button" type="button">
@@ -162,8 +212,11 @@ const base = import.meta.env.BASE_URL;
     hidden
   >
     <h2 id="conversion-guide-title">Step by step</h2>
-    <ol id="conversion-steps"></ol>
+    <div id="math-reasoning"></div>
     <div id="translated-equation" class="translated-equation" hidden></div>
+  </section>
+  <section id="learning-guide" class="learning-guide" aria-labelledby="symbol-key-title">
+    <Fragment set:html={renderLearningGuide(initial, await loadGlyphs(initial.region))} />
   </section>
   <div class="converter-context">
     <div>
@@ -178,7 +231,7 @@ const base = import.meta.env.BASE_URL;
         {initial.period}
       </p>
     </div>
-    <a id="learn-link" href={`${base}systems/kaktovik/`}>
+    <a id="learn-link" href={`${base}systems/${initial.id}/`}>
       Details <span aria-hidden="true">↗</span>
     </a>
   </div>

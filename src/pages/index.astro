@@ -3,8 +3,15 @@ import Layout from '../components/Layout.astro';
 import Converter from '../components/Converter.astro';
 import SystemCard from '../components/SystemCard.astro';
 import Specimen from '../components/Specimen.astro';
-import { getSystem, converters } from '../data/systems';
-const featured = ['medefaidrin', 'cistercian', 'mangarevan', 'mende-kikakui', 'khipu', 'rods']
+import { getSystem, converters, systems } from '../data/systems';
+const featured = [
+  'medieval-finger-counting',
+  'cistercian-gestures',
+  'yoruba',
+  'cistercian',
+  'mangarevan',
+  'rods',
+]
   .map((id) => getSystem(id)!)
   .filter(Boolean);
 const base = import.meta.env.BASE_URL;
@@ -21,8 +28,12 @@ const base = import.meta.env.BASE_URL;
       <div class="hero-aside">
         <p>
           {converters.length} numeral converters.
-          <br />
-          10 traditions with selected examples.
+          {systems.length > converters.length && (
+            <>
+              <br />
+              {systems.length - converters.length} traditions with selected examples.
+            </>
+          )}
         </p>
       </div>
     </section>
@@ -37,7 +48,7 @@ const base = import.meta.env.BASE_URL;
         ))}
       </div>
       <a class="collection-cta" href={`${base}collection/`}>
-        All 36 traditions <span aria-hidden="true">↗</span>
+        All {systems.length} traditions <span aria-hidden="true">↗</span>
       </a>
     </section>
     <section class="editorial-feature">

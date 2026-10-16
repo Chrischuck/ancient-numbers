@@ -1,0 +1,51 @@
+# Calculator reasoning: sources and scope
+
+The reasoning panel explains how the selected tradition writes, names, or physically represents the entered quantity. Each explanation connects the displayed signs or positions to their values. It keeps three kinds of evidence distinct: recorded arithmetic methods, modern worked applications of documented representations, and later scholarly reconstructions. Number-name morphology is not treated as a universal description of a speaker’s mental arithmetic.
+
+## Textbook model for worked explanations
+
+[OpenStax, Contemporary Mathematics 4.2: Early Numeration Systems](https://openstax.org/books/contemporary-mathematics/pages/4-2-early-numeration-systems) works through actual numeral groups: identify each group, give its value, assign a place value where needed, and add the contributions. Its Roman examples identify letters and subtractive pairs rather than giving an unexplained sum. Its Maya examples assign increasing powers of 20 from bottom to top. This informs the panel’s connection between the rendered numeral and its numerical reading.
+
+[OpenStax 4.3: Converting with Base Systems](https://openstax.org/books/contemporary-mathematics/pages/4-3-converting-with-base-systems) teaches conversion from decimal with repeated division, retaining each remainder, then reading the remainders in reverse order. Converting to Maya notation has two stages: find base-20 digits, then write those digits with the appropriate signs. The panel should make both stages visible. Example 4.24 contains editorial inconsistencies in its numbers and vertical ordering; the app uses the correct bottom-to-top place order described in section 4.2 and verifies its own arithmetic.
+
+[Pearson, New General Mathematics 1 teacher’s guide, Chapter 1](https://za.pearson.com/content/dam/region-growth/south-africa/pearson-south-africa/TeacherResourceMaterial/9781447978329_ngm_mat_fm1_tg_eng_ng_screen.pdf), printed pages 13–14 (PDF pages 25–26), separates counting in groups, written symbols, counter-board operations, and place value. That distinction supports explaining the notation before describing an operation and treating a numeral’s construction separately from evidence for a historical calculating method.
+
+The resulting design rules are specific to this app:
+
+- Start with the selected notation’s rule and apply it to the input. A decimal decomposition belongs only where it explains that notation’s actual construction.
+- Name the visible signs, groups, rows, or quadrants. A formula alone does not tell a learner which marks to draw or how to read them.
+- Keep zero places in positional explanations. State what an empty cell or zero sign preserves, even though its contribution to the final sum is zero.
+- Finish with a check that reconstructs the original value. Omit steps that merely repeat the input or result.
+- Keep historical qualifications near the relevant method. General scope notes should not displace the worked explanation.
+
+Original worked checks for the implementation:
+
+- **Egyptian 56:** five signs worth 10 and six signs worth 1; check `5 × 10 + 6 × 1 = 56`. For 3,056, use three 1,000 signs, five 10 signs, and six 1 signs; no hundred sign is required.
+- **Roman 56:** `L = 50`, `V = 5`, and `I = 1`, so write `LVI`. For 349, write `CCC`, `XL`, and `IX`; check `300 + (50 − 10) + (10 − 1) = 349`.
+- **Babylonian 56:** one base-60 digit, made from five ten-wedges and six unit-wedges. For 3,656, the digit groups are `1, 0, 56`; check `1 × 3,600 + 0 × 60 + 56 × 1 = 3,656`. Retain the middle place in the app’s reading grid.
+- **Maya 56:** `56 = 2 × 20 + 16`; put two dots in the twenties row and three bars plus one dot in the units row below. For 416, the rows from top to bottom are `1, 0, 16`; check `1 × 400 + 0 × 20 + 16 × 1 = 416`. The middle shell preserves the twenties row.
+
+## Sources used for distinct approaches
+
+- **Egyptian doubling and division through multiplication:** [Arnold Buffum Chace’s translation of the Rhind Mathematical Papyrus, volume I, page 4](https://en.wikisource.org/wiki/Page:The_Rhind_Mathematical_Papyrus,_Volume_I.pdf/20) documents selected doubling rows and multiplication-based division. [Open University’s Egyptian calculation lesson](https://www.open.edu/openlearn/science-maths-technology/mathematics-statistics/egyptian-mathematics/content-section-1.1.2) supplies context, including unit fractions. The worked table is a modern application; it does not reproduce the papyrus’s hieratic text using the exhibit’s hieroglyphs.
+- **Chinese decimal rod boards:** [J. J. O’Connor and E. F. Robertson, Chinese numerals](https://mathshistory.st-andrews.ac.uk/HistTopics/Chinese_numerals/) describes decimal rod places and the arithmetic instructions in Sunzi and Xiahou Yang, including shifts by decimal powers. Calculator carries, borrowing, and partial products are explicitly labeled modern teaching applications, rather than a translation of a particular historical problem.
+- **Babylonian reciprocal division:** [Open University, Babylonian mathematics](https://www.open.edu/openlearn/mod/oucontent/view.php?id=1976&printable=1) discusses reciprocal-table evidence and finite versus nonterminating sexagesimal expansions. The application multiplies by an exact reciprocal. Separators, explicit scale, and six-place fractional previews are modern aids; an ellipsis never means the displayed reciprocal is a finite exact value.
+- **Roman counter regrouping:** [Oxford Classical Dictionary, Abacus](https://doi.org/10.1093/acrefore/9780199381135.013.1) describes substitution and Roman-style devices. The panel distinguishes written subtractive numeral groups from a modern exercise with numerical counter columns.
+- **Maya positional structure and its limits:** [Berenice Rojo-Garibaldi, Costanza Rangoni, Diego L. González, and Julyan H. E. Cartwright (2021)](https://pmc.ncbi.nlm.nih.gov/articles/PMC8022160/) discuss Mesoamerican positional representations, the Long Count’s mixed multipliers, and the limits of evidence for ordinary vigesimal use. The app’s base-20 operations are modern exercises; they are not asserted to be surviving Maya arithmetic recipes. The Long Count’s third place is 360, while the app’s ordinary base-20 layout uses 400.
+- **Yorùbá number-name formation:** [Matthew Ajibade, A construction morphology approach to Yoruba numerals (2023)](https://constructions.journals.hhu.de/article/download/549/585/2271), especially the addition and subtraction schemas and Tables 3, 4, 7, and 10, informs the shared `yorubaConstruction` function. This exposes distinct routes such as 56 = 60 − 4 and 60 = 3 × 20. In conventional standard naming, 54 instead builds as (3 × 20 − 10) + 4. Complement-based worked operations are labeled modern illustrations, separate from linguistic claims. [Fábùnmi’s comparative dialect study (2010)](https://bop.unibe.ch/linguistik-online/article/download/411/652?inline=1) also demonstrates why dialect variation matters.
+- **Mangarevan binary steps:** [Andrea Bender and Sieghard Beller (2013), Mangarevan invention of binary steps for easier calculation](https://math.hawaii.edu/~tom/ethnomathematics/PNAS-2013.pdf), DOI 10.1073/pnas.1309160110, analyzes the 10/20/40/80 grouping vocabulary and demonstrates possible operations. The panel calls this an analytical reconstruction, matching the authors’ distinction between recorded vocabulary and unavailable observations of historical performance. Counting units remain separate from individual objects.
+- **Trappist time gestures:** [Du Bois’s 1824 sign list, reproduced in French with Rebecca Lucas’s translation](https://www.medieval-baltic.us/trappe.pdf), entry _Heure_, records fingers for hours and fractional finger/joint references for halves and quarters. The time context supplies a unit; the app does not infer a general cardinal arithmetic algorithm or equate this convention with the written Cistercian cipher.
+
+Other entries inherit their source links and documented rules from their system definitions. Bede’s decimal hand convention, written Cistercian quadrants, Oksapmin’s ordered body sequence, additive sign values, multiplier notation, decimal knots, and selected verbal dictionaries are treated as their own representational structures. The body sequence is not described as positional base 27. Example-only dictionaries are never extrapolated into invented words or glyphs.
+
+## Implementation bounds
+
+`renderMathReasoning(system, value, calculation?, glyphs?)` renders escaped HTML and filters source URLs to HTTP(S). `numeral-lesson.ts` connects individual written signs to their values; `spoken-lesson.ts` handles productive decimal number words, and `worked-spoken-lesson.ts` handles the mixed counting units and body path. The calculator and system pages supply the regional artwork to illustrate each step. Source notes are collapsed below the worked example. Exact arithmetic remains in `numbers.ts`.
+
+- Number formation expands at most twelve decimal digits; larger numbers retain a concise structural description.
+- General worked operations use nonnegative whole-number operands through 999,999,999. Egyptian doubling tables have at most ten rows. All worked lists have at most fourteen steps.
+- Signed and fractional inputs retain exact modern results and distinguish absent app artwork from historical mathematical capabilities.
+- The Cistercian gesture explanation can describe quarter-hour fractions even though its artwork illustrates whole hours.
+- Huge integers are abbreviated only inside the explanatory panel. They are not converted to floating-point numbers or used for unbounded repeated-sign loops.
+
+`tests/math-methods.test.ts` checks numeral formation, actual operation steps and results, reciprocal precision labels, source-linked rendering for every system, historical scope distinctions, specimen-only behavior, HTML escaping, and bounded handling of large or unsupported inputs.

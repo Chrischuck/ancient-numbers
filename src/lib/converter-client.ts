@@ -1,8 +1,10 @@
 import { getSystem, systems } from '../data/systems';
-import { calculate, parseNumber, formatNumber, baseDigits } from './numbers';
+import { calculate, parseNumber, formatNumber } from './numbers';
 import { represent } from './format';
+import { renderLearningGuide } from './learning-guide';
 import { loadGlyphs, escapeHTML } from './glyphs';
 import { renderRepresentation, copyText, exportSVG } from './render';
+import { initSystemPicker } from './system-picker';
 import type { GlyphSet, Representation, Rational } from './types';
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const input = el<HTMLInputElement>('number-input');
@@ -19,7 +21,9 @@ if (input) {
     lastGlyphs: GlyphSet = {},
     lastExact = '42';
   let comparisonIds: string[] = [];
+  let guideSystemId = 'babylonian';
   if (getSystem(params.get('system') ?? '')) systemSelect.value = params.get('system')!;
+  initSystemPicker(systemSelect);
   if (params.get('number')) input.value = params.get('number')!.slice(0, 205);
   if (params.get('second')) second.value = params.get('second')!.slice(0, 205);
   if (['add', 'subtract', 'multiply', 'divide'].includes(params.get('operation') ?? ''))
@@ -88,13 +92,33 @@ if (input) {
     el('system-caveat').textContent = system.caveat;
     el<HTMLAnchorElement>('system-source').href = system.sources[0].url;
     el('availability').textContent =
-      system.engine === 'explainer' ? 'Selected examples only' : 'Whole numbers';
+      system.engine === 'explainer'
+        ? 'Documented specimens only'
+        : system.max.length <= 12
+          ? `Whole numbers · ${Number(system.min).toLocaleString('en-US')}–${Number(system.max).toLocaleString('en-US')}`
+          : 'Whole numbers';
     el('example-chips').innerHTML = system.examples
       .map(
         (e) =>
           `<button type="button" data-example="${escapeHTML(e.value)}">${escapeHTML(e.value)}</button>`,
       )
       .join('');
+    if (guideSystemId !== system.id) {
+      el('learning-guide').hidden = true;
+      try {
+        const guideGlyphs = await loadGlyphs(system.region);
+        if (current !== serial) return;
+        el('learning-guide').innerHTML = renderLearningGuide(system, guideGlyphs);
+        guideSystemId = system.id;
+        el('learning-guide').hidden = false;
+      } catch {
+        if (current !== serial) return;
+        resetOutput(
+          'The artwork could not load. Check your connection and choose the system again.',
+        );
+        return;
+      }
+    } else el('learning-guide').hidden = false;
     let value: Rational;
     let firstValue: Rational;
     let secondValue: Rational | undefined;
@@ -129,55 +153,22 @@ if (input) {
     } else el('output-value').hidden = false;
     document.querySelector('.output-panel')?.setAttribute('aria-busy', 'true');
     try {
-      const glyphs = await loadGlyphs(system.region);
+      const [glyphs, { renderMathReasoning }] = await Promise.all([
+        loadGlyphs(system.region),
+        import('./math-methods'),
+      ]);
       if (current !== serial) return;
       const symbol =
         { add: '+', subtract: '−', multiply: '×', divide: '÷' }[operation.value as 'add'] ?? '+';
-      const steps: { title: string; text: string }[] = [
-        {
-          title: mode === 'calculate' ? 'Calculate the value' : 'Start with the value',
-          text:
-            mode === 'calculate'
-              ? `${formatNumber(firstValue)} ${symbol} ${formatNumber(secondValue!)} = ${lastExact}. Calculate with the exact input values, then write the answer in ${system.name}.`
-              : `${lastExact} is the value in familiar base-10 notation. The value stays the same when its notation changes.`,
-        },
-      ];
-      if (result.tokens.length) {
-        const radix = system.engine === 'babylonian' ? 60 : (system.radix ?? 10);
-        const positional = ['positional', 'babylonian', 'rods', 'suzhou', 'khipu'].includes(
-          system.engine,
-        );
-        let method = system.howItWorks;
-        if (positional) {
-          const digits = baseDigits(value.numerator, radix);
-          const divisions: string[] = [];
-          let remaining = value.numerator;
-          do {
-            divisions.push(
-              `${remaining} ÷ ${radix} = ${remaining / BigInt(radix)}, remainder ${remaining % BigInt(radix)}`,
-            );
-            remaining /= BigInt(radix);
-          } while (remaining > 0n);
-          method = `Divide repeatedly by ${radix} and keep each remainder: ${divisions.join('; ')}. Read the remainders in reverse order to get the digits ${digits.join(', ')}. Each place is worth ${radix} times the next. ${system.howItWorks}`;
-        }
-        steps.push({ title: 'Build the numeral', text: method });
-        steps.push({
-          title: 'Read it back',
-          text: `${result.explanation} The signs above encode ${lastExact}.`,
-        });
-      } else {
-        steps.push({
-          title: 'Check the notation’s limits',
-          text: result.reason ?? system.howItWorks,
-        });
-      }
-      el('conversion-steps').innerHTML = steps
-        .map(
-          (step) =>
-            `<li><strong>${escapeHTML(step.title)}</strong><p>${escapeHTML(step.text)}</p></li>`,
-        )
-        .join('');
       el('conversion-guide').hidden = false;
+      el('math-reasoning').innerHTML = renderMathReasoning(
+        system,
+        value,
+        mode === 'calculate'
+          ? { first: firstValue, second: secondValue!, operation: operation.value }
+          : undefined,
+        glyphs,
+      );
       const equation = el('translated-equation');
       equation.hidden = mode !== 'calculate';
       if (mode === 'calculate') {
@@ -191,6 +182,8 @@ if (input) {
       lastResult = result;
       el('output-value').innerHTML = renderRepresentation(result, glyphs);
       const canCopy = !!copyText(result, glyphs, system);
+      el('copy-button').lastChild!.textContent =
+        result.layout === 'words' ? ' Copy words' : ' Copy numeral';
       el<HTMLButtonElement>('copy-button').disabled = !canCopy;
       el('copy-button').title = canCopy
         ? 'Copy this representation'
@@ -202,7 +195,7 @@ if (input) {
       );
       el('download-button').title =
         result.layout === 'words'
-          ? 'Word specimens are available through Copy numeral.'
+          ? 'Word specimens are available through Copy words.'
           : 'Download the vector drawing.';
       await renderComparisons(value, current);
       clearTimeout(announcementTimer);
@@ -310,7 +303,7 @@ if (input) {
     if (text)
       try {
         await clipboard(text);
-        status('Numeral copied.');
+        status(lastResult.layout === 'words' ? 'Words copied.' : 'Numeral copied.');
       } catch {
         status('Copy is unavailable in this browser.');
       }

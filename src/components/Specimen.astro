@@ -15,20 +15,18 @@ const glyphs = await loadGlyphs(system.region);
 <div
   class:list={['specimen', `layout-${result.layout}`, { compact: compact }]}
   role="img"
+  lang={result.layout === 'words' ? result.tokens[0]?.lang : undefined}
   aria-label={`${system.name}: ${value}`}
 >
   {result.tokens.map((token) =>
     token.glyph ? (
-      <span class="glyph-cell">
+      <span class:list={['glyph-cell', { 'hand-glyph': token.glyph.startsWith('hand-') }]}>
         {findGlyph(token.glyph, glyphs) && (
           <Fragment set:html={glyphSVG(findGlyph(token.glyph, glyphs)!)} />
         )}
       </span>
     ) : (
-      <span
-        class="word-specimen"
-        lang={system.id === 'maori' ? 'mi' : system.id === 'hawaiian' ? 'haw' : undefined}
-      >
+      <span class="word-specimen" lang={token.lang}>
         {token.text}
       </span>
     ),

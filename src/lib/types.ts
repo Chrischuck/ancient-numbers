@@ -7,6 +7,7 @@ export interface Source {
 export interface GlyphPath {
   d: string;
   fill?: boolean;
+  color?: string;
   weight?: number;
 }
 export interface GlyphDefinition {
@@ -16,6 +17,7 @@ export interface GlyphDefinition {
   viewBox?: string;
   source: string;
   provenance?: 'original' | 'adapted';
+  license?: 'public-domain';
 }
 export type GlyphSet = Record<string, GlyphDefinition>;
 export type Engine =
@@ -24,6 +26,11 @@ export type Engine =
   | 'ethiopic'
   | 'roman'
   | 'cistercian'
+  | 'gestures'
+  | 'yoruba'
+  | 'spoken'
+  | 'pacific'
+  | 'written'
   | 'tamil'
   | 'kharoshthi'
   | 'mende'
@@ -73,6 +80,7 @@ export interface RenderToken {
   text?: string;
   label?: string;
   place?: string;
+  lang?: string;
 }
 export interface Representation {
   status: 'ok' | 'unsupported' | 'explainer';

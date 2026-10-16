@@ -174,11 +174,13 @@ test('khipu selects knot types by decimal order', () => {
   assert.deepEqual(ids('khipu', '135'), ['khipu-knots-1', 'khipu-knots-3', 'khipu-units-5']);
   assert.deepEqual(ids('khipu', '101'), ['khipu-knots-1', 'khipu-knots-0', 'khipu-units-1']);
 });
-test('explorers show verified specimens without fabricating arbitrary translations', () => {
+test('expanded converters retain source specimens and construct intermediate values', () => {
   assert.equal(rep('mangarevan', '40').tokens[0].text, 'tataua');
-  assert.equal(rep('mangarevan', '42').tokens.length, 0);
+  assert.equal(rep('mangarevan', '42').tokens[0].text, 'tataua rua');
   assert.equal(rep('oksapmin', '14').tokens[0].glyph, 'oksapmin-14');
-  assert.equal(rep('cherokee', '42').status, 'explainer');
+  assert.equal(rep('cherokee', '42').status, 'ok');
+  assert.equal(rep('mangarevan', '800').status, 'unsupported');
+  assert.equal(rep('cherokee', '101').status, 'unsupported');
 });
 test('exactfractional and negative results stay honest across renderer capabilities', () => {
   assert.equal(rep('roman', '-1').status, 'unsupported');

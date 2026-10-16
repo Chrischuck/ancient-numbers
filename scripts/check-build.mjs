@@ -17,8 +17,8 @@ const files = await walk(fileURLToPath(root));
 const html = files.filter((f) => f.endsWith('.html'));
 assert.equal(
   html.length,
-  41,
-  'Home, collection, timeline, about, 404, and 36 system pages must be generated.',
+  43,
+  'Home, collection, timeline, about, 404, and 38 system pages must be generated.',
 );
 for (const p of html) {
   const text = await readFile(p, 'utf8');
@@ -74,5 +74,5 @@ for (const font of fonts) initial += (await stat(font)).size;
 assert.ok(initial < 250 * 1024, `Initial transfer estimate exceeds250KB: ${initial}`);
 assert.ok(!files.some((f) => /server|functions/.test(f)), 'Build must contain only static assets.');
 console.log(
-  `Verified 41 static pages and repository-prefixed links. Initial JS graph: ${(js / 1024).toFixed(1)}KB gzip; initial transfer estimate: ${(initial / 1024).toFixed(1)}KB.`,
+  `Verified ${html.length} static pages and repository-prefixed links. Initial JS graph: ${(js / 1024).toFixed(1)}KB gzip; initial transfer estimate: ${(initial / 1024).toFixed(1)}KB.`,
 );

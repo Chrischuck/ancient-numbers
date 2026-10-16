@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { timeline } from '../../src/data/timeline';
+import { systems } from '../../src/data/systems';
 
 const visible = '[data-entry]:visible';
 test('timeline filters combine, preserve URL state, and recover from empty results', async ({
@@ -121,7 +122,7 @@ test('all supported systems are linked and unknown origins respect date filters'
   await page.goto('timeline/?type=numerals');
   await expect(
     page.locator('[data-entry]:visible .timeline-entry-links a[href*="/systems/"]'),
-  ).toHaveCount(36);
+  ).toHaveCount(systems.length);
   await expect(page.locator('#yoruba-numerals')).toContainText('Origin unknown');
   await page.getByLabel('Search timeline', { exact: true }).fill('Yoruba');
   await expect(page.locator(visible)).toHaveCount(1);

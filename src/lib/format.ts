@@ -1,5 +1,11 @@
 import type { Rational, Representation, RenderToken, SystemDefinition } from './types';
 import { baseDigits } from './numbers';
+import { representGesture } from './gestures';
+import { representYoruba, spokenLanguage } from './spoken';
+import { representAmericanWords } from './spoken-americas';
+import { representPolynesianWords } from './spoken-polynesian';
+import { representPacificCount } from './pacific-counts';
+import { representWrittenExpansion } from './written-expansions';
 const unsupported = (reason: string): Representation => ({
   status: 'unsupported',
   tokens: [],
@@ -23,12 +29,12 @@ export function represent(value: Rational, system: SystemDefinition): Representa
         tokens: [],
         layout: 'words',
         explanation: system.howItWorks,
-        reason: 'Only the listed examples are available for this system.',
+        reason: `This entry currently displays documented specimens only. A general conversion rule has not been implemented for ${system.name}; choose one of its examples.`,
       };
     return {
       status: 'explainer',
       tokens: example.glyphs?.map((glyph) => ({ glyph })) ?? [
-        { text: example.words ?? example.value },
+        { text: example.words ?? example.value, lang: spokenLanguage(system) },
       ],
       layout: example.glyphs ? 'row' : 'words',
       explanation: example.explanation,
@@ -56,6 +62,18 @@ export function represent(value: Rational, system: SystemDefinition): Representa
   };
   try {
     switch (system.engine) {
+      case 'gestures':
+        return representGesture(n, system);
+      case 'yoruba':
+        return representYoruba(n);
+      case 'spoken':
+        return system.region === 'Americas'
+          ? representAmericanWords(n, system)
+          : representPolynesianWords(n, system);
+      case 'pacific':
+        return representPacificCount(n, system);
+      case 'written':
+        return representWrittenExpansion(n, system);
       case 'positional': {
         const base = system.radix ?? 10;
         const digits = baseDigits(n, base);

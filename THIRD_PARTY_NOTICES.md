@@ -21,3 +21,9 @@ Newsreader and Inter are distributed by Fontsource under OFL1.1. Their files are
 Research material is linked and paraphrased in original explanatory writing. Manuscript images, museum photographs, and Unicode code-chart pages are not redistributed with the app. The source lists identify the evidence used for numerical rules and original geometric drawing.
 
 The site does not imply endorsement by the communities, museums, standards bodies, researchers, or font designers it references.
+
+## Historical hand-counting woodcut
+
+Bede finger-counting artwork is copied from **Finger numerals 1520–Bedan system**, an SVG reproduction of a woodcut printed in 1520 by an unknown sixteenth-century artist, reproduced by Tobias Dantzig in _Number, the Language of Science_, 4th revised edition (1954). Wikimedia Commons lists the work and reproduction as public domain: https://commons.wikimedia.org/wiki/File:Finger_numerals_1520-Bedan_system.svg . Uploaded by Otfried Lieberknecht, 23 September 2012. Public Domain Mark: https://creativecommons.org/publicdomain/mark/1.0/ .
+
+The unmodified original SVG is retained in `public/reference/hands/finger-numerals-1520.svg`. The site extracts individual figures without changing their paths, colors, hatching, or printed numbers. This historical artwork is public domain and is not claimed as original project artwork or licensed font outlines.

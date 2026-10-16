@@ -1,6 +1,6 @@
 # Ancient Numbers
 
-A world of ways to count. A free, static exploration of 36 written, spoken, and physical counting traditions, with 26 whole-number converters and ten sourced specimen explorers.
+A world of ways to count. A free, static exploration of 38 written, spoken, and physical counting traditions, each with a sourced whole-number converter and explicit supported range.
 
 ![Ancient Numbers converter preview](docs/preview.png)
 
@@ -14,8 +14,11 @@ A world of ways to count. A free, static exploration of 36 written, spoken, and 
 - Search the collection by name, location, region, or mathematical structure.
 - Explore the interactive timeline of mathematical notation, numeral traditions, and major milestones, with era filters, shareable searches, and periods of use.
 - Read the source references, notation limits, and selected period on each system page.
+- Learn human hand poses with gesture dictionaries, illustrated rules, and downloadable vector artwork.
+- Explore spoken-number dictionaries and the additive, subtractive, and multiplicative relationships in number names.
+- Follow worked applications of documented calculation methods in the calculator, alongside explanations of number formation.
 
-The collection includes modern and living traditions as well as ancient ones. Spoken number words are not given invented written glyphs. Physical representations are labeled as modern teaching diagrams.
+The collection includes modern and living traditions as well as ancient ones. Spoken words use their documented spelling; generated Yoruba compounds separate morphemes and explicitly identify that teaching form. Physical representations, including hands, are labeled as modern teaching diagrams of documented practices.
 
 ## Run locally
 
@@ -61,9 +64,9 @@ Open Graph and Twitter metadata use `public/social-card-v1.png`, a 1200 × 630 i
 
 ## Accuracy and limits
 
-Conversion follows named variants with explicit ranges. Some systems currently support a narrow interval (for example, Brahmi below 100). Sinhala Illakkam supports 1–9,999 using documented hundred and thousand multipliers. Those are app limits, not historical claims. Ten entries intentionally offer individually verified specimens rather than an arbitrary-number converter.
+Conversion follows named variants with explicit ranges. Some systems currently support a narrow interval (for example, Brahmi below 100). Sinhala Illakkam supports 1–9,999 using documented hundred and thousand multipliers. Those are app limits, not historical claims. All formerly specimen-only entries now have bounded converters: Māori 0–9,999; Hawaiian 0–100; Choctaw and Diné/Navajo 1–100; Mangarevan 1–799 counting units; Oksapmin 1–27; Mende Kikakui 1–9,999,999; Sequoyah’s Cherokee numerals 0–100; Ottoman Siyaq 1–9,999. Bede’s hand-only variant covers 1–9,999; the selected La Trappe hour signals illustrate 1–10 without inventing a larger cardinal code.
 
-A modern cell grid fixes the integer scale for Old Babylonian notation and makes empty counting-rod positions visible. Ordinary Maya base-20 notation is kept separate from Long Count calendar notation. The calculator does not claim to reproduce historical arithmetic procedures. Fractional and negative answers remain exact even when their historical rendering is unavailable.
+A modern cell grid fixes the integer scale for Old Babylonian notation and makes empty counting-rod positions visible. Ordinary Maya base-20 notation is kept separate from Long Count calendar notation. The calculator distinguishes number formation from arithmetic procedures, and labels modern worked applications of documented methods. Fractional and negative answers remain exact even when their historical rendering is unavailable. A spoken number’s structure does not establish how every speaker reasons while calculating.
 
 Each system contains formation references and at least three worked examples. Tests compare source examples and important boundaries; they do not substitute for specialist or community review. Corrections with inspectable references are welcome.
 

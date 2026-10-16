@@ -33,6 +33,18 @@ const dated = (
  * Null means the linked evidence does not establish an origin date; never invent a plotting year.
  */
 export const systemOrigins: Record<string, SystemOrigin> = {
+  'medieval-finger-counting': dated(
+    725,
+    '725 CE · Bede’s account',
+    'Bede describes finger reckoning in De temporum ratione. This dates a surviving account of an older practice, rather than its invention.',
+    'historical',
+  ),
+  'cistercian-gestures': dated(
+    1824,
+    '1824 · published La Trappe sign list',
+    'Louis Du Bois publishes a Cistercian/Trappist sign vocabulary including gestures for hours, half-hours, and quarter-hours. This dates the selected documentation, not the beginning of monastic signing.',
+    'historical',
+  ),
   maya: dated(
     -300,
     'c. 300–200 BCE',

@@ -1,6 +1,6 @@
 ---
 import Layout from '../components/Layout.astro';
-import { systems } from '../data/systems';
+import { systems, converters } from '../data/systems';
 const base = import.meta.env.BASE_URL;
 ---
 
@@ -9,8 +9,8 @@ const base = import.meta.env.BASE_URL;
     <article class="about-page">
       <h1>About</h1>
       <p class="about-intro">
-        Ancient Numbers covers 36 numeral and counting traditions, including modern and living
-        systems.
+        Ancient Numbers covers {systems.length} numeral and counting traditions, including modern
+        and living systems.
       </p>
       <h2>Notation</h2>
       <p>
@@ -20,15 +20,17 @@ const base = import.meta.env.BASE_URL;
       </p>
       <h2>Limits</h2>
       <p>
-        There are 26 converters and 10 entries with selected documented examples. Supported ranges
-        are app limits unless stated otherwise. Number words, knots, and body counting use words or
-        diagrams. Place-value labels and diagram guides are modern reading aids.
+        There are {converters.length} converters, each with an explicit supported range. Supported
+        ranges are app limits unless stated otherwise. Number words, knots, and body counting use
+        words or diagrams. Place-value labels and diagram guides are modern reading aids.
       </p>
       <h2>Calculations</h2>
       <p>
         Decimals and fractions are calculated exactly. If a system cannot display the result, the
-        answer remains visible in familiar digits. The calculator does not reproduce historical
-        calculation methods.
+        answer remains visible in familiar digits. The calculator explains number formation and
+        includes worked applications of documented methods, such as Egyptian doubling and Babylonian
+        reciprocal division. Sources distinguish historical procedures from modern teaching examples
+        and translations of an equation.
       </p>
       <h2>Code</h2>
       <p>

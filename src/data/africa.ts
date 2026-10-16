@@ -475,20 +475,23 @@ export const africaSystems: SystemDefinition[] = [
     history:
       'Yorùbá numeration is a spoken language tradition, not an extinct set of written numeral glyphs. Its number names carry mathematical relationships, including multiples of twenty and subtraction from a nearby larger value. Tone marks and underdots belong to the spelling.',
     howItWorks:
-      'Some Yorùbá number expressions build on groups of twenty. Work out whether the expression adds to a group or takes away from it.',
+      'Build around a named ten or a multiple of twenty. Units one through four add to the lower ten; five through nine subtract five through one from the next ten.',
     readingSteps: [
       'Begin with Ogún, meaning twenty.',
       'The example for fifteen describes taking five away from twenty. Start at 20 and take away 5: 20 − 5 = 15.',
-      'Ogójì means forty: think of two groups of twenty, 20 + 20 = 40.',
-      'These are selected language examples. The words used for counting in sequence can differ from those used for counting objects, so keep the example’s wording and context together.',
+      'Ogójì means forty (2 × 20), Ọgọ́ta sixty (3 × 20), and Ọgọ́rin eighty (4 × 20). Àádọ́ta, fifty, means ten taken from sixty: 3 × 20 − 10.',
+      'For 54, add four to fifty: 50 + 4 = 54. Expanding the fifty gives (3 × 20 − 10) + 4.',
+      'For 56, take four from sixty: 3 × 20 − 4 = 56. The words place the subtracted amount first, while the mathematical expression puts sixty first.',
+      'Lé expresses addition and dín expresses subtraction. Dots in a generated teaching form separate the unit root, operation, linking preposition ní, and anchor. Ordinary speech contracts these parts.',
+      'These are number-name constructions. They do not establish that every Yorùbá speaker follows these steps while calculating. Object-counting and dialect forms can differ.',
     ],
     caveat:
-      'These are selected language examples with source orthography preserved, not a general translator. Pronunciation, dialect, tone marking, and noun context matter; abstract number names are shown here.',
-    engine: 'explainer',
+      'The 1–100 learning converter retains attested complete forms where available. Other compounds are expanded morphological teaching forms with dots, not standard compound spellings or pronunciation guides. Tone, contraction, dialect, and noun context matter. This is a spoken tradition represented in writing, without an invented numeral alphabet.',
+    engine: 'yoruba',
     min: '1',
     max: '100',
     zero: false,
-    specimen: 15,
+    specimen: 56,
     examples: [
       {
         value: '2',
@@ -507,6 +510,18 @@ export const africaSystems: SystemDefinition[] = [
       },
       { value: '20', words: 'Ogún', explanation: 'Twenty, the important score-sized grouping.' },
       { value: '40', words: 'Ogójì', explanation: 'Two twenties: 20 × 2.' },
+      {
+        value: '54',
+        words: 'ẹ̀rin leládọ́ta',
+        explanation:
+          'Four added to fifty; fifty itself is 3 × 20 − 10, giving (3 × 20 − 10) + 4 = 54. Complete form and spacing follow the community table.',
+      },
+      {
+        value: '56',
+        words: 'ẹ̀rin dílọgọ́ta',
+        explanation:
+          'Four taken from three twenties: 3 × 20 − 4 = 56. Complete form and spacing follow the community table.',
+      },
     ],
     sources: [
       {
@@ -514,6 +529,18 @@ export const africaSystems: SystemDefinition[] = [
         url: 'https://www.ledeyoruba.com/learn/yoruba-numbers/',
         detail:
           'Community language teaching resource: words, tone marks, counting-object forms, and additive/subtractive explanations.',
+      },
+      {
+        title: 'Matthew Ajibade: A construction morphology approach to Yoruba numerals (2023)',
+        url: 'https://constructions.journals.hhu.de/article/download/549/585/2271',
+        detail:
+          'Native-speaker linguistic analysis: Tables 3, 4, 7 and 10; productive addition of 1–4 and subtraction of 1–5. The converter shows expanded morphemes rather than guessing surface contractions.',
+      },
+      {
+        title: 'Kelvin Obareti / CreatedbyKelz: Yoruba Number System (2022)',
+        url: 'https://www.createdbykelz.com/2022/01/yoruba-number-system-yoruba-numerals.html',
+        detail:
+          'Community number table explicitly prints 54 as fifty plus four and 56 as sixty minus four. Its spelling and spacing are retained for those two specimens.',
       },
     ],
   },

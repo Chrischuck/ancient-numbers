@@ -2,14 +2,17 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { systems } from '../../src/data/systems';
 import { readFile } from 'node:fs/promises';
+import { selectSystem } from './helpers';
 const ready = async (page: import('@playwright/test').Page) => {
   await expect(page.locator('.output-panel')).toHaveAttribute('aria-busy', 'false');
 };
 test('default converter, calculator exactness, and unsupported results', async ({ page }) => {
   await page.goto('');
   await ready(page);
+  await expect(page.locator('#system-select')).toHaveValue('babylonian');
+  await expect(page.locator('#output-name')).toHaveText('BABYLONIAN SEXAGESIMAL');
   await expect(page.locator('#exact-value')).toHaveText('42');
-  await expect(page.locator('#output-value .numeral-glyph')).toHaveCount(2);
+  await expect(page.locator('#output-value .numeral-glyph')).toHaveCount(1);
   await page.getByRole('tab', { name: 'Calculate' }).click();
   await page.locator('#number-input').fill('0.1');
   await page.locator('#second-input').fill('0.2');
@@ -33,7 +36,7 @@ test('every tradition loads its specimen without client errors', async ({ page }
   await page.goto('');
   for (const s of systems) {
     await page.locator('#number-input').fill(String(s.specimen));
-    await page.locator('#system-select').selectOption(s.id);
+    await selectSystem(page, s.id);
     await ready(page);
     await expect(page.locator('#output-name')).toHaveText(s.name.toUpperCase());
     await expect(page.locator('#exact-value')).toHaveText(String(s.specimen));
@@ -71,7 +74,7 @@ test('SVGdownload contains paths and no font dependency', async ({ page }) => {
   expect(svg).toContain('<path');
   expect(svg).not.toContain('<text');
   expect(svg).not.toContain('href=');
-  expect(file.suggestedFilename()).toBe('ancient-numbers-kaktovik-42.svg');
+  expect(file.suggestedFilename()).toBe('ancient-numbers-babylonian-42.svg');
 });
 test('comparison state is bounded, shareable, and restored', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
@@ -95,7 +98,7 @@ test('comparison state is bounded, shareable, and restored', async ({ page, cont
 });
 test('collection filters normalize accents and combine filters', async ({ page }) => {
   await page.goto('collection/');
-  await expect(page.locator('[data-card]:visible')).toHaveCount(36);
+  await expect(page.locator('[data-card]:visible')).toHaveCount(systems.length);
   await page.locator('#region-filter').selectOption('Africa');
   await expect(page.locator('[data-card]:visible')).toHaveCount(11);
   await page.locator('#structure-filter').selectOption('Spoken');
@@ -162,19 +165,46 @@ test('tool tabs follow keyboard focus and Home/End semantics', async ({ page }) 
   await expect(calculate).toBeFocused();
 });
 
-test('conversion steps and translated arithmetic explain the current inputs', async ({ page }) => {
+test('one formation lesson and translated arithmetic explain the current inputs', async ({
+  page,
+}) => {
   await page.goto('?system=kaktovik&number=42');
-  await expect(page.locator('#conversion-steps')).toContainText('42 ÷ 20 = 2, remainder 2');
+  await expect(page.locator('#math-reasoning .formation-steps')).toContainText('42 ÷ 20 = 2');
+  await expect(page.locator('#math-reasoning')).toContainText('2 × 20 + 2 = 42');
+  await expect(page.locator('#conversion-steps')).toHaveCount(0);
   await expect(page.locator('#translated-equation')).toBeHidden();
   await page.getByRole('tab', { name: 'Calculate' }).click();
-  await expect(page.locator('#conversion-steps')).toContainText('42 + 8 = 50');
+  await expect(page.locator('#math-reasoning')).toContainText('42 + 8 = 50');
+  await expect(page.locator('#math-reasoning')).toContainText('2 × 20 + 10 = 50');
   await expect(page.locator('#translated-equation .equation-term')).toHaveCount(3);
   await expect(page.locator('#translated-equation')).toContainText('modern operators');
   await page.locator('#operation').selectOption('subtract');
-  await expect(page.locator('#conversion-steps')).toContainText('42 − 8 = 34');
+  await expect(page.locator('#math-reasoning')).toContainText('42 − 8 = 34');
   await page.locator('#second-input').fill('100');
-  await expect(page.locator('#conversion-steps')).toContainText('42 − 100 = -58');
-  await expect(page.locator('#conversion-steps')).toContainText('notation’s limits');
+  await expect(page.locator('#math-reasoning')).toContainText('42 − 100 = -58');
+  await expect(page.locator('#math-reasoning')).toContainText(
+    'does not supply historical negative-number notation',
+  );
   await page.locator('#second-input').fill('invalid');
   await expect(page.locator('#conversion-guide')).toBeHidden();
+});
+
+test('symbol keys and illustrated rules follow the selected system', async ({ page }) => {
+  await page.goto('?system=roman&number=42');
+  const guide = page.locator('#learning-guide');
+  await expect(guide.locator('.symbol-tile')).toHaveCount(7);
+  await expect(guide).toContainText('M = 1,000');
+  await expect(guide).toContainText('5 − 1 = 4');
+  await expect(guide).toContainText('5 + 1 = 6');
+  await expect(guide.locator('.rule-card')).toHaveCount(5);
+  await selectSystem(page, 'maya');
+  await expect(guide.locator('.symbol-tile')).toHaveCount(20);
+  await expect(guide.locator('.rule-card .layout-stack')).toHaveCount(4);
+  await page.locator('#number-input').fill('invalid');
+  await selectSystem(page, 'cistercian');
+  await expect(guide.locator('.symbol-tile')).toHaveCount(36);
+  await expect(guide).toContainText('upper right');
+  await page.goto('systems/roman/');
+  await expect(page.locator('.learning-guide .symbol-tile')).toHaveCount(7);
+  await expect(page.locator('.learning-guide')).toContainText('5 − 1 = 4');
 });

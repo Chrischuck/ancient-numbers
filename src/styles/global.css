@@ -299,7 +299,7 @@ h1 em {
   min-height: 380px;
   border: 1px solid var(--line);
   border-radius: 3px;
-  overflow: hidden;
+  overflow: visible;
 }
 .input-panel {
   background: var(--white);
@@ -356,7 +356,8 @@ h1 em {
 .select-wrap {
   position: relative;
 }
-.select-wrap > select {
+.select-wrap > select,
+.system-picker-button {
   width: 100%;
   height: 49px;
   background-color: var(--paper);
@@ -364,6 +365,76 @@ h1 em {
   border-radius: 2px;
   padding: 0 36px 0 15px;
   font-size: 12px;
+}
+.system-picker-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-right: 15px;
+  text-align: left;
+}
+.system-picker-button svg {
+  flex-shrink: 0;
+}
+.system-picker {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--white);
+  box-shadow: 0 10px 28px #282e2926;
+}
+.system-search {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--paper);
+  font-size: 12px;
+}
+.system-search::placeholder {
+  color: var(--muted);
+}
+.system-options {
+  max-height: min(280px, 35dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin-top: 8px;
+}
+.system-option-region {
+  padding: 12px 10px 6px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.system-option {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px;
+  border-radius: 2px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.system-option:hover,
+.system-option.is-active {
+  background: var(--green-light);
+}
+.system-option[aria-selected='true'] {
+  font-weight: 600;
+}
+.system-search-status {
+  margin: 8px 4px 0;
+  color: var(--muted);
+  font-size: 11px;
 }
 .example-chips {
   display: flex;
@@ -1571,7 +1642,8 @@ h2 {
   .system-field > .eyebrow {
     font-size: 8px;
   }
-  .select-wrap > select {
+  .select-wrap > select,
+  .system-picker-button {
     height: 46px;
   }
   .input-note {
@@ -2054,4 +2126,285 @@ h2 {
 }
 .equation-operator {
   font-size: 24px;
+}
+
+.learning-guide {
+  border-bottom: 1px solid var(--line);
+  padding: 32px 0;
+}
+.learning-guide h2 {
+  font-family: var(--serif);
+  font-size: 28px;
+  margin: 0 0 12px;
+}
+.learning-guide p {
+  font-size: 14px;
+  line-height: 1.7;
+  max-width: 75ch;
+  overflow-wrap: anywhere;
+}
+.symbol-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+  padding: 0;
+  margin: 22px 0 32px;
+  list-style: none;
+}
+.symbol-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 12px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.symbol-tile .numeral-glyph {
+  width: 54px;
+  height: 64px;
+  flex: none;
+}
+.learning-guide .rules-title {
+  margin-top: 30px;
+}
+.rule-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+.rule-card {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.rule-card h3 {
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+.rule-card .specimen {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+.rule-card .specimen > .glyph-cell {
+  width: 42px;
+  height: 66px;
+}
+.rule-card .word-specimen {
+  font-size: 24px;
+  overflow-wrap: anywhere;
+}
+.learning-guide .learning-note {
+  margin-top: 24px;
+  font-size: 12px;
+}
+.rule-card .place-label {
+  color: var(--muted);
+  opacity: 1;
+  font-size: 10px;
+}
+
+.word-dictionary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  gap: 10px;
+  margin: 24px 0 32px;
+}
+.word-entry {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 18px;
+  overflow-wrap: anywhere;
+}
+.word-entry dt {
+  font-family: var(--serif);
+  color: var(--green);
+  font-size: 25px;
+  line-height: 1.5;
+}
+.word-entry dd {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.math-reasoning {
+  min-width: 0;
+  padding: 24px;
+  margin-bottom: 28px;
+  background: var(--paper-dark, #eeeee5);
+  border-left: 3px solid var(--green);
+  overflow-wrap: anywhere;
+}
+.math-reasoning h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 23px;
+  margin: 20px 0 10px;
+}
+.math-reasoning h3:first-child {
+  margin-top: 0;
+}
+.math-reasoning p,
+.math-reasoning li {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.math-reasoning .math-check-label {
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin: 24px 0 0;
+  color: var(--muted);
+}
+.math-reasoning .math-equation {
+  color: var(--green);
+  font-size: clamp(18px, 3vw, 26px);
+  line-height: 1.6;
+  margin: 12px 0;
+}
+.math-reasoning .math-steps {
+  padding-left: 20px;
+  margin: 16px 0;
+}
+.math-reasoning .math-steps li {
+  margin-bottom: 10px;
+}
+.math-reasoning .formation-steps {
+  margin: 20px 0;
+  padding-left: 24px;
+}
+.math-reasoning .formation-steps li {
+  padding: 12px 0 16px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.formation-steps li::marker {
+  color: var(--green);
+  font-weight: 600;
+}
+.math-reasoning .formation-steps p {
+  margin: 8px 0 0;
+}
+.formation-sign .specimen {
+  justify-content: flex-start;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-height: 0;
+}
+.formation-sign .specimen > .glyph-cell {
+  width: 46px;
+  height: 58px;
+  flex: 0 0 46px;
+}
+.formation-sign .specimen > .hand-glyph {
+  width: 78px;
+  height: 100px;
+  flex-basis: 78px;
+}
+.formation-body .specimen > .glyph-cell {
+  width: 100px;
+  height: 125px;
+  flex-basis: 100px;
+}
+.formation-sign .word-specimen {
+  font-size: 25px;
+  line-height: 1.5;
+}
+.formation-sign .place-label {
+  color: var(--muted);
+  opacity: 1;
+}
+.math-references {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.math-references summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+}
+.math-reasoning .math-context,
+.math-reasoning .math-sources {
+  font-size: 12px;
+  color: var(--muted);
+}
+.math-sources a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.number-reasoning {
+  margin: 0 0 24px;
+}
+@media (max-width: 600px) {
+  .math-reasoning {
+    padding: 20px 16px;
+  }
+}
+.gesture-grid {
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+}
+.gesture-grid .numeral-glyph {
+  width: 86px;
+  height: 100px;
+}
+.rule-card .specimen > .hand-glyph,
+.equation-term .specimen > .hand-glyph {
+  width: 78px;
+  height: 100px;
+}
+
+/* Hand illustrations need enough room for their printed and anatomical details. */
+.system-showcase .specimen > .hand-glyph {
+  width: 148px;
+  height: 160px;
+  flex: 0 1 148px;
+  min-width: 96px;
+}
+.output-value .specimen > .hand-glyph {
+  width: 136px;
+  height: 150px;
+  flex-basis: 136px;
+}
+.gesture-grid .numeral-glyph {
+  width: 100px;
+  height: 116px;
+}
+
+.system-showcase .specimen:has(> .hand-glyph:nth-child(3)),
+.output-value .specimen:has(> .hand-glyph:nth-child(3)) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 148px));
+  justify-content: center;
+  gap: 16px;
+}
+.woodcut-reference {
+  margin: 24px 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+}
+.woodcut-reference summary {
+  cursor: pointer;
+}
+.woodcut-reference figure {
+  margin: 20px 0 0;
+}
+.woodcut-reference img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: white;
+}
+.woodcut-reference figcaption {
+  margin-top: 12px;
+  font-size: 12px;
 }

@@ -3,11 +3,15 @@ import Layout from '../../components/Layout.astro';
 import Specimen from '../../components/Specimen.astro';
 import SystemCard from '../../components/SystemCard.astro';
 import { systems } from '../../data/systems';
+import { loadGlyphs } from '../../lib/glyphs';
+import { renderLearningGuide } from '../../lib/learning-guide';
+import { renderMathReasoning } from '../../lib/math-methods';
 export function getStaticPaths() {
   return systems.map((system) => ({ params: { id: system.id }, props: { system } }));
 }
 const { system } = Astro.props;
 const base = import.meta.env.BASE_URL;
+const glyphs = await loadGlyphs(system.region);
 const related = systems.filter((s) => s.id !== system.id && s.region === system.region).slice(0, 3);
 const first =
   system.examples.find((e) => e.value === String(system.specimen)) ?? system.examples[0];
@@ -71,6 +75,27 @@ const first =
           {first.explanation}
         </p>
       </div>
+    </section>
+    <section class="number-reasoning" aria-labelledby="number-reasoning-title">
+      <h2 id="number-reasoning-title" class="sr-only">
+        Worked example
+      </h2>
+      <div id="detail-reasoning">
+        <Fragment
+          set:html={renderMathReasoning(
+            system,
+            {
+              numerator: BigInt(system.specimen),
+              denominator: 1n,
+            },
+            undefined,
+            glyphs,
+          )}
+        />
+      </div>
+    </section>
+    <section class="learning-guide" aria-labelledby="symbol-key-title">
+      <Fragment set:html={renderLearningGuide(system, glyphs)} />
     </section>
     <div class="system-article">
       <article>
@@ -140,6 +165,7 @@ const first =
   import { represent } from '../../lib/format';
   import { loadGlyphs } from '../../lib/glyphs';
   import { renderRepresentation } from '../../lib/render';
+  import { renderMathReasoning } from '../../lib/math-methods';
   const showcase = document.querySelector<HTMLElement>('[data-system]')!;
   const system = getSystem(showcase.dataset.system!)!;
   let serial = 0;
@@ -156,6 +182,15 @@ const first =
     document.getElementById('detail-description')!.textContent = system.examples.find(
       (e) => e.value === value,
     )!.explanation;
+    document.getElementById('detail-reasoning')!.innerHTML = renderMathReasoning(
+      system,
+      {
+        numerator: BigInt(value),
+        denominator: 1n,
+      },
+      undefined,
+      glyphs,
+    );
     showcase
       .querySelectorAll<HTMLButtonElement>('[data-detail-example]')
       .forEach((b) => b.setAttribute('aria-pressed', String(b === button)));

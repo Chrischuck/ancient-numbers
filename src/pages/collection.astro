@@ -8,7 +8,7 @@ import { systems, regions, converters } from '../data/systems';
   <div class="container">
     <section class="collection-hero">
       <h1>Collection</h1>
-      <p>36 numeral and counting traditions, grouped by region and structure.</p>
+      <p>{systems.length} numeral and counting traditions, grouped by region and structure.</p>
     </section>
     <div class="collection-tools">
       <div class="search-wrap">
@@ -53,11 +53,14 @@ import { systems, regions, converters } from '../data/systems';
         ))}
       </select>
       <span id="filter-count" class="filter-count" role="status" aria-live="polite">
-        36 traditions
+        {systems.length} traditions
       </span>
     </div>
     <p class="collection-key">
-      {converters.length} converters · 10 entries with selected examples.
+      {converters.length} converters
+      {systems.length > converters.length
+        ? ` · ${systems.length - converters.length} entries with selected examples.`
+        : ' · Each entry shows its supported range.'}
     </p>
     <div class="collection-grid" id="collection-grid">
       {[...systems]
