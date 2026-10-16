@@ -332,7 +332,7 @@ function sexagesimalProduct(value: bigint): string {
       return place === 1n ? String(digit) : `${digit} × ${place}`;
     })
     .join(' + ');
-  return `${value} (base 60: [${sexagesimal(value)}] = ${expansion})`;
+  return `${value}\nBase 60: [${sexagesimal(value)}] = ${expansion}`;
 }
 
 function babylonian(
@@ -386,7 +386,17 @@ function babylonian(
         const lookups = xParts.flatMap((x) =>
           yParts.map((y) => `${x} × ${y} = ${sexagesimalProduct(BigInt(x * y))}`),
         );
-        const decomposition = `${xParts.length > 1 ? `${left[i]} = ${xParts.join(' + ')}. ` : ''}${yParts.length > 1 ? `${right[j]} = ${yParts.join(' + ')}. ` : ''}${lookups.join('; ')}.${lookups.length > 1 ? ` Add these table multiples: ${xParts.flatMap((x) => yParts.map((y) => x * y)).join(' + ')} = ${product}. Therefore ${left[i]} × ${right[j]} = ${sexagesimalProduct(product)}.` : ''}`;
+        const decomposition = [
+          ...(xParts.length > 1 ? [`Split ${left[i]}: ${left[i]} = ${xParts.join(' + ')}.`] : []),
+          ...(yParts.length > 1 ? [`Split ${right[j]}: ${right[j]} = ${yParts.join(' + ')}.`] : []),
+          ...lookups,
+          ...(lookups.length > 1
+            ? [
+                `Add: ${xParts.flatMap((x) => yParts.map((y) => x * y)).join(' + ')} = ${product}.`,
+                `Therefore ${left[i]} × ${right[j]} = ${sexagesimalProduct(product)}.`,
+              ]
+            : []),
+        ].join('\n');
         partials.push(product * place);
         if (rows.length < 10)
           rows.push({

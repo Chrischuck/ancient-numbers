@@ -2394,6 +2394,12 @@ h2 {
 .math-cell-label {
   display: none;
 }
+.math-cell-line {
+  display: block;
+}
+.math-cell-line + .math-cell-line {
+  margin-top: 12px;
+}
 .math-table tr.selected {
   background: var(--green-light);
 }

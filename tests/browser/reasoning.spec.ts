@@ -251,10 +251,28 @@ for (const width of [320, 390, 1440]) {
     await page.goto('?system=babylonian&number=42&mode=calculate&operation=multiply&second=8');
     await expect(page.locator('#exact-value')).toHaveText('336');
     const table = page.locator('#math-reasoning .math-table');
-    await expect(table).toContainText('40 × 8 = 320 (base 60: [5, 20] = 5 × 60 + 20)');
-    await expect(table).toContainText('320 + 16 = 336');
     await expect(table).not.toContainText('40 × 8 = 5, 20');
     const cells = table.locator('tbody tr').first().locator('td');
+    const lines = cells.first().locator('.math-cell-line');
+    await expect(lines).toHaveText([
+      'Split 42: 42 = 40 + 2.',
+      '40 × 8 = 320',
+      'Base 60: [5, 20] = 5 × 60 + 20',
+      '2 × 8 = 16',
+      'Add: 320 + 16 = 336.',
+      'Therefore 42 × 8 = 336',
+      'Base 60: [5, 36] = 5 × 60 + 36.',
+    ]);
+    const lineBoxes = await lines.evaluateAll((elements) =>
+      elements.map((element) => {
+        const { y, height } = element.getBoundingClientRect();
+        return { y, height };
+      }),
+    );
+    for (let i = 1; i < lineBoxes.length; i++)
+      expect(lineBoxes[i].y).toBeGreaterThanOrEqual(
+        lineBoxes[i - 1].y + lineBoxes[i - 1].height + 10,
+      );
     const boxes = await cells.evaluateAll((elements) =>
       elements.map((element) => {
         const { x, y, width, height } = element.getBoundingClientRect();

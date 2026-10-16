@@ -376,9 +376,10 @@ test('Babylonian multiplication builds a missing product from table multiples, w
   const html = worked('babylonian', 47n, 7n, 'multiply');
   assert.match(html, /Multiplication tables supplied/);
   assert.match(html, /47 = 40 \+ 7/);
-  assert.match(html, /40 × 7 = 280 \(base 60: \[4, 40\] = 4 × 60 \+ 40\)/);
+  assert.match(html, /40 × 7 = 280/);
+  assert.match(html, /Base 60: \[4, 40\] = 4 × 60 \+ 40/);
   assert.match(html, /7 × 7 = 49/);
-  assert.match(html, /47 × 7 = 329 \(base 60: \[5, 29\] = 5 × 60 \+ 29\)/);
+  assert.match(html, /Base 60: \[5, 29\] = 5 × 60 \+ 29/);
   assert.match(html, /47 × 7 = 329/);
   assert.match(html, /Documented tools, reconstructed working/);
   assert.doesNotMatch(html, /reciprocal|Division ·|formation-steps/);
@@ -386,9 +387,18 @@ test('Babylonian multiplication builds a missing product from table multiples, w
 
 test('Babylonian products cannot be mistaken for decimal values separated by a comma', () => {
   const html = worked('babylonian', 42n, 8n, 'multiply');
-  assert.match(html, /40 × 8 = 320 \(base 60: \[5, 20\] = 5 × 60 \+ 20\)/);
-  assert.match(html, /320 \+ 16 = 336/);
-  assert.match(html, /42 × 8 = 336 \(base 60: \[5, 36\] = 5 × 60 \+ 36\)/);
+  const lines = [...html.matchAll(/<span class="math-cell-line">([^<]+)<\/span>/g)].map(
+    (match) => match[1],
+  );
+  assert.deepEqual(lines.slice(0, 7), [
+    'Split 42: 42 = 40 + 2.',
+    '40 × 8 = 320',
+    'Base 60: [5, 20] = 5 × 60 + 20',
+    '2 × 8 = 16',
+    'Add: 320 + 16 = 336.',
+    'Therefore 42 × 8 = 336',
+    'Base 60: [5, 36] = 5 × 60 + 36.',
+  ]);
   assert.doesNotMatch(html, /40 × 8 = 5, 20|42 × 8 = 5, 36/);
 });
 
