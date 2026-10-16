@@ -5,7 +5,6 @@ import type { OperationLesson, OperationPart } from './operation-lessons';
 import { arithmeticColumns } from './operation-lessons';
 import { baseDigits, calculate, rational } from './numbers';
 import { represent } from './format';
-import { yorubaConstruction } from './spoken';
 import type { CalculationWorkspace } from './arithmetic-workspace';
 
 const names = {
@@ -602,7 +601,7 @@ function yoruba(
     gap = anchor - a;
   const start = part(
     system,
-    `Keep the counting units fixed. The first quantity is ${words(system, a)}${yorubaConstruction(a) ? `; its documented name structure is ${yorubaConstruction(a)}` : ''}. For this calculation use groups of twenty, with tens and fives when convenient.`,
+    `Keep the counting units fixed. The first quantity is ${words(system, a)}. Work directly with its twenty-groups, tens, and fives.`,
     a,
   );
   if (operation === 'add') {

@@ -312,7 +312,7 @@ test('non-decimal calculators lead with native working and keep decimal readings
       await expect(lesson.locator('.math-decimal-hint').first()).toBeVisible();
       if (equation) await expect(lesson.locator('.math-equation')).toHaveText(equation);
       expect((await lesson.locator('.math-steps li > p').allTextContents()).join(' ')).not.toMatch(
-        /42 × 8 = 336|320 \+ 16 = 336/,
+        /42 × 8 = 336|320 \+ 16 = 336|documented name structure/,
       );
       await expect(page.locator('#output-equation')).toBeHidden();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
