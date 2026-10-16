@@ -118,7 +118,7 @@ export function renderLearningGuide(system: SystemDefinition, glyphs: GlyphSet):
       'Number words are the signs in this tradition. This dictionary shows the documented words and their meanings, preserving the spelling used by the sources. Some words name whole groups or connect parts of a number.';
   if (bodyCount)
     note =
-      'Follow positions 1–27 in order. Each close-up highlights the body part to touch; the ring marks the counting point. Begin on either side, pass through the nose at 14, then continue down the other side.';
+      'Follow positions 1–27 in order. Each close-up highlights the body part to touch; the dot marks the counting point. Begin on either side, pass through the nose at 14, then continue down the other side.';
   const dictionary = words.length
     ? `<dl class="word-dictionary" aria-label="${escapeHTML(system.name)} number-word dictionary">${words.map(({ word, meaning }) => `<div class="word-entry"><dt${spokenLanguage(system) ? ` lang="${spokenLanguage(system)}"` : ''}>${escapeHTML(word)}</dt><dd>${escapeHTML(meaning)}</dd></div>`).join('')}</dl>`
     : '';
