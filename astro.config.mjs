@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 export default defineConfig({
-  site: 'https://cumputersluts.github.io',
+  site: 'https://chrischuck.github.io',
   base: '/ancient-numbers',
   trailingSlash: 'always',
   output: 'static',
