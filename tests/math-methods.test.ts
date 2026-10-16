@@ -369,7 +369,7 @@ test('Babylonian multiplication combines native table entries without decimal wo
   assert.match(html, /Look up \[40\] × \[7\] = \[4, 40\]/);
   assert.match(html, /Look up \[7\] × \[7\] = \[49\]/);
   assert.match(html, /The product is \[5, 29\]/);
-  assert.match(html, /Decimal hint: 329/);
+  assert.match(html, /<small class="math-decimal-hint">329<\/small>/);
   assert.doesNotMatch(html, /reciprocal|Division ·|formation-steps/);
 });
 
@@ -378,8 +378,28 @@ test('Babylonian 42 times 8 uses separate native steps and small decimal hints',
   assert.match(html, /Look up \[40\] × \[8\] = \[5, 20\]/);
   assert.match(html, /\[20\] \+ \[16\] = \[36\]/);
   assert.match(html, /The product is \[5, 36\]/);
-  assert.match(html, /<small class="math-decimal-hint">Decimal hint: 320<\/small>/);
+  assert.match(html, /<small class="math-decimal-hint">320<\/small>/);
   assert.doesNotMatch(html, /<p>[^<]*(?:320|336)/);
+  assert.doesNotMatch(
+    html,
+    /Decimal hint|facsimile|displayed facts|learned multiplication table entries/i,
+  );
+});
+
+test('Babylonian multiplication introduces the actual table before asking for its rows', async () => {
+  const entry = system('babylonian');
+  const html = renderMathReasoning(
+    entry,
+    rational(504n),
+    { first: rational(63n), second: rational(8n), operation: 'multiply' },
+    await loadGlyphs(entry.region),
+  );
+  assert.match(html, /one sixty and three/);
+  assert.ok(html.indexOf('Table of [8]') < html.indexOf('<ol class="math-steps">'));
+  assert.match(html, /<details class="math-table-more"><summary>Full table · 1–20, 30, 40, 50/);
+  assert.match(html, /Combine the places: \[24\] \+ \[8, 0\] = \[8, 24\]/);
+  assert.match(html, /\[8, 24\]/);
+  assert.match(html, /<svg/);
 });
 
 test('rod multiplication follows Sunzi’s rows, while division shifts a divisor and retains its remainder', async () => {
@@ -505,12 +525,12 @@ test('Babylonian division keeps reciprocal multiplication and fractional scale s
   const regular = worked('babylonian', 54n, 6n, 'divide');
   assert.match(regular, /\[6\] ↔ \[0; 10\]/);
   assert.match(regular, /\[54\] × \[0; 10\]/);
-  assert.match(regular, /terminating base-60 expansion/);
+  assert.match(regular, /terminates in base 60/);
   const irregular = worked('babylonian', 1n, 7n, 'divide');
   assert.match(irregular, /8, 34, 17, 8, 34, 17, …/);
   assert.match(irregular, /does not terminate in base 60/);
-  assert.match(irregular, /fraction result here stays exact/);
-  assert.match(irregular, /not an exact finite reciprocal/);
+  assert.match(irregular, /fraction below is exact/);
+  assert.match(irregular, /dots mark an approximation/);
 });
 
 test('Maya exercises carry twenty while Roman writing exposes subtractive groups', () => {

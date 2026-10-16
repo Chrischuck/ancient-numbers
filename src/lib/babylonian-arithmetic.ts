@@ -1,5 +1,5 @@
 import { babylonianTables, babylonianReciprocals } from '../data/babylonian-tables';
-import type { OperationLesson, OperationPart } from './operation-lessons';
+import type { OperationLesson, OperationPart, OperationTable } from './operation-lessons';
 import type { SystemDefinition, RenderToken, Source } from './types';
 import { baseDigits, rational, formatNumber } from './numbers';
 import { boundNativeParts, nativePicture } from './native-arithmetic';
@@ -46,6 +46,48 @@ function fixedReading(digits: readonly number[], scale: number, approximate = fa
 export interface BabylonianProductTrace {
   digits: number[];
   parts: OperationPart[];
+  tables: OperationTable[];
+}
+
+function multiplicationTable(principal: number, selected: Set<number>): OperationTable {
+  return {
+    caption: `Table of ${reading([principal])}`,
+    headings: [`Times ${reading([principal])}`, 'Product'],
+    fullLabel: 'Full table · 1–20, 30, 40, 50',
+    rows: Object.entries(babylonianTables[principal]).map(([row, digits]) => ({
+      selected: selected.has(Number(row)),
+      cells: [
+        { text: reading([Number(row)]), tokens: pictures([Number(row)]) },
+        {
+          text: reading(digits),
+          tokens: pictures(digits),
+          hint: digits.length > 1 ? String(valueOf(digits)) : undefined,
+        },
+      ],
+    })),
+  };
+}
+
+function reciprocalTable(divisor: bigint): OperationTable {
+  return {
+    caption: 'Reciprocal table',
+    headings: ['Number', 'Reciprocal'],
+    fullLabel: 'Full reciprocal table',
+    rows: Object.entries(babylonianReciprocals).map(([number, digits]) => ({
+      selected: number === String(divisor),
+      cells: [
+        {
+          text: reading(baseDigits(BigInt(number), 60)),
+          tokens: pictures(baseDigits(BigInt(number), 60)),
+        },
+        {
+          text: fixedReading(digits, digits.length),
+          tokens: pictures([0, ...digits], digits.length),
+          hint: `1/${number}`,
+        },
+      ],
+    })),
+  };
 }
 function rowParts(digit: number): number[] {
   return digit <= 20 || digit % 10 === 0 ? [digit] : [Math.floor(digit / 10) * 10, digit % 10];
@@ -79,6 +121,7 @@ export function babylonianProductTrace(
     throw new RangeError('A sexagesimal digit must be between zero and fifty-nine.');
   let accumulator = [0];
   const parts: OperationPart[] = [];
+  const consulted = new Map<number, Set<number>>();
   const l = [...left].reverse(),
     r = [...right].reverse();
   for (let i = 0; i < l.length; i++)
@@ -90,23 +133,33 @@ export function babylonianProductTrace(
         parts.push({
           text:
             babylonianTables[r[j]] || babylonianTables[l[i]]
-              ? `Use ${facts.map((f) => reading([f.row])).join(' and ')} rows of the ${reading([principal])} table for this digit product.`
-              : `Neither digit has a listed standard single-place table here. Separate their ten-wedges and unit-wedges, then use the listed component tables.`,
+              ? `Use ${facts.map((f) => reading([f.row])).join(' and ')} rows of the ${reading([principal])} table.`
+              : 'Split the digits into tens and units to use the tables above.',
         });
       }
       for (const fact of facts) {
+        const principal = babylonianTables[fact.principal]
+          ? fact.principal
+          : fact.identity && babylonianTables[fact.row]
+            ? fact.row
+            : undefined;
+        if (principal !== undefined) {
+          const selected = consulted.get(principal) ?? new Set<number>();
+          selected.add(principal === fact.principal ? fact.row : 1);
+          consulted.set(principal, selected);
+        }
         const product = [...fact.digits];
         parts.push({
           text: fact.identity
-            ? `${reading([fact.row])} × ${reading([fact.principal])} = ${reading(product)}. Multiplying by one keeps the same wedge group.`
+            ? `${reading([fact.row])} × ${reading([fact.principal])} = ${reading(product)}.`
             : `Look up ${reading([fact.row])} × ${reading([fact.principal])} = ${reading(product)}.`,
           tokens: pictures(product),
-          hint: String(valueOf(product)),
+          hint: product.length > 1 ? String(valueOf(product)) : undefined,
         });
         const shifted = [...product, ...Array(i + j).fill(0)];
         if (i + j)
           parts.push({
-            text: `Move this product ${i + j === 1 ? 'one place' : `${i + j} places`} left to match the factors’ places: ${reading(shifted)}. Empty places stay open.`,
+            text: `Shift ${i + j === 1 ? 'one place' : `${i + j} places`} left: ${reading(shifted)}.`,
             tokens: pictures(shifted),
             hint: String(valueOf(shifted)),
           });
@@ -117,6 +170,8 @@ export function babylonianProductTrace(
         const a = [...accumulator].reverse(),
           b = [...shifted].reverse(),
           sum: number[] = [];
+        const previous = accumulator;
+        const stepCount = parts.length;
         let carry = 0;
         for (let k = 0; k < Math.max(a.length, b.length) || carry; k++) {
           const incoming = carry,
@@ -126,9 +181,10 @@ export function babylonianProductTrace(
           const digit = raw % 60;
           carry = Math.floor(raw / 60);
           sum.push(digit);
+          if ((!x || !y) && !incoming && !carry) continue;
           const place = k === 0 ? 'units' : k === 1 ? 'sixties' : `sexagesimal place ${k + 1}`;
           parts.push({
-            text: `In ${place}: ${reading([x])} + ${reading([y])}${incoming ? ` + ${reading([incoming])} carried` : ''} = ${reading(carry ? [carry, digit] : [digit])}.\n${carry ? 'Exchange sixty units for one in the next place. ' : ''}Keep ${reading([digit])} here${carry ? ` and carry ${reading([carry])} left` : ''}.`,
+            text: `In ${place}: ${reading([x])} + ${reading([y])}${incoming ? ` + ${reading([incoming])} carried` : ''} = ${reading(carry ? [carry, digit] : [digit])}.${carry ? '\nExchange sixty units for one in the next place.' : ''}`,
             tokens: [
               {
                 glyph: `babylonian-${digit}`,
@@ -136,18 +192,25 @@ export function babylonianProductTrace(
                 label: `${digit} in the ${place} place`,
               },
             ],
-            hint: String(raw),
           });
         }
         accumulator = normalize(sum.reverse());
         parts.push({
-          text: `The collected groups are ${reading(accumulator)}.`,
+          text:
+            parts.length === stepCount
+              ? `Combine the places: ${reading(previous)} + ${reading(shifted)} = ${reading(accumulator)}.`
+              : `Together: ${reading(accumulator)}.`,
           tokens: pictures(accumulator),
           hint: String(valueOf(accumulator)),
         });
       }
     }
-  return { digits: accumulator, parts };
+  if (parts.at(-1)?.text === `Together: ${reading(accumulator)}.`) parts.pop();
+  return {
+    digits: accumulator,
+    parts,
+    tables: [...consulted].map(([principal, selected]) => multiplicationTable(principal, selected)),
+  };
 }
 
 export function babylonianNativeLesson(
@@ -160,14 +223,14 @@ export function babylonianNativeLesson(
   const left = baseDigits(a, 60),
     right = baseDigits(b, 60);
   const notes = [
-    'Bracketed place groups, commas, semicolons and explicit scale are modern reading aids. They identify the Babylonian wedge groups used at every stage.',
-    'An empty place is a gap, not an invented Old Babylonian zero sign. Decimal hints label a quantity only; they are not steps in the calculation.',
+    'Brackets and place labels help read the wedges. A semicolon separates whole and fractional places; an empty place stays blank.',
+    'School tablets list multiples 1–20, then 30, 40 and 50. The table values here follow that pattern.',
   ];
   if (operation === 'multiply') {
     const trace = babylonianProductTrace(left, right);
     const parts: OperationPart[] = [
       {
-        text: `Work with ${reading(left)} and ${reading(right)}. Use learned multiplication table entries, then collect the wedge groups in matching places.`,
+        text: `Multiply ${reading(left)} by ${reading(right)}.`,
         tokens: nativePicture(system, a),
         hint: `${a} × ${b}`,
       },
@@ -179,14 +242,15 @@ export function babylonianNativeLesson(
       },
     ];
     return {
-      title: 'Multiplication · Babylonian table entries and wedge groups',
-      text: 'Keep the calculation in sexagesimal places. A table supplies each small product; combine its wedge groups and carry sixty of a place into the next.',
+      title: 'Multiplication · using the tables',
+      text: 'Scribes learned multiplication tables on clay tablets. Use these rows, then add the products.',
       evidence:
-        'Documented table practice, new worked example: school tablets list multiples one through twenty, then thirty, forty and fifty. The displayed facts regenerate that table format; this is not a facsimile of a particular tablet.',
+        'Each place is worth 60 times the one to its right: [1, 3] means one sixty and three.',
       evidenceKind: 'documented',
       equation: `${reading(left)} × ${reading(right)} = ${reading(trace.digits)}`,
       sources,
       notes,
+      referenceTables: trace.tables,
       parts: boundNativeParts(parts),
     };
   }
@@ -226,17 +290,17 @@ export function babylonianNativeLesson(
   const outcome = fixedReading(trace.digits, scale, approximate);
   const parts: OperationPart[] = [
     {
-      text: `Find the reciprocal paired with ${reading(right)}. ${known ? 'Read the standard reciprocal-table pair' : 'This divisor is outside the selected standard pairs; the following worked reciprocal is a teaching extension'}: ${reading(right)} ↔ ${fixedReading(reciprocalDigits, scale, approximate)}.`,
+      text: `${known ? 'Read the pair' : 'Calculate a reciprocal'}: ${reading(right)} ↔ ${fixedReading(reciprocalDigits, scale, approximate)}.`,
       tokens: pictures([0, ...reciprocal], scale),
       hint: `1/${b}`,
     },
     {
-      text: `Division becomes multiplication by that reciprocal:\n${reading(left)} × ${fixedReading(reciprocalDigits, scale, approximate)}.\nKeep its fractional places while using the multiplication tables.`,
+      text: `Multiply by the reciprocal:\n${reading(left)} × ${fixedReading(reciprocalDigits, scale, approximate)}.`,
       tokens: nativePicture(system, a),
     },
     ...trace.parts,
     {
-      text: `The table products have ${scale === 1 ? 'one fractional place' : `${scale} fractional places`}. Read the collected groups at that fractional scale: ${approximate ? 'approximately ' : ''}${outcome}.`,
+      text: `Keep ${scale === 1 ? 'one fractional place' : `${scale} fractional places`}: ${approximate ? 'approximately ' : ''}${outcome}.`,
       tokens: pictures(
         [...Array(Math.max(0, scale + 1 - trace.digits.length)).fill(0), ...trace.digits],
         scale,
@@ -245,17 +309,17 @@ export function babylonianNativeLesson(
     },
     {
       text: approximate
-        ? `${regular === 1n ? 'This reciprocal terminates, but needs more places than this six-place preview.' : 'This reciprocal does not terminate in base 60.'} The ellipsis marks an approximation, not an exact finite reciprocal. The exact fraction result here stays exact in the small hint.`
-        : 'The reciprocal has a terminating base-60 expansion. The sexagesimal result above is exact.',
+        ? `${regular === 1n ? 'This reciprocal terminates, but needs more places than shown.' : 'This reciprocal does not terminate in base 60.'} The dots mark an approximation; the fraction below is exact.`
+        : 'The reciprocal terminates in base 60, so this result is exact.',
       hint: formatNumber(rational(a, b)),
     },
   ];
   return {
     title: 'Division · multiplying by a reciprocal',
-    text: 'Read the reciprocal table, multiply the wedge groups in sexagesimal places, and keep their fractional scale.',
+    text: 'Scribes divided by multiplying by a reciprocal. The paired numbers multiply to one.',
     evidence: known
-      ? 'Documented practice: reciprocal pairs and multiplication tables survive. The placement of the fractional boundary is a modern aid to make the problem’s scale explicit.'
-      : 'Worked extension of reciprocal-table arithmetic: this generated reciprocal is not claimed as a surviving entry. Babylonian tablets attest approximate reciprocals as well as exact pairs.',
+      ? 'The semicolon marks fractional places: [0; 10] means ten sixtieths.'
+      : 'This divisor is outside the standard table; its reciprocal is calculated here.',
     evidenceKind: known ? 'documented' : 'reconstruction',
     equation: `${reading(left)} ÷ ${reading(right)} ${approximate ? '≈' : '='} ${outcome}`,
     sources: [
@@ -266,6 +330,7 @@ export function babylonianNativeLesson(
       },
     ],
     notes,
+    referenceTables: [...(known ? [reciprocalTable(b)] : []), ...trace.tables],
     parts: boundNativeParts(parts),
   };
 }

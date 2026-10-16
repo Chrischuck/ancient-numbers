@@ -251,13 +251,34 @@ for (const width of [320, 390, 1440]) {
     await page.goto('?system=babylonian&number=42&mode=calculate&operation=multiply&second=8');
     await expect(page.locator('#exact-value')).toHaveText('336');
     const lesson = page.locator('#math-reasoning');
+    const reference = lesson.locator('.math-table-reference').first();
+    const preview = reference.locator(':scope > .math-reference-table');
+    await expect(preview.getByRole('caption')).toHaveText('Table of [8]');
+    await expect(preview.locator('tbody tr')).toHaveCount(2);
+    await expect(preview.locator('tbody tr').first()).toContainText('[2]');
+    await expect(preview.locator('tbody tr').last()).toContainText('[40]');
+    const more = reference.locator('.math-table-more');
+    await expect(more).not.toHaveAttribute('open');
+    await more.locator('summary').click();
+    await expect(more.locator('tbody tr')).toHaveCount(23);
+    await expect(more.locator('tbody tr').last()).toContainText('[6, 40]');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+    await more.locator('summary').click();
     const paragraphs = lesson.locator('.math-steps li > p');
     await expect(paragraphs.filter({ hasText: 'Look up [40] × [8] = [5, 20].' })).toBeVisible();
     await expect(paragraphs.filter({ hasText: 'Look up [2] × [8] = [16].' })).toBeVisible();
     await expect(paragraphs.filter({ hasText: 'The product is [5, 36].' })).toBeVisible();
     await expect(
-      lesson.locator('.math-decimal-hint').filter({ hasText: /^Decimal hint: 320$/ }),
+      lesson.locator('.math-steps .math-decimal-hint').filter({ hasText: /^320$/ }),
     ).toBeVisible();
+    await expect(lesson).not.toContainText(/Decimal hint|facsimile|displayed facts/i);
+    expect(
+      await page
+        .locator('.result-caption')
+        .evaluate((element) => getComputedStyle(element, '::before').content),
+    ).not.toContain('Decimal hint');
     const text = await paragraphs.allTextContents();
     expect(text.join(' ')).not.toMatch(/320|336|convert|decimal/);
     const boxes = await paragraphs.evaluateAll((elements) =>

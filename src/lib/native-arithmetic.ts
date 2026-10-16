@@ -247,7 +247,7 @@ export function nativePositionalLesson(
   const quotientRemainder = operation === 'divide' ? a % b : 0n;
   return {
     title: `${names[operation]} · ${system.id === 'kaktovik' ? 'twenty-place strokes and beads' : system.id === 'maya' ? 'dot-and-bar places' : `${system.name} digit arithmetic`}`,
-    text: `Use the selected numerals and their place exchanges. Small decimal hints identify quantities; they do not supply the working steps.`,
+    text: 'Use the selected numerals and their place exchanges.',
     evidence: `${evidenceLabels[profile.evidence[operation]]}: ${profile.operationNotes[operation]}`,
     evidenceKind: profile.evidence[operation],
     sources: profile.sources,

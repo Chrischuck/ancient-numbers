@@ -2483,9 +2483,6 @@ h2 {
   font-size: 11px;
   color: var(--paper);
 }
-.result-caption.is-decimal-hint::before {
-  content: 'Decimal hint: ';
-}
 .math-table tr.selected {
   background: var(--green-light);
 }
@@ -2604,6 +2601,81 @@ h2 {
     color: var(--ink);
     font-weight: 400;
   }
+}
+.math-table.math-reference-table table {
+  display: table;
+  table-layout: fixed;
+  min-width: 0;
+  font-size: 13px;
+}
+.math-reference-table caption {
+  display: table-caption;
+  color: var(--ink);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.math-reference-table thead {
+  position: static;
+  display: table-header-group;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  white-space: normal;
+}
+.math-reference-table tbody {
+  display: table-row-group;
+}
+.math-reference-table tbody tr {
+  display: table-row;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.math-reference-table tbody tr.selected {
+  background: var(--green-light);
+}
+.math-reference-table th,
+.math-reference-table td {
+  display: table-cell;
+  padding: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.math-reference-table .math-cell-label {
+  display: none;
+}
+.math-reference-table .math-step-signs {
+  margin: 0 0 4px;
+}
+.math-reference-table .specimen {
+  gap: 4px;
+}
+.math-reference-table .math-decimal-hint {
+  margin: 4px 0 0;
+}
+.math-table-reference > .math-table {
+  margin-bottom: 0;
+}
+.math-table-more {
+  margin-bottom: 20px;
+}
+.math-table-more > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--green);
+  font-size: 12px;
+  cursor: pointer;
+}
+.math-table-more > summary::before {
+  content: '+';
+  font-size: 18px;
+}
+.math-table-more[open] > summary::before {
+  content: '−';
 }
 .gesture-grid {
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));

@@ -54,7 +54,7 @@ export function mayaProductLesson(system: SystemDefinition, a: bigint, b: bigint
     sources,
     notes: [
       'This lesson uses ordinary powers of twenty: 1, 20, 400 and so on. The Long Count calendar’s 360-day third position requires different exchanges.',
-      'The dots, bars and shell use the selected Maya repertoire. Small decimal hints identify quantities for comparison. Bracketed working values and the dot-and-bar grid remain vigesimal throughout.',
+      'The dots, bars and shell use the selected Maya repertoire. Bracketed values and the grid use base twenty.',
     ],
   };
 

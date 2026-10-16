@@ -13,6 +13,15 @@ export interface OperationPart {
   tokens?: RenderToken[];
   workspace?: CalculationWorkspace;
 }
+export interface OperationTable {
+  caption: string;
+  headings: string[];
+  rows: {
+    selected?: boolean;
+    cells: { text: string; hint?: string; tokens?: RenderToken[] }[];
+  }[];
+  fullLabel?: string;
+}
 export interface OperationLesson {
   title: string;
   text: string;
@@ -22,14 +31,8 @@ export interface OperationLesson {
   parts?: OperationPart[];
   notes?: string[];
   sources: Source[];
-  table?: {
-    caption: string;
-    headings: string[];
-    rows: {
-      selected?: boolean;
-      cells: { text: string; hint?: string; tokens?: RenderToken[] }[];
-    }[];
-  };
+  table?: OperationTable;
+  referenceTables?: OperationTable[];
 }
 interface Calculation {
   first: Rational;

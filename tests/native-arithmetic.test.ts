@@ -51,6 +51,35 @@ test('42 times 8 stays sexagesimal in the working and confines decimal equivalen
   assert.ok(lesson.parts!.some((p) => p.hint === '320'));
   assert.equal(lesson.parts!.at(-1)!.hint, '336');
 });
+test('Babylonian lessons expose complete tables and identify the rows used by the current operands', () => {
+  const multiplication = babylonianNativeLesson(system('babylonian'), 63n, 8n, 'multiply');
+  const table = multiplication.referenceTables![0];
+  assert.equal(table.caption, 'Table of [8]');
+  assert.equal(table.rows.length, 23);
+  assert.deepEqual(
+    table.rows.filter((row) => row.selected).map((row) => row.cells.map((cell) => cell.text)),
+    [
+      ['[1]', '[8]'],
+      ['[3]', '[24]'],
+    ],
+  );
+  assert.deepEqual(
+    table.rows.at(-1)!.cells.map((cell) => cell.text),
+    ['[50]', '[6, 40]'],
+  );
+  const split = babylonianNativeLesson(system('babylonian'), 42n, 8n, 'multiply');
+  assert.deepEqual(
+    split.referenceTables![0].rows.filter((row) => row.selected).map((row) => row.cells[0].text),
+    ['[2]', '[40]'],
+  );
+  const division = babylonianNativeLesson(system('babylonian'), 54n, 6n, 'divide');
+  const reciprocal = division.referenceTables![0];
+  assert.equal(reciprocal.caption, 'Reciprocal table');
+  assert.deepEqual(
+    reciprocal.rows.filter((row) => row.selected).map((row) => row.cells.map((cell) => cell.text)),
+    [['[6]', '[0; 10]']],
+  );
+});
 test('standard reciprocal pairs are exact at the supplied whole-divisor scale', () => {
   for (const [divisor, digits] of Object.entries(babylonianReciprocals))
     assert.equal(value(digits) * BigInt(divisor), 60n ** BigInt(digits.length));

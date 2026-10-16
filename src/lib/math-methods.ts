@@ -40,6 +40,7 @@ interface Method extends Explanation {
   evidence?: string;
   evidenceKind?: EvidenceKind;
   table?: OperationLesson['table'];
+  referenceTables?: OperationLesson['referenceTables'];
 }
 
 // These limits bound the *teaching explanation*, not the calculator's exact arithmetic.
@@ -524,30 +525,35 @@ function renderOperation(worked: Method, glyphs?: GlyphSet): string {
               .map((line) => `<p>${escapeHTML(line)}</p>`)
               .join(
                 '',
-              )}${part.hint ? `<small class="math-decimal-hint">Decimal hint: ${escapeHTML(part.hint)}</small>` : ''}</li>`,
+              )}${part.hint ? `<small class="math-decimal-hint">${escapeHTML(part.hint)}</small>` : ''}</li>`,
         )
         .join('')}</ol>`
     : '';
-  const table = worked.table
-    ? `<div class="math-table" data-columns="${worked.table.headings.length}" role="region" aria-label="${escapeHTML(worked.table.caption)}" tabindex="0"><table role="table"><caption>${escapeHTML(worked.table.caption)}</caption><thead><tr role="row">${worked.table.headings.map((heading) => `<th scope="col" role="columnheader">${escapeHTML(heading)}</th>`).join('')}</tr></thead><tbody>${worked.table.rows
-        .map(
-          (row) =>
-            `<tr role="row"${row.selected ? ' class="selected"' : ''}>${row.cells
-              .map(
-                (cell, index) =>
-                  `<td role="cell"><span class="math-cell-label" aria-hidden="true">${escapeHTML(worked.table!.headings[index] ?? '')}</span><div class="math-cell-content">${illustration(cell.tokens, cell.text)}${cell.text
-                    .split('\n')
-                    .map((line) => `<span class="math-cell-line">${escapeHTML(line)}</span>`)
-                    .join(
-                      '',
-                    )}${cell.hint ? `<small class="math-decimal-hint">Decimal hint: ${escapeHTML(cell.hint)}</small>` : ''}</div></td>`,
-              )
-              .join('')}</tr>`,
-        )
-        .join('')}</tbody></table></div>`
-    : '';
-  const methodSources = (worked.sources ?? []).filter((source) => /^https?:\/\//.test(source.url));
-  return `<h3>${escapeHTML(worked.title)}</h3><p>${escapeHTML(worked.text)}</p>${worked.evidence ? `<p class="math-evidence"${worked.evidenceKind ? ` data-evidence="${worked.evidenceKind}"` : ''}>${escapeHTML(worked.evidence)}</p>` : ''}${table}${steps}${worked.equation ? `<p class="math-equation">${escapeHTML(worked.equation)}</p>` : ''}${methodSources.length ? `<p class="math-method-sources">${methodSources.map((source) => `<a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.title)}</a>`).join(' · ')}</p>` : ''}`;
+  const renderTable = (table: NonNullable<Method['table']>, reference = false): string =>
+    `<div class="math-table${reference ? ' math-reference-table' : ''}" data-columns="${table.headings.length}" role="region" aria-label="${escapeHTML(table.caption)}" tabindex="0"><table role="table"><caption>${escapeHTML(table.caption)}</caption><thead><tr role="row">${table.headings.map((heading) => `<th scope="col" role="columnheader">${escapeHTML(heading)}</th>`).join('')}</tr></thead><tbody>${table.rows
+      .map(
+        (row) =>
+          `<tr role="row"${row.selected ? ' class="selected"' : ''}>${row.cells
+            .map(
+              (cell, index) =>
+                `<td role="cell"><span class="math-cell-label" aria-hidden="true">${escapeHTML(table.headings[index] ?? '')}</span><div class="math-cell-content">${illustration(cell.tokens, cell.text)}${cell.text
+                  .split('\n')
+                  .map((line) => `<span class="math-cell-line">${escapeHTML(line)}</span>`)
+                  .join(
+                    '',
+                  )}${cell.hint ? `<small class="math-decimal-hint">${escapeHTML(cell.hint)}</small>` : ''}</div></td>`,
+            )
+            .join('')}</tr>`,
+      )
+      .join('')}</tbody></table></div>`;
+  const table = worked.table ? renderTable(worked.table) : '';
+  const references = (worked.referenceTables ?? [])
+    .map((reference) => {
+      const used = reference.rows.filter((row) => row.selected);
+      return `<div class="math-table-reference">${renderTable({ ...reference, rows: used.length ? used : reference.rows.slice(0, 3) }, true)}<details class="math-table-more"><summary>${escapeHTML(reference.fullLabel ?? 'Full table')}</summary>${renderTable(reference, true)}</details></div>`;
+    })
+    .join('');
+  return `<h3>${escapeHTML(worked.title)}</h3><p>${escapeHTML(worked.text)}</p>${worked.evidence ? `<p class="math-evidence"${worked.evidenceKind ? ` data-evidence="${worked.evidenceKind}"` : ''}>${escapeHTML(worked.evidence)}</p>` : ''}${references}${table}${steps}${worked.equation ? `<p class="math-equation">${escapeHTML(worked.equation)}</p>` : ''}`;
 }
 
 /** Render a bounded, source-linked worked example without changing calculator arithmetic. */
@@ -594,5 +600,5 @@ export function renderMathReasoning(
   const lesson = worked
     ? renderOperation(worked, glyphs)
     : `<h3>${verb} ${escapeHTML(valueText(normalized))} in ${escapeHTML(system.name)}</h3>${renderExplanation(construction!, glyphs)}`;
-  return `<div class="math-reasoning"${worked && calculation ? ` data-operation="${escapeHTML(calculation.operation)}"` : ''}>${lesson}<details class="math-references"><summary>Sources and notation notes</summary>${context.map((note) => `<p class="math-context">${escapeHTML(note)}</p>`).join('')}${sources.length ? `<p class="math-sources">${sources.map((source) => `<a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.title)}</a>`).join(' · ')}</p>` : ''}</details></div>`;
+  return `<div class="math-reasoning"${worked && calculation ? ` data-operation="${escapeHTML(calculation.operation)}"` : ''}>${lesson}<details class="math-references"><summary>Sources and notation notes</summary>${context.map((note) => `<p class="math-context">${escapeHTML(note)}</p>`).join('')}${sources.length ? `<p class="${worked ? 'math-method-sources' : 'math-sources'}">${sources.map((source) => `<a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.title)}</a>`).join(' · ')}</p>` : ''}</details></div>`;
 }
